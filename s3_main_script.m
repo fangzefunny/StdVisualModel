@@ -45,7 +45,6 @@ for data_index = 1: size(alldataset , 2)
     
 end
 
-pred_summary(1:50 , 5 , 1) = BOLD_prediction_69;
 %% Predict BOLD response of SOC model
 
 % load data
@@ -60,25 +59,22 @@ save('para_summary' , 'para_summary');
 save('pred_summary' , 'pred_summary');
 save('Rsqu_summary' , 'Rsqu_summary');
 
-%%
-save('parameters_69' , 'parameters_69');
-save('BOLD_prediction_69' , 'BOLD_prediction_69');
-save('Rsquare_69' , 'Rsquare_69');
+%% Table 1: R Square
 
-%% Plot the result
+
+%% Plot the result (Figure S)
 
 addpath(genpath(fullfile(pwd,'plot')));
 
 legend_name = {'data', 'Contrast' , 'NormStd' , 'NormVar' , 'NormPower' , 'SOC'};
 
-for data_index = 1%: size(alldataset , 2)
+for data_index = 1: size(alldataset , 2)
      
     % Select the dataset
     which_data = alldataset{data_index};
     
     plot_BOLD(which_data , pred_summary(: , : , data_index) , legend_name);
-    
-    title('V2')
+
 end
 
 
