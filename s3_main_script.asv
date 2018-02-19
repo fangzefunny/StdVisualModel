@@ -36,9 +36,9 @@ for data_index = 1: size(alldataset , 2)
         
         % Parameters Estimation 
         para_summary( : , 1:size(BOLD_prediction, 2) , model_index , data_index) = parameters';
-        % BOLD predictions Prediction 
+        % BOLD_predictions
         pred_summary(1:size(BOLD_prediction, 2) , model_index , data_index) = BOLD_prediction;
-        % Rsquare Summary 
+        % Rsquare
         Rsqu_summary(: , model_index , data_index) = Rsquare;
                
     end
@@ -70,7 +70,6 @@ for data_index = 1: size(alldataset , 2)
     % Select the dataset
     which_data = alldataset{data_index};
     
-    % Plot 
     plot_BOLD(which_data , pred_summary(: , : , data_index) , legend_name);
 
 end
