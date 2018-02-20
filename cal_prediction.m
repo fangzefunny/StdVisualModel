@@ -1,6 +1,10 @@
 function [ para, BOLD_prediction, Rsquare ] = cal_prediction( which_data, which_model, which_type, fittime ,v2_mean_op , data_op ,w_d)
 % This function is used to calculate the BOLD prediction of each dataset.
 
+% The first value means dataset: e.p. Ca69_v1 
+% Second value means model: e.p. std
+% Thrid value means type of the model: e.p. 
+
 % Load the dataset for our training the model
 
 % Go foward to the right fold to get the data
@@ -141,16 +145,16 @@ switch which_type
         
         % calculate normalized energy cording the model  we choose
         switch which_model
-            case 'e'
+            case 'contrast'
                 % Energy model
                 d = E_ori; % ori x example x stimili
-            case 'std'
+            case 'normStd'
                 % std model
                 d = E_ori ./(1 + w.*std(E_ori , 1)); % ori x example x stimili
-            case 'var'
+            case 'normVar'
                 % var model
                 d = E_ori.^2 ./(1 + w^2.*var(E_ori, 1)); % ori x example x stimili
-            case 'power'
+            case 'normPower'
                 d = E_ori.^2./( 1 + w^2.*mean(E_ori.^2, 1)); % ori x example x stimili
             otherwise
                 disp('Please select the right model')

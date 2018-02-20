@@ -3,7 +3,7 @@ function figureM1=plot_BOLD(which_data, all_prediction, legend_name)
 % Create a figure to carry the plot 
 figureM1=figure('units', 'normalized', 'outerposition', [0 0 1 1], 'color',[1 1 1]);
 
-% This the color vectors used 
+% Colors for each model 
 col_vector = {'k' , 'r' , 'b' , 'g' , 'c','y'};
 
 addpath(genpath(fullfile(pwd,'data')));
@@ -24,54 +24,58 @@ switch which_data
         end
         
         
-        % Use bar plot to produce data
+        % Use bar plot to visualize data
         
         b1 = bar(1:50 , v_mean);
         set(b1,'Facecolor', [.7, .7, .7])
         
         hold on
+        
+        % Visualize the data prediction result
         for which_prediction = 1:size( all_prediction ,2)
-            mVec = all_prediction(  : , which_prediction );
-            mVec = mVec';
+            
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
             col = col_vector{which_prediction};
-            scatter(1:50,mVec,'filled','MarkerFaceColor', col)
+            scatter(1:50,model_prediction,'filled','MarkerFaceColor', col)
             
         end
         legend('data', legend_name)
         
         for which_prediction = 1:size( all_prediction ,2)
-            mVec = all_prediction(  : , which_prediction );
-            mVec = mVec';
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
             col = col_vector{which_prediction};
-            plot(1:5, mVec(1:5), col);
+       
+            plot(1:5, model_prediction(1:5), col);
             hold on
-            plot(6:10,mVec(6:10),col);
+            plot(6:10,model_prediction(6:10),col);
             hold on
-            plot(11:15, mVec(11:15), col);
+            plot(11:15, model_prediction(11:15), col);
             hold on
-            plot(16:21, mVec(16:21), col);
+            plot(16:21, model_prediction(16:21), col);
             hold on
-            plot(22:24, mVec(22:24), col);
+            plot(22:24, model_prediction(22:24), col);
             hold on
-            plot(25:27, mVec(25:27), col);
+            plot(25:27, model_prediction(25:27), col);
             hold on
-            plot(28:30, mVec(28:30), col);
+            plot(28:30, model_prediction(28:30), col);
             hold on
-            plot(31:34, mVec(31:34), col);
+            plot(31:34, model_prediction(31:34), col);
             hold on
-            plot(35:38, mVec(35:38), col);
+            plot(35:38, model_prediction(35:38), col);
             hold on
-            plot(39:42, mVec(39:42), col);
+            plot(39:42, model_prediction(39:42), col);
             hold on
-            plot(43:46, mVec(43:46), col);
+            plot(43:46, model_prediction(43:46), col);
             hold on
-            plot(47:50, mVec(47:50), col);
+            plot(47:50, model_prediction(47:50), col);
             hold on
             
         end
         
         
-        
+        % Label the group
         set(gca,'xtick',[1, 6,11,16,22,25,28,31,35,39,43,47]);
         set(gca,'XTickLabel',{'Patterns-Sparsity','Grating-Sparsity','NoiseBars-Sparsity','Waves-Sparisity','Grating-Orientation','Noisebar-Orientation','Waves-Orientation','Grating-cross','Grating-Contrast','Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'});
         
@@ -80,8 +84,11 @@ switch which_data
         set (gca,'position',[0.1,0.2,.8,.75] );
         box off
         hold on
+        
+        % The legend of the line 
         g=max(v_mean)*1;
         
+        % 
         line([5.4,5.4],[0,g])
         hold on
         line([10.4,10.4],[0,g])
@@ -130,41 +137,41 @@ switch which_data
         
         hold on
         for which_prediction = 1:size( all_prediction ,2)
-            mVec = all_prediction(  : , which_prediction );
-            mVec = mVec';
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
             col = col_vector{which_prediction};
-            scatter(1:48,mVec(1:48),'filled','MarkerFaceColor', col)
+            scatter(1:48,model_prediction(1:48),'filled','MarkerFaceColor', col)
         end
         legend('data', legend_name)
         
         for which_prediction = 1:size( all_prediction ,2)
-            mVec = all_prediction(  : , which_prediction );
-            mVec = mVec';
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
             col = col_vector{which_prediction};
             hold on
-            plot(1:5, mVec(1:5), col);
+            plot(1:5, model_prediction(1:5), col);
             hold on
-            plot(6:10, mVec(6:10), col);
+            plot(6:10, model_prediction(6:10), col);
             hold on
-            plot(11:15, mVec(11:15), col);
+            plot(11:15, model_prediction(11:15), col);
             hold on
-            plot(16:19, mVec(16:19), col);
+            plot(16:19, model_prediction(16:19), col);
             hold on
-            plot(20:22, mVec(20:22), col);
+            plot(20:22, model_prediction(20:22), col);
             hold on
-            plot(23:25, mVec(23:25), col);
+            plot(23:25, model_prediction(23:25), col);
             hold on
-            plot(26:28, mVec(26:28), col);
+            plot(26:28, model_prediction(26:28), col);
             hold on
-            plot(29:32, mVec(29:32), col);
+            plot(29:32, model_prediction(29:32), col);
             hold on
-            plot(33:36, mVec(33:36), col);
+            plot(33:36, model_prediction(33:36), col);
             hold on
-            plot(37:40, mVec(37:40), col);
+            plot(37:40, model_prediction(37:40), col);
             hold on
-            plot(41:44, mVec(41:44), col);
+            plot(41:44, model_prediction(41:44), col);
             hold on
-            plot(45:48, mVec(45:48), col);
+            plot(45:48, model_prediction(45:48), col);
         end
         
         set(gca,'xtick',[1, 6,11,16,22,25,28,31,35,39,43,47]);
@@ -214,31 +221,31 @@ switch which_data
         
         hold on
         for which_prediction = 1:size( all_prediction ,2)
-            mVec = all_prediction(  : , which_prediction );
-            mVec = mVec';
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
             col = col_vector{which_prediction};
-            scatter(1:39,mVec(1:39),'filled','MarkerFaceColor', col)
+            scatter(1:39,model_prediction(1:39),'filled','MarkerFaceColor', col)
         end
         legend('data' , legend_name)
         
         for which_prediction = 1:size( all_prediction ,2)
-            mVec = all_prediction(  : , which_prediction );
-            mVec = mVec';
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
             col = col_vector{which_prediction};
             hold on
-            plot(1:8, mVec(1:8), col );
+            plot(1:8, model_prediction(1:8), col );
             hold on
-            plot(9:12,mVec(9:12), col );
+            plot(9:12,model_prediction(9:12), col );
             hold on
-            plot(13:16, mVec(13:16), col );
+            plot(13:16, model_prediction(13:16), col );
             hold on
-            plot(17:20, mVec(17:20), col );
+            plot(17:20, model_prediction(17:20), col );
             hold on
-            plot(21:30, mVec(21:30), col );
+            plot(21:30, model_prediction(21:30), col );
             hold on
-            plot(31:35, mVec(31:35), col );
+            plot(31:35, model_prediction(31:35), col );
             hold on
-            plot(36:39, mVec(36:39), col );
+            plot(36:39, model_prediction(36:39), col );
             
         end
         
@@ -279,31 +286,31 @@ switch which_data
         
         hold on
         for which_prediction = 1:size( all_prediction ,2)
-            mVec = all_prediction(  : , which_prediction );
-            mVec = mVec';
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
             col = col_vector{which_prediction};
-            scatter(1:39,mVec(1:39),'filled','MarkerFaceColor', col)
+            scatter(1:39,model_prediction(1:39),'filled','MarkerFaceColor', col)
         end
         legend('data',legend_name)
         
         for which_prediction = 1:size( all_prediction ,2)
-            mVec = all_prediction(  : , which_prediction );
-            mVec = mVec';
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
             col = col_vector{which_prediction};
             hold on
-            plot(1:8, mVec(1:8), col );
+            plot(1:8, model_prediction(1:8), col );
             hold on
-            plot(9:12,mVec(9:12), col );
+            plot(9:12,model_prediction(9:12), col );
             hold on
-            plot(13:16, mVec(13:16), col );
+            plot(13:16, model_prediction(13:16), col );
             hold on
-            plot(17:20, mVec(17:20), col );
+            plot(17:20, model_prediction(17:20), col );
             hold on
-            plot(21:30, mVec(21:30), col );
+            plot(21:30, model_prediction(21:30), col );
             hold on
-            plot(31:35, mVec(31:35), col );
+            plot(31:35, model_prediction(31:35), col );
             hold on
-            plot(36:39, mVec(36:39), col );
+            plot(36:39, model_prediction(36:39), col );
             
         end
         

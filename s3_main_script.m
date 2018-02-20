@@ -4,8 +4,8 @@ clear all; close all;clc
 %% Set up the dataset and the models we are going to test
 
 alldataset = {'Ca69_v1' , 'Ca05_v1' , 'K1_v1' , 'K2_v1' , 'Ca69_v2' , 'Ca05_v2' , 'K1_v2' , 'K2_v2' , 'Ca69_v3' , 'Ca05_v3' , 'K1_v3' , 'K2_v3'};
-allmodel = {'e' ,  'std' , 'var' , 'power'};%   , 'SOC'
-alltype = {'orientation' , 'orientation' , 'orientation' , 'orientation' };% 'space'};
+allmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower' , 'SOC'}
+alltype = {'orientation' , 'orientation' , 'orientation' , 'orientation' , 'space'};
 
 % How many random start points.
 fittime  = 5;
@@ -13,9 +13,9 @@ fittime  = 5;
 %% Predict the BOLD response of given stimuli
 
 % Create empty matrix
-para_summary = zeros(3 , 50 , size(allmodel , 2) , size(alldataset , 2));
-pred_summary = zeros(50 , size(allmodel , 2) , size(alldataset , 2));
-Rsqu_summary =  zeros(1 , size(allmodel , 2) , size(alldataset , 2));
+para_summary = zeros(3 , 50 , size(allmodel , 2) , size(alldataset , 2)); % 3(w or c or none) x n_stimuli x n_model x n_data 
+pred_summary = zeros(50 , size(allmodel , 2) , size(alldataset , 2)); %  n_stimuli x n_model x n_data 
+Rsqu_summary =  zeros(1 , size(allmodel , 2) , size(alldataset , 2));  % 1(R) x n_model x n_data
 
 
 for data_index = 1: size(alldataset , 2)
@@ -63,7 +63,7 @@ showRsquare = squeeze( Rsqu_summary )
 
 addpath(genpath(fullfile(pwd,'plot')));
 
-legend_name = {'data', 'Contrast' , 'NormStd' , 'NormVar' , 'NormPower' , 'SOC'};
+legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'};
 
 for data_index = 1: size(alldataset , 2)
      
