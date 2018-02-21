@@ -13,9 +13,9 @@ fittime  = 5;
 %% Predict the BOLD response of given stimuli
 
 % Create empty matrix
-para_summary = zeros(3 , 50 , size(allmodel , 2) , size(alldataset , 2)); % 3(w or c or none) x n_stimuli x n_model x n_data 
-pred_summary = zeros(50 , size(allmodel , 2) , size(alldataset , 2)); %  n_stimuli x n_model x n_data 
-Rsqu_summary =  zeros(1 , size(allmodel , 2) , size(alldataset , 2));  % 1(R) x n_model x n_data
+para_summary_all = zeros(3 , 50 , size(allmodel , 2) , size(alldataset , 2)); % 3(w or c or none) x n_stimuli x n_model x n_data 
+pred_summary_all = zeros(50 , size(allmodel , 2) , size(alldataset , 2)); %  n_stimuli x n_model x n_data 
+Rsqu_summary_all =  zeros(size(allmodel , 2) , size(alldataset , 2));  %  n_model x n_data
 
 
 for data_index = 1: size(alldataset , 2)
@@ -35,25 +35,34 @@ for data_index = 1: size(alldataset , 2)
         [ parameters , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type , fittime);
         
         % Parameters Estimation 
-        para_summary( : , 1:size(BOLD_prediction, 2) , model_index , data_index) = parameters';
+        para_summary_all( : , 1:size(BOLD_prediction, 2) , model_index , data_index) = parameters';
         % BOLD predictions Prediction 
-        pred_summary(1:size(BOLD_prediction, 2) , model_index , data_index) = BOLD_prediction;
+        pred_summary_all(1:size(BOLD_prediction, 2) , model_index , data_index) = BOLD_prediction;
         % Rsquare Summary 
-        Rsqu_summary(: , model_index , data_index) = Rsquare;
+        Rsqu_summary_all( model_index , data_index) = Rsquare;
                
     end
     
 end
 
 %% Save the results 
+save_address = fullfile(pwd, 'results' );
 
-save('para_summary' , 'para_summary');
-save('pred_summary' , 'pred_summary');
-save('Rsqu_summary' , 'Rsqu_summary');
+save([save_address , '\para_summary_all'] , 'para_summary_all');
+save([save_address , '\pred_summary_all'] , 'pred_summary_all');
+save([save_address , '\Rsqu_summary_all'] , 'Rsqu_summary_all');
 
 %% Table 1: R Square
 
-showRsquare = squeeze( Rsqu_summary )
+% V1
+showRsquare_v1 = squeeze( Rsqu_summary_all(: , 1:4) )
+
+% V2
+showRsquare_v2 = squeeze( Rsqu_summary_all(: , 5:8 ) )
+
+% V3
+showRsquare_v3 = squeeze( Rsqu_summary_all(: , 9:12 ) )
+
 
 %% Table 2: Estimated parameters 
 
