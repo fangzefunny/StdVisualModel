@@ -66,9 +66,9 @@ showRsquare_v3 = Rsqu_summary_all(: , 9:12 )
 
 %% Table 2: Estimated parameters
 
-for which_data = 1: size(alldataset , 2) % dataset: (1-4: v1, 5-8: v2 , 9-12:v3)
+for which_data = 1: size(alldataset , 2)
     
-    for which_model  = 1:5 % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
+    for which_model  = 1:5
         
         % all models except contrast model have three parameters.
         if which_model ~= 1
@@ -96,7 +96,7 @@ for which_data = 1: size(alldataset , 2) % dataset: (1-4: v1, 5-8: v2 , 9-12:v3)
         mean_para = [mean(lambda_set(valid_vector)) , mean(g_set(valid_vector)) , mean(n_set(valid_vector))];
         std_para =[ std(lambda_set(valid_vector)) , std(g_set(valid_vector)) , std(n_set(valid_vector)) ];
         
-        showPara_mean( : , which_model , which_data ) =  mean_para'; 
+        showPara_mean( : , which_model , which_data ) =  mean_para'; % parameters x 5 models (1: c
         showPara_std( : , which_model , which_data ) = std_para';
         
     end
@@ -104,12 +104,11 @@ end
     
 
 
-%% Plot the result (Figure S) 
-% Here we choose results from contrast model, std model, SOC model for ploting
+%% Plot the result (Figure S)
 
 addpath(genpath(fullfile(pwd,'plot')));
 
-legend_name = {'data', 'contrast' , 'normStd' , 'SOC'};
+legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'};
 
 for data_index = 1: size(alldataset , 2)
     
@@ -117,8 +116,7 @@ for data_index = 1: size(alldataset , 2)
     which_data = alldataset{data_index};
     
     % Plot
-    plot_BOLD(which_data , pred_summary(: , [1 , 2 , 5]  , data_index) , legend_name); 
-    % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC) 
+    plot_BOLD(which_data , pred_summary(: , : , data_index) , legend_name);
     
 end
 

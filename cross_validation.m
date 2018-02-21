@@ -103,7 +103,7 @@ for knock_index  = knock_out
             para = cal_prediction('new', which_model, which_type, fittime ,mean_vali , E_vali);
                      
             % fix the parameter and predict the leave-out response 
-            w = para(1);
+            lambda = para(1);
             g = para(2);
             n = para(3);
                         
@@ -117,13 +117,13 @@ for knock_index  = knock_out
                     d = E_ori; % ori x example x 1
                 case 'normStd'
                     % normstd model
-                    d = E_ori ./(1 + w.*std(E_ori , 1)); % ori x example x 1
+                    d = E_ori ./(1 + lambda.*std(E_ori , 1)); % ori x example x 1
                 case 'normVar'
                     % normvar model
-                    d = E_ori.^2 ./(1 + w^2.*var(E_ori, 1)); % ori x example x 1
+                    d = E_ori.^2 ./(1 + lambda^2.*var(E_ori, 1)); % ori x example x 1
                 case 'normPower'
                     % normPower model
-                    d = E_ori.^2./( 1 + w^2.*mean(E_ori.^2, 1)); % ori x example x 1
+                    d = E_ori.^2./( 1 + lambda^2.*mean(E_ori.^2, 1)); % ori x example x 1
                 otherwise
                     disp('Please select the right model')
             end
@@ -162,8 +162,8 @@ for knock_index  = knock_out
             v =  (E_space - c*mean(mean(E_space, 1) , 2)).^2; % X x Y x ep x stimuli
             
             % Create a disk to prevent edge effect
-            w = gen_disk(size(E_space , 1) , size(E_space , 3), 1 , 'disk');
-            d = w.*v;  % X x Y x ep x 1
+            lambda = gen_disk(size(E_space , 1) , size(E_space , 3), 1 , 'disk');
+            d = lambda.*v;  % X x Y x ep x 1
             
             % Sum over spatial position
             s = squeeze(mean(mean( d , 1) , 2)); % ep x 1

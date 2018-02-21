@@ -139,7 +139,7 @@ switch which_type
         para(:) = x(trials(1), :);
         
         % Assign the parameter
-        w = para(1);
+        lambda = para(1);
         g = para(2);
         n = para(3);
         
@@ -150,12 +150,12 @@ switch which_type
                 d = E_ori; % ori x example x stimili
             case 'normStd'
                 % std model
-                d = E_ori ./(1 + w.*std(E_ori , 1)); % ori x example x stimili
+                d = E_ori ./(1 + lambda.*std(E_ori , 1)); % ori x example x stimili
             case 'normVar'
                 % var model
-                d = E_ori.^2 ./(1 + w^2.*var(E_ori, 1)); % ori x example x stimili
+                d = E_ori.^2 ./(1 + lambda^2.*var(E_ori, 1)); % ori x example x stimili
             case 'normPower'
-                d = E_ori.^2./( 1 + w^2.*mean(E_ori.^2, 1)); % ori x example x stimili
+                d = E_ori.^2./( 1 + lambda^2.*mean(E_ori.^2, 1)); % ori x example x stimili
             otherwise
                 disp('Please select the right model')
         end
