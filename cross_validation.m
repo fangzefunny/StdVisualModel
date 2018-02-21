@@ -173,8 +173,7 @@ for knock_index  = knock_out
     BOLD_prediction_ind = g.*s.^n; % ep x 1
     
     % Sum over different examples
-    BOLD_prediction(knock_index) = squeeze(mean(BOLD_prediction
-    _ind)); % scalar
+    BOLD_prediction(knock_index) = squeeze(mean(BOLD_prediction_ind)); % scalar
     
     % Collect the parameters
     para_set( knock_index, :) = para;
