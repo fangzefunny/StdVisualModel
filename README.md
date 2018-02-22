@@ -7,4 +7,4 @@ This is new repositories to carry all the data we need
 * Step 2. Run **s2_get_E.m** to calculate the **E** (energy) of model and store them into folder **E**.
 * Step 3. Run **s3_main_script.m** to fit the model and achieve the estimated parameters, lots of tables, figures. 
 
-Note: I have run all the result in subfolder of each target folder **ZF**.
+Note: I have run all the result in subfolder of each target folder **ZF**. If you want to use those data, you need to pull them out of the **ZF** folder.
