@@ -1,4 +1,4 @@
-function [ para, BOLD_prediction, Rsquare ] = cal_prediction( which_data, which_model, which_type, fittime ,v2_mean_op , data_op ,w_d)
+function [ para, BOLD_prediction, Rsquare ] = cal_prediction( which_data, which_model, which_type, fittime ,v2_mean_op , E_op ,w_d)
 % This function is used to calculate the BOLD prediction of each dataset.
 
 % The first value means dataset: e.p. Ca69_v1 
@@ -94,7 +94,7 @@ switch which_type
                 E_ori = E_ori_K;
                 
             case 'new'
-                E_ori = data_op;
+                E_ori = E_op;
                 
             otherwise
                 disp('input the right data')
@@ -169,18 +169,18 @@ switch which_type
         switch which_data
             case {'Ca69_v1' , 'Ca69_v2' , 'Ca69_v3'}
                 load e_xy_69;
-                E_space = e_xy_69;
+                E_space = E_xy_69;
                 
             case {'Ca05_v1' , 'Ca05_v2' , 'Ca05_v3'}
                 load e_xy_05;
-                E_space = e_xy_05;
+                E_space = E_xy_05;
                 
             case {'K1_v1' , 'K1_v2' , 'K1_v3' , 'K2_v1' , 'K2_v2' , 'K2_v3'}
                 load e_xy_K;
-                E_space = e_xy_K;
+                E_space = E_xy_K;
                                
             case 'new'
-                E_space = data_op;
+                E_space = E_op;
                 
             otherwise
                 disp('Please select the right mode for fitting')

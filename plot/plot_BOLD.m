@@ -1,9 +1,9 @@
 function figureM1=plot_BOLD(which_data, all_prediction, legend_name)
 
-% Create a figure to carry the plot 
+% Create a figure to carry the plot
 figureM1=figure('units', 'normalized', 'outerposition', [0 0 1 1], 'color',[1 1 1]);
 
-% Colors for each model 
+% Colors for each model
 col_vector = {'k' , 'r' , 'b' , 'g' , 'c','y'};
 
 addpath(genpath(fullfile(pwd,'data')));
@@ -46,7 +46,7 @@ switch which_data
             model_prediction = all_prediction(  : , which_prediction );
             model_prediction = model_prediction';
             col = col_vector{which_prediction};
-       
+            
             plot(1:5, model_prediction(1:5), col);
             hold on
             plot(6:10,model_prediction(6:10),col);
@@ -85,10 +85,10 @@ switch which_data
         box off
         hold on
         
-        % The legend of the line 
+        % The legend of the line
         g=max(v_mean)*1;
         
-        % 
+        %
         line([5.4,5.4],[0,g])
         hold on
         line([10.4,10.4],[0,g])
@@ -212,7 +212,7 @@ switch which_data
         
     case {'K1_v1' , 'K1_v2' , 'K1_v3'}
         load v_mean_K1
-
+        
         switch which_data
             case 'K1_v1'
                 v_mean = v_mean_K1( 1 , : );
@@ -285,7 +285,7 @@ switch which_data
         
     case {'K2_v1' , 'K2_v2' , 'K2_v3'}
         load v_mean_K2
-
+        
         switch which_data
             case 'K2_v1'
                 v_mean = v_mean_K2( 1 , : );
@@ -353,6 +353,74 @@ switch which_data
         line([35.4,35.4],[0,g])
         hold on
         
+    case {'K1_testSOC_v1' , 'K1_testSOC_v2' , 'K1_testSOC_v3' , 'K2_testSOC_v1' , 'K2_testSOC_v2' , 'K2_testSOC_v3'}
+        load v_mean_K2
+        load v_mean_K1
+        switch which_data
+            case 'K1_testSOC_v1'
+                v_mean = v_mean_K1( 1 , 1:30 );
+            case 'K1_testSOC_v2'
+                v_mean = v_mean_K1( 2 , 1:30 );
+            case 'K1_testSOC_v3'
+                v_mean = v_mean_K1( 3 , 1:30);
+            case 'K2_testSOC_v1'
+                v_mean = v_mean_K2( 1 , 1:30 );
+            case 'K2_testSOC_v2'
+                v_mean = v_mean_K2( 2 , 1:30 );
+            case 'K2_testSOC_v3'
+                v_mean = v_mean_K2( 3 , 1:30);
+        end
+        
+        % Use bar plot to produce data
+        
+        b1 = bar(1:30 , v_mean);
+        set(b1,'Facecolor', [.7, .7, .7])
+        
+        hold on
+        for which_prediction = 1:size( all_prediction ,2)
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
+            col = col_vector{which_prediction};
+            scatter(1:30 ,model_prediction(1:30),'filled','MarkerFaceColor', col)
+        end
+        legend('data',legend_name)
+        
+        for which_prediction = 1:size( all_prediction ,2)
+            model_prediction = all_prediction(  : , which_prediction );
+            model_prediction = model_prediction';
+            col = col_vector{which_prediction};
+            hold on
+            plot(1:8, model_prediction(1:8), col );
+            hold on
+            plot(9:12,model_prediction(9:12), col );
+            hold on
+            plot(13:16, model_prediction(13:16), col );
+            hold on
+            plot(17:20, model_prediction(17:20), col );
+            hold on
+            plot(21:30, model_prediction(21:30), col );
+
+            
+        end
+        
+        set(gca,'xtick',[1, 9,13,17,21]);
+        set(gca,'XTickLabel',{'Grating-Orientation','Grating-Contrast','Chess-Contrast','Dust-Contrast','Pattern-Contrast'});
+        
+        h=gca;
+        th=rotateticklabel(h,90);
+        set (gca,'position',[0.1,0.2,.8,.75] );
+        box off
+        hold on
+        g=max(v_mean)*1.5;
+        
+        line([8.4,8.4],[0,g])
+        hold on
+        line([12.4,12.4],[0,g])
+        hold on
+        line([16.4,16.4],[0,g])
+        hold on
+        line([20.4,20.4],[0,g])
+       
         
     otherwise
         disp('Choose the right dataset')
