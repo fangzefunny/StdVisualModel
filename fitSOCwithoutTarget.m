@@ -6,7 +6,7 @@ v_mean_test = {v_mean_K1(1:30) , v_mean_K2(1:30)}
 %% Choose stimuli
 choose_vector = [1: 30 ];
 for which_mean = 1: 2
-   
+    
     test_E_xy_K = E_xy_K( : , : , : , 1:30);
     v_mean = v_mean_test{which_mean};
     test_v_mean = v_mean
@@ -32,10 +32,10 @@ save([save_address , '\Rsquare_SOC'] , 'Rsquare_SOC');
 addpath(genpath(fullfile(pwd,'plot')));
 allsit = {'K1_testSOC_v1' , 'K1_testSOC_v2' , 'K1_testSOC_v3' ; 'K2_testSOC_v1' , 'K2_testSOC_v2' , 'K2_testSOC_v3'}
 
-    for r =1:3
-        for c= 1:2
-            situations = allsit{r + 2*(c-1)}
-            plot_BOLD(situations , BOLD_prediction_SOC( : , r, c ) , {'data' , 'SOC'});
-        end
+for r =1:3
+    for c= 1:2
+        situations = allsit{r + 2*(c-1)}
+        plot_BOLD(situations , BOLD_prediction_SOC( : , r, c ) , {'data' , 'SOC'});
     end
+end
 
