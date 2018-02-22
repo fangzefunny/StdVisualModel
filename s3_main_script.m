@@ -66,24 +66,24 @@ showRsquare_v3 = Rsqu_summary_all(: , 9:12 )
 
 %% Table 2: Estimated parameters
 
-for which_data = 1: size(alldataset , 2) % dataset: (1-4: v1, 5-8: v2 , 9-12:v3)
+for data_index = 1: size(alldataset , 2) % dataset: (1-4: v1, 5-8: v2 , 9-12:v3)
     
-    for which_model  = 1:5 % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
+    for model_index  = 1:5 % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
         % all models except contrast model have three parameters.
-        if which_model ~= 1
-            lambda_set = para_summary_all( 1 , : , which_model , which_data); % type of parameter x stimuli x which_model x which_data
+        if model_index ~= 1
+            lambda_set = para_summary_all( 1 , : , model_index , data_index); % type of parameter x stimuli x which_model x which_data
         else
             lambda_set = NaN( 1 , size(para_summary_all , 2) , 1 , 1 );
         end
         
-        g_set = para_summary_all( 2 , : , which_model , which_data); % type of parameter x stimuli x which_model x which_data
-        n_set = para_summary_all( 3 , : , which_model , which_data); % type of parameter x stimuli x which_model x which_data
+        g_set = para_summary_all( 2 , : , model_index , data_index); % type of parameter x stimuli x which_model x which_data
+        n_set = para_summary_all( 3 , : , model_index , data_index); % type of parameter x stimuli x which_model x which_data
                 
         % valid vector: not all dataset have 50 valid stimuli, some have 48
         % , and the other have 39
         
-        data_type = mod( which_data , 4 ) 
+        data_type = mod( data_index , 4 ) 
         
         if data_type == 1
             valid_vector = 1:50; %Ca69
@@ -96,8 +96,8 @@ for which_data = 1: size(alldataset , 2) % dataset: (1-4: v1, 5-8: v2 , 9-12:v3)
         mean_para = [mean(lambda_set(valid_vector)) , mean(g_set(valid_vector)) , mean(n_set(valid_vector))];
         std_para =[ std(lambda_set(valid_vector)) , std(g_set(valid_vector)) , std(n_set(valid_vector)) ];
         
-        showPara_mean( : , which_model , which_data ) =  mean_para'; 
-        showPara_std( : , which_model , which_data ) = std_para';
+        showPara_mean( : , model_index , data_index ) =  mean_para'; 
+        showPara_std( : , model_index , data_index ) = std_para';
         
     end
 end
@@ -111,14 +111,23 @@ addpath(genpath(fullfile(pwd,'plot')));
 
 legend_name = {'data', 'contrast' , 'normStd' , 'SOC'};
 
-for data_index = 1: size(alldataset , 2)
+for data_index = 1:size(alldataset , 2)
     
     % Select the dataset
     which_data = alldataset{data_index};
     
     % Plot
-    plot_BOLD(which_data , pred_summary(: , [1 , 2 , 5]  , data_index) , legend_name); 
+    plot_BOLD(which_data , pred_summary_all(: , [1 , 2 , 5]  , data_index) , legend_name); 
     % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC) 
+    
+    switch data_index
+        case { 1 , 2 , 3 , 4 }
+            title('V1')
+        case { 5 , 6 , 7 , 8 }
+            title('V2')
+        case { 9 , 10 , 11 , 12 }
+            title('V3')
+    end
     
 end
 

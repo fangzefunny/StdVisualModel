@@ -212,7 +212,15 @@ switch which_data
         
     case {'K1_v1' , 'K1_v2' , 'K1_v3'}
         load v_mean_K1
-        v_mean = v2_mean_K1;
+
+        switch which_data
+            case 'K1_v1'
+                v_mean = v_mean_K1( 1 , : );
+            case 'K1_v2'
+                v_mean = v_mean_K1( 2 , : );
+            case 'K1_v3'
+                v_mean = v_mean_K1( 3 , : );
+        end
         
         % Use bar plot to produce data
         
@@ -275,9 +283,17 @@ switch which_data
         % Add a title
         
         
-    case 'K2'
-        load v2_mean_K2
-        v_mean = v2_mean_K2;
+    case {'K2_v1' , 'K2_v2' , 'K2_v3'}
+        load v_mean_K2
+
+        switch which_data
+            case 'K2_v1'
+                v_mean = v_mean_K2( 1 , : );
+            case 'K2_v2'
+                v_mean = v_mean_K2( 2 , : );
+            case 'K2_v3'
+                v_mean = v_mean_K2( 3 , : );
+        end
         
         % Use bar plot to produce data
         
