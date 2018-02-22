@@ -39,9 +39,9 @@ pred_summary_all = zeros(50 , size(allmodel , 2) , size(alldataset , 2)); %  n_s
 Rsqu_summary_all =  zeros(size(allmodel , 2) , size(alldataset , 2));  %  n_model x n_data
 
 
-for data_index = 1: size(alldataset , 2)
+for data_index = 1: size(alldataset , 2) 
     
-    for model_index = 1:size(allmodel , 2)
+    for model_index = 1:size(allmodel , 2) % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
         % Select the model and show 
         which_model = allmodel{model_index}
