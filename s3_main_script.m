@@ -41,7 +41,7 @@ Rsqu_summary_all =  zeros(size(allmodel , 2) , size(alldataset , 2));  %  n_mode
 
 for data_index = 1: size(alldataset , 2)
     
-    for model_index = 5%1:size(allmodel , 2)
+    for model_index = 1:size(allmodel , 2)
         
         % Select the model and show 
         which_model = allmodel{model_index}
