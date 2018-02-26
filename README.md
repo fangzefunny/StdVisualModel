@@ -9,7 +9,7 @@ Download the code from Github and Download data from **Data** folder from google
 Run **s1_get_ROImean.m** to get the mean of ROI region and store them into folder **ROImean**. This part takes less than 30s. 
 
 * **Step 2. Calculate Energy of the image.**
-Run **s2_get_E.m** to calculate the Energy of model and store them into folder **E**. This part takes about half an hour.
+Run **s2_get_E.m** to calculate the Energy of model and store them into folder **E**. This part takes about 40 mintues. Note that 
 
 * **Step 3. Fit the model and generate the tables and figures.**
 Run **s3_main_script.m** to fit the model and achieve the estimated parameters, lots of tables, figures. This is one of the most time consuming part, so we can choose to fit only when we need to. Usually,  combo like: 1 ROI + 4 datasets + 4 orientaion models fitting takes about 4 hours to do all the cross-validation. 1 ROI + 1 dataset + SOC model fitting takes about 12 hours. Use chooseData function to choose the ROI and model you are interested in. 
