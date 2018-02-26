@@ -1,6 +1,6 @@
 function [ para_set , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type, fittime, v_mean_op , E_op , w_d)
 
-addpath(genpath(fullfile(pwd,'data\ROImean')));
+addpath(genpath(fullfile(pwd,'ROImean')));
 addpath(genpath(fullfile(pwd,'E')));
 % Load the data and create a vector to knock out the
 

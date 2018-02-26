@@ -6,7 +6,7 @@ clear all; close all; clc
 % This script is the second step, to calculate the energy as the imput of
 % our later model;
 
-addpath(genpath(fullfile(pwd,'data')));
+addpath(genpath(fullfile(pwd,'Stimuli')));
 save_address = fullfile(pwd, 'E' );
 
 %% Load the data 

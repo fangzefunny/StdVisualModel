@@ -1,0 +1,28 @@
+function [ alldataset ,  allmodel , alltype] = chooseData( data_mod , model_mod)
+% This is a simple function to help select model
+
+defaultdataset = {'Ca69_v1' , 'Ca05_v1' , 'K1_v1' , 'K2_v1' , 'Ca69_v2' , 'Ca05_v2' , 'K1_v2' , 'K2_v2' , 'Ca69_v3' , 'Ca05_v3' , 'K1_v3' , 'K2_v3'};
+defaultmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower'};
+defaulttype = {'orientation' , 'orientation' , 'orientation' , 'orientation'};
+
+switch data_mod
+    case 'all'
+        alldataset = defaultdataset;
+    case 'v1'
+        alldataset = defaultdataset{ 1:4 };
+    case 'v2'
+        alldataset = {'Ca69_v2' , 'Ca05_v2' , 'K1_v2' , 'K2_v2' , 'Ca69_v3' , 'Ca05_v3' , 'K1_v3' , 'K2_v3'};
+    case 'v3'
+        alldataset = {'Ca69_v1' , 'Ca05_v1' , 'K1_v1' , 'K2_v1' , 'Ca69_v2' , 'Ca05_v2' , 'K1_v2' , 'K2_v2' , 'Ca69_v3' , 'Ca05_v3' , 'K1_v3' , 'K2_v3'};
+        
+        
+        switch model_mod
+            case 'fit_ori'
+                
+                
+            case 'fit_all'
+                allmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower' , 'SOC'};
+                alltype = {'orientation' , 'orientation' , 'orientation' , 'orientation' , 'space'};
+                
+        end
+        

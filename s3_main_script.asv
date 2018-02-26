@@ -7,18 +7,12 @@ addpath(genpath(fullfile(pwd,'E')));
 
 %% Set up the dataset and the models we are going to test
 
-% The default datasets and model types are shown below, but runing SOC
-% model is really time consuming and the model is not the model we focus
-% on, so here, we can fit partially. Use chooseData to fit partilly.
-
+% The default 
 %alldataset = {'Ca69_v1' , 'Ca05_v1' , 'K1_v1' , 'K2_v1' , 'Ca69_v2' , 'Ca05_v2' , 'K1_v2' , 'K2_v2' , 'Ca69_v3' , 'Ca05_v3' , 'K1_v3' , 'K2_v3'};
 %allmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower' , 'SOC'};
 %alltype = {'orientation' , 'orientation' , 'orientation' , 'orientation' , 'space'};
 
-% Function to choose dataset and model. the first value is to choose ROI,
-% choose from {'all' , 'v1' , 'v2', 'v3'}
-% Choose from {'fit_all' , 'fit_ori', 'fit_spa'}
-[ alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_all' );
+[ alldataset ,  allmodel , alltype] = chooseData( data_mod )
 
 % How many random start points.
 fittime  = 5;
@@ -41,6 +35,7 @@ clear E_xy_05
 clear E_xy_K
 
 %% Predict the BOLD response of given stimuli
+% 
 
 % Create empty matrix
 para_summary_all = zeros(3 , 50 , size(allmodel , 2) , size(alldataset , 2)); % 3(w or c or none) x n_stimuli x n_model x n_data
