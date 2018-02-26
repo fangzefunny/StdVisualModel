@@ -1,10 +1,10 @@
 function figureM1=plot_BOLD(which_data, all_prediction, legend_name)
 
 % Create a figure to carry the plot
-figureM1=figure('units', 'normalized', 'outerposition', [0 0 1 1], 'color',[1 1 1]);
+figureM1=figure('units', 'normalized', 'outerposition', [0.1 0.05 .6 .85], 'color',[1 1 1]);
 
 % Colors for each model
-col_vector = {'k' , 'r' , 'b' , 'g' , 'c','y'};
+col_vector = {'k' , 'r' , 'g' , 'b' , 'y','m'};
 
 addpath(genpath(fullfile(pwd,'data\ROImean')));
 
@@ -208,6 +208,7 @@ switch which_data
         hold on
         line([48.4,48.4],[0,g])
         
+          ylabel('Predicted BOLD response')
         
         
     case {'K1_v1' , 'K1_v2' , 'K1_v3'}
@@ -278,6 +279,8 @@ switch which_data
         hold on
         line([35.4,35.4],[0,g])
         hold on
+        
+          ylabel('Predicted BOLD response')
         
         % Add a title
         
@@ -351,6 +354,9 @@ switch which_data
         hold on
         line([35.4,35.4],[0,g])
         hold on
+        
+          ylabel('Predicted BOLD response')
+        
         
     case {'K1_testSOC_v1' , 'K1_testSOC_v2' , 'K1_testSOC_v3' , 'K2_testSOC_v1' , 'K2_testSOC_v2' , 'K2_testSOC_v3'}
         load v_mean_K2

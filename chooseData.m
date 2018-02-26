@@ -9,24 +9,24 @@ switch data_mod
     case 'all'
         alldataset = defaultdataset;
     case 'v1'
-        alldataset = defaultdataset{ 1:4 };
+        alldataset = defaultdataset( 1:4 );
     case 'v2'
-        alldataset = defaultdataset{ 5:8 };
+        alldataset = defaultdataset( 5:8 );
     case 'v3'
-        alldataset = defaultdataset{ 9:12 };
+        alldataset = defaultdataset( 9:12 );
 end
 
 
 switch model_mod
     case 'fit_all'
-        allmodel = defaultmodel{1:5};
-        alltype = defaulttype{1:5};
+        allmodel = defaultmodel;
+        alltype = defaulttype;
     case 'fit_ori'
-        allmodel = defaultmodel{1:4};
-        alltype = defaultype{1:4};
+        allmodel = defaultmodel( 1:4 );
+        alltype = defaulttype( 1:4 );
     case 'fit_spa'
-        allmodel = defaultmodel{5};
-        alltype = defaultype{5};
+        allmodel = defaultmodel(5);
+        alltype = defaulttype(5);
         
 end
 end

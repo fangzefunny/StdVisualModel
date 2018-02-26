@@ -56,7 +56,7 @@ for data_index = 1: size(alldataset , 2)
         which_model = allmodel{model_index}
         
         % Select the type of the model
-        which_type = alltype{model_index};
+        which_type = alltype{model_index}
         
         % Select the dataset and show 
         which_data = alldataset{data_index}
@@ -209,7 +209,7 @@ end
 
 addpath(genpath(fullfile(pwd,'plot')));
 
-legend_name = {'data', 'contrast' , 'normStd' , 'SOC'};
+legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'};
 
 for data_index = 1: size(alldataset , 2)
 
@@ -218,9 +218,18 @@ for data_index = 1: size(alldataset , 2)
     which_data = alldataset{data_index};
     
     % Plot
-    plot_BOLD(which_data , pred_summary_all(: , [1 , 2 , 5]  , data_index) , legend_name);
+    plot_BOLD(which_data , pred_summary_all(: , : , data_index) , legend_name);
     % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
     
+    switch data_index
+        case { 1 , 2 , 3 , 4 }
+            title('v1')
+        case { 5 , 6 , 7 , 8 }
+            title('v2')
+        case { 9 , 10 , 11 , 12 }
+            title('v3')
+    end
+
 end
 
 
