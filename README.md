@@ -2,7 +2,7 @@
 This is new repositories to carry all the data we need
 
 ### To use these code you should do the following steps
-* **Step 0. Preparation.** 
+* **Step 0. Prepare for the fitting.** 
 Download the code from Github and Download data from **Data** folder from google drive. Enter **Data** folder and copy all 5 folders (**Stimuli , ROImean, fMRIdata, fitResults and E**) to the folder you store your code. 
 
 * **Step 1. Calculate ROImean.**
