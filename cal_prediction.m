@@ -8,7 +8,7 @@ function [ para, BOLD_prediction, Rsquare ] = cal_prediction( which_data, which_
 % Load the dataset for our training the model
 
 % Go foward to the right fold to get the data
-addpath(genpath(fullfile(pwd,'data')));
+addpath(genpath(fullfile(pwd,'data\ROImean')));
 
 % load the right trainning data according to the dataset we choose
 switch which_data

@@ -32,6 +32,7 @@ clear E_xy_05
 clear E_xy_K
 
 %% Predict the BOLD response of given stimuli
+% 
 
 % Create empty matrix
 para_summary_all = zeros(3 , 50 , size(allmodel , 2) , size(alldataset , 2)); % 3(w or c or none) x n_stimuli x n_model x n_data
@@ -136,13 +137,13 @@ for data_index = 1: size(alldataset , 2)
 end
 
 %% Save the results
-save_address = fullfile(pwd, 'results' );
+save_address = fullfile(pwd, 'fitResults' );
 
 save([save_address , '\para_summary_all'] , 'para_summary_all');
 save([save_address , '\pred_summary_all'] , 'pred_summary_all');
 save([save_address , '\Rsqu_summary_all'] , 'Rsqu_summary_all');
 
-%% Table 1: R Square
+%% Table 1 + Table S1 + Table S2: R Square
 
 % V1
 showRsquare_v1 = Rsqu_summary_all(: , 1:4)
@@ -154,7 +155,7 @@ showRsquare_v2 = Rsqu_summary_all(: , 5:8 )
 showRsquare_v3 = Rsqu_summary_all(: , 9:12 )
 
 
-%% Table 2: Estimated parameters
+%% Table S3 + Table S4 + Table S5: Estimated parameters
 
 for data_index = 1: size(alldataset , 2) % dataset: (1-4: v1, 5-8: v2 , 9-12:v3)
     
@@ -209,7 +210,6 @@ for data_index = 1: size(alldataset , 2)
     which_data = alldataset{data_index};
     
     % Plot
-
     plot_BOLD(which_data , pred_summary_all(: , [1 , 2 , 5]  , data_index) , legend_name);
     % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
     

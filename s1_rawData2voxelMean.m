@@ -4,8 +4,8 @@ clear all; close all; clc
 
 %%
 % Add path of data to the script
-addpath(genpath(fullfile(pwd,'data')));
-save_address = fullfile(pwd, 'data' );
+addpath(genpath(fullfile(pwd,'data\fMRIdata')));
+save_address = fullfile(pwd, 'data\ROImean' );
 
 %% Load Dataset 1 (Catherine 06-19)
 

@@ -6,7 +6,7 @@ figureM1=figure('units', 'normalized', 'outerposition', [0 0 1 1], 'color',[1 1 
 % Colors for each model
 col_vector = {'k' , 'r' , 'b' , 'g' , 'c','y'};
 
-addpath(genpath(fullfile(pwd,'data')));
+addpath(genpath(fullfile(pwd,'data\ROImean')));
 
 % Load the data to see how the data looks like
 
