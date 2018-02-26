@@ -12,7 +12,7 @@ Run **s1_get_ROImean.m** to get the mean of ROI region and store them into folde
 Run **s2_get_E.m** to calculate the Energy of model and store them into folder **E**. This part takes about half an hour.
 
 * **Step 3. Fit the model and generate the tables and figures.**
-Run **s3_main_script.m** to fit the model and achieve the estimated parameters, lots of tables, figures. This is one of the most time consuming part, so we can choose to fit only when we need to. Usually, 1 ROI + 4 orientaion models fitting takes about 4 hours to do all the cross-validation. 1 ROI + SOC model fitting takes about 12 hours. Use chooseData function to choose the ROI and model you are interested in. 
+Run **s3_main_script.m** to fit the model and achieve the estimated parameters, lots of tables, figures. This is one of the most time consuming part, so we can choose to fit only when we need to. Usually, 1 ROI + 4 datasets + 4 orientaion models fitting takes about 4 hours to do all the cross-validation. 1 ROI + 1 dataset SOC model fitting takes about 12 hours. Use chooseData function to choose the ROI and model you are interested in. 
 
 Note: 
 * 1. These steps are mostly sequential and skipping on step will lead to failutre in runing the following model. 
