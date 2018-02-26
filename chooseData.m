@@ -2,7 +2,7 @@ function [ alldataset ,  allmodel , alltype] = chooseData( data_mod , model_mod)
 % This is a simple function to help select model
 
 defaultdataset = {'Ca69_v1' , 'Ca05_v1' , 'K1_v1' , 'K2_v1' , 'Ca69_v2' , 'Ca05_v2' , 'K1_v2' , 'K2_v2' , 'Ca69_v3' , 'Ca05_v3' , 'K1_v3' , 'K2_v3'};
-defaultmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower'};
+defaultmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower', ' SOC'};
 defaulttype = {'orientation' , 'orientation' , 'orientation' , 'orientation'};
 
 switch data_mod

@@ -147,9 +147,9 @@ end
 %% Save the results
 save_address = fullfile(pwd, 'fitResults' );
 
-save([save_address , '\para_summary_all'] , 'para_summary_all');
-save([save_address , '\pred_summary_all'] , 'pred_summary_all');
-save([save_address , '\Rsqu_summary_all'] , 'Rsqu_summary_all');
+save([save_address , '\All stimulus classes\para_summary_all'] , 'para_summary_all');
+save([save_address , '\All stimulus classes\pred_summary_all'] , 'pred_summary_all');
+save([save_address , '\All stimulus classes\Rsqu_summary_all'] , 'Rsqu_summary_all');
 
 %% Table 1 + Table S1 + Table S2: R Square
 
