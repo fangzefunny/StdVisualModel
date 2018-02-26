@@ -2,16 +2,16 @@
 This is new repositories to carry all the data we need
 
 ### To use these code you should do the following steps
-* **Step 0. Preparation** 
+* **Step 0. Preparation.** 
 Download the code from Github and Download data from **Data** folder from google drive. Enter **Data** folder and copy all 5 folders (**Stimuli , ROImean, fMRIdata, fitResults and E**) to the folder you store your code. 
 
-* **Step 1. Calculate ROImean**
+* **Step 1. Calculate ROImean.**
 Run **s1_get_ROImean.m** to get the mean of ROI region and store them into folder **ROImean**. This part takes less than 30s. 
 
-* **Step 2. Calculate Energy of the image**
+* **Step 2. Calculate Energy of the image.**
 Run **s2_get_E.m** to calculate the Energy of model and store them into folder **E**. This part takes about half an hour.
 
-* **Step 3. Fit the model and generate the tables and figures**
+* **Step 3. Fit the model and generate the tables and figures.**
 Run **s3_main_script.m** to fit the model and achieve the estimated parameters, lots of tables, figures. This is one of the most time consuming part, so we can choose to fit only when we need to. Usually, 1 ROI + 4 orientaion models fitting takes about 4 hours to do all the cross-validation. 1 ROI + SOC model fitting takes about 12 hours. Use chooseData function to choose the ROI and model you are interested in. 
 
 Note: 
