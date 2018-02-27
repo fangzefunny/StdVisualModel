@@ -64,7 +64,7 @@ for data_index = 1:size(alldataset , 2)
         
         which_model = allmodel{model_index};
         which_type = alltype{model_index};
-        choose_dataset = mod( size( data_index , 2 ) , 4);
+        choose_dataset = mod( data_index , 4);
         choose_ROI = floor( (data_index - 1)/4 ) + 1;
         
         switch choose_dataset
@@ -84,7 +84,7 @@ for data_index = 1:size(alldataset , 2)
                 % remain = 2, Ca05
             case 2
                 t_mean = t_mean_05;
-                if model ~= 5
+                if model_index ~= 5
                     E_op = E_ori_t_05;
                     w_d = 0;
                 else
@@ -94,7 +94,7 @@ for data_index = 1:size(alldataset , 2)
                 end
                 
             case {3 , 0}
-                if model ~= 5
+                if model_index ~= 5
                     E_op = E_ori_t_K;
                     w_d = 0;
                 else
@@ -201,7 +201,7 @@ legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'}
 
 for data_index = 1: size(alldataset , 2)
     
-    choose_dataset = mod( size( data_index , 2 ) , 4);
+    choose_dataset = mod( data_index , 2 , 4);
     choose_ROI = floor( (data_index - 1)/4 ) + 1;
     
     switch choose_dataset
