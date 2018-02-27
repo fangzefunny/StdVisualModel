@@ -154,7 +154,7 @@ for knock_index  = knock_out
             v =  (E_space - c*mean(mean(E_space, 1) , 2)).^2; % X x Y x ep x stimuli
             
             % Create a disk to prevent edge effect
-            lambda = gen_disk(size(E_space , 1) , size(E_space , 3), 1 , 'disk');
+            lambda = gen_disk(size(E_space , 1) , size(E_space , 3), 1 );
             d = lambda.*v;  % X x Y x ep x 1
             
             % Sum over spatial position

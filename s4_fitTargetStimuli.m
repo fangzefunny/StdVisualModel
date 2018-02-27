@@ -78,7 +78,7 @@ for data_index = 1:size(alldataset , 2)
                 else
                     E_op = E_xy_t_69;
                     % generate a disk to prevent edge effect
-                    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
+                    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4)-1 );
                 end
                 
                 % remain = 2, Ca05
@@ -90,7 +90,7 @@ for data_index = 1:size(alldataset , 2)
                 else
                     E_op = E_xy_t_05;
                     % generate a disk to prevent edge effect
-                    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
+                    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4)-1 );
                 end
                 
             case {3 , 0}
@@ -100,7 +100,7 @@ for data_index = 1:size(alldataset , 2)
                 else
                     E_op = E_xy_t_K;
                     % generate a disk to prevent edge effect
-                    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
+                    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4)-1 );
                 end
                 switch choose_dataset
                     % remain = 3, K1
@@ -120,17 +120,17 @@ for data_index = 1:size(alldataset , 2)
         [ parameters , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type, fittime, t_mean_op , E_op , w_d);
         
         % Ensure the dimension matches
-        if isequal( size(para_summary_target , 1) , size(parameters)) == 0
+        if isequal( size(para_summary_target , 1) , size(parameters , 1)) == 0
             parameters = parameters';
         end
-        if isequal( size(pred_summary_target , 1) , size(BOLD_prediction)) == 0
+        if isequal( size(pred_summary_target , 1) , size(BOLD_prediction , 1)) == 0
             BOLD_prediction = BOLD_prediction';
         end
         
         % Parameters Estimation
-        para_summary_target( : , 1:size(BOLD_prediction, 2) , model_index , data_index) = parameters;
+        para_summary_target( : , 1:length(BOLD_prediction) , model_index , data_index) = parameters;
         % BOLD predictions Prediction
-        pred_summary_target(1:size(BOLD_prediction, 2) , model_index , data_index) = BOLD_prediction;
+        pred_summary_target(1: length(BOLD_prediction) , model_index , data_index) = BOLD_prediction;
         % Rsquare Summary
         Rsqu_summary_target( model_index , data_index) = Rsquare;
     end
