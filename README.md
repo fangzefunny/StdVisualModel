@@ -15,7 +15,7 @@ Run **s2_get_E.m** to calculate the Energy of model and store them into folder *
 Run **s3_main_script.m** to fit the model and achieve the estimated parameters, lots of tables, figures. This is one of the most time consuming part, so we can choose to fit only when we need to. Usually,  combo like: 1 ROI + 4 datasets + 4 orientaion models fitting takes about 4 hours to do all the cross-validation. 1 ROI + 1 dataset + SOC model fitting takes about 12 hours. Use chooseData function to choose the ROI and model you are interested in. 
 
 * **Step 4. Fit the two main stimulus class.**
-Run **s4_fitTargetStimuli.m** to fit the model to two main stimulus classes. In this step, you do the model fitting, calculate R square, estimate parameters, just like what happen in step three except the stimul. Since I fit 5 models to 4 datasets, the whole step takes about 4 hours. 
+Run **s4_fit_target_stimuli.m** to fit the model to two main stimulus classes. In this step, you do the model fitting, calculate R square, estimate parameters, just like what happen in step three except the stimul. Since I fit 5 models to 4 datasets, the whole step takes about 4 hours. 
 
 Note: 
 * 1. These steps are mostly sequential and skipping on step will lead to failutre in runing the following model. 
