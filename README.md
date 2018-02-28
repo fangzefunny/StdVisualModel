@@ -1,5 +1,5 @@
 # StdVisualModel
-This is new repositories to carry all the data we need
+This is new repositories to carry all the codes we need
 
 ### To use these code you should do the following steps
 * **Step 0. Prepare for the fitting.** 
