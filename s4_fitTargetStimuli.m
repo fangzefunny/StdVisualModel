@@ -193,6 +193,10 @@ for data_index = 1: size(alldataset , 2) % dataset: (1-4: v1, 5-8: v2 , 9-12:v3)
     end
 end
 
+%% Prepare for the plot.
+% In Ca69 and Ca05, 1:5 are pattern group and 6:10 is grating. But in K1
+% and K2, 1:5 are grating and 6:9are pattern. Here we can change the
+% squence of the result, so it is easy for us to do the plot.
 %%
 
 addpath(genpath(fullfile(pwd,'plot')));
@@ -201,7 +205,7 @@ legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'}
 
 for data_index = 1: size(alldataset , 2)
     
-    choose_dataset = mod( data_index , 2 , 4);
+    choose_dataset = mod( data_index , 4);
     choose_ROI = floor( (data_index - 1)/4 ) + 1;
     
     switch choose_dataset
@@ -210,22 +214,24 @@ for data_index = 1: size(alldataset , 2)
         case 1
             t_mean = t_mean_69;
             % remain = 2, Ca05
+            % Select the dataset
+            which_data = 'Ca69_target';
         case 2
             t_mean = t_mean_05;
             % remain = 3, K1
+            which_data = 'Ca05_target';
         case 3
             t_mean = t_mean_K1;
             % remain = 0, K2
+            which_data = 'K1_target';
         case 0
             t_mean = t_mean_K2;
+            which_data = 'K2_target';
             
     end
     
     t_mean_op = t_mean( choose_ROI , : );
-    
-    % Select the dataset
-    which_data = 'new';
-    
+
     % Plot
     plot_BOLD(which_data , pred_summary_target(: , : , data_index) , legend_name, t_mean_op);
     % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)

@@ -14,6 +14,7 @@ switch which_data
         switch which_data
             case 'Ca69_v1'
                 v_mean = v_mean_69(1 , : );
+                
             case 'Ca69_v2'
                 v_mean = v_mean_69(2 , : );
             case 'Ca69_v3'
@@ -57,7 +58,7 @@ switch which_data
                 v_mean = v_mean_K2(2 , : );
             case 'K2_v3'
                 v_mean = v_mean_K2(3 , : );
-         end
+        end
         
     case 'new'
         v_mean = v_mean_op;
