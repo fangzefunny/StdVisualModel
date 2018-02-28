@@ -17,7 +17,7 @@ Run **s3_main_script.m** to fit the model and achieve the estimated parameters, 
 * **Step 4. Fit the two main stimulus class.**
 Run **s4_fit_target_stimuli.m** to fit the model to two main stimulus classes. In this step, you do the model fitting, calculate R square, estimate parameters, just like what happen in step three except the stimul. Since I fit 5 models to 4 datasets, the whole step takes about 4 hours. 
 
-Note: 
+**Note:** 
 * 1. These steps are mostly sequential and skipping on step will lead to failutre in runing the following model. 
 * 2. If you want to use the results I do, go to the **Results\Data**, and copy all 3 folders (**ROImean, fitResults, E**) to replace the folders with the same name. 
 * 3. What are these scripts for: 
