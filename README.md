@@ -24,8 +24,7 @@ Run **s4_fit_target_stimuli.m** to fit the model to two main stimulus classes. I
   * a. cal_prediction: Fit the built-in or input data, generate parameters, BOLD prediction, and R squares.
   * b. cross_validation: Do cal_prediction in a leave out cross validation way.
   * c. chooseData: A little tools helps in selecting dataset.
-  * d. fitSOCwithoutTarget: Fit SOC model to the stimulus classes that does not contain those two main stimulus classes.
-  * e. FUNF: Function used in model fitting.
-  * f. gen_disk: Generate a disk to prevent edge effect.
-  * g. Icontrast: Do the convolution and calculate the energy of the images.
-  * h. makeGaborFilter: Create Gabor filters. 
+  * d. FUNF: Function used in model fitting.
+  * e. gen_disk: Generate a disk to prevent edge effect.
+  * f. Icontrast: Do the convolution and calculate the energy of the images.
+  * g. makeGaborFilter: Create Gabor filters. 
