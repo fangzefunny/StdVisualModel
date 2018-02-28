@@ -19,7 +19,7 @@ Run **s4_fit_target_stimuli.m** to fit the model to two main stimulus classes. I
 
 **Note:** 
 * 1. These steps are mostly sequential and skipping on step will lead to failutre in runing the following model. 
-* 2. If you want to use the results I do, go to the **Results\Data**, and copy all 3 folders (**ROImean, fitResults, E**) to replace the folders with the same name. 
+* 2. If you want to use the results I do, go to the **Results**, and copy all 3 folders (**ROImean, fitResults, E**) to replace the folders with the same name. 
 * 3. What are these scripts for: 
   * a. cal_prediction: Fit the built-in or input data, generate parameters, BOLD prediction, and R squares.
   * b. cross_validation: Do cal_prediction in a leave out cross validation way.
