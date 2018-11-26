@@ -128,7 +128,7 @@ for knock_index  = knock_out
     
 end
 
-if isequal( size(v_mean) , size(BOLD_prediction)) == 0
+if ~isequal( size(v_mean) , size(BOLD_prediction))
     BOLD_prediction = BOLD_prediction';
 end
 
