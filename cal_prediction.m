@@ -1,71 +1,25 @@
 function [ para, BOLD_prediction, Rsquare ] = cal_prediction( which_data, which_model, which_type, fittime ,v2_mean_op , E_op ,w_d)
 % This function is used to calculate the BOLD prediction of each dataset.
 
-% The first value means dataset: e.p. Ca69_v1 
+% The first value means dataset: e.p. Ca69_v1
 % Second value means model: e.p. std
-% Thrid value means type of the model: e.p. 
+% Thrid value means type of the model: e.p.
 
 % Load the dataset for our training the model
 
-% Go foward to the right fold to get the data
-addpath(genpath(fullfile(pwd,'ROImean')));
 
 % load the right trainning data according to the dataset we choose
-switch which_data
+if isnumeric(which_data)
     
-    case {'Ca69_v1' , 'Ca69_v2' , 'Ca69_v3'}
-        
-        load v_mean_69
-        switch which_data
-            case 'Ca69_v1'
-                v_mean = v_mean_69(1 , : );
-            case 'Ca69_v2'
-                v_mean = v_mean_69(2 , : );
-            case 'Ca69_v3'
-                v_mean = v_mean_69(3 , : );
-        end
-        
-    case {'Ca05_v1' , 'Ca05_v2' , 'Ca05_v3'}
-        
-        load v_mean_05;
-        switch which_data
-            case 'Ca05_v1'
-                v_mean = v_mean_05(1 , : );
-            case 'Ca05_v2'
-                v_mean = v_mean_05(2 , : );
-            case 'Ca05_v3'
-                v_mean = v_mean_05(3 , : );
-        end
-        
-    case { 'K1_v1' , 'K1_v2' , 'K1_v3' }
-        
-        load v_mean_K1;
-        switch which_data
-            case 'K1_v1'
-                v_mean = v_mean_K1(1 , : );
-            case 'K1_v2'
-                v_mean = v_mean_K1(2 , : );
-            case 'K1_v3'
-                v_mean = v_mean_K1(3 , : );
-        end
-        
-    case { 'K2_v1' , 'K2_v2' , 'K2_v3' }
-        
-        load v_mean_K2
-        switch which_data
-            case 'K2_v1'
-                v_mean = v_mean_K2( 1 , : );
-            case 'K2_v2'
-                v_mean = v_mean_K2(2 , : );
-            case 'K2_v3'
-                v_mean = v_mean_K2(3 , : );
-        end
-        
-    case 'new'
-        v_mean = v2_mean_op;
-        
-    otherwise
-        disp('Choose the right dataset')
+    load(sprintf('dataset%02d.mat', which_data(1)), 'v_mean');
+    
+    v_mean = v_mean(which_data(2) , : );
+    
+elseif strcmp(which_data, 'new')
+    v_mean = v2_mean_op;
+    
+else
+    disp('Choose the right dataset')
 end
 
 % load  input of our model
@@ -80,24 +34,12 @@ switch which_type
         
         % Because this is a model care much about the variance of the
         % orientation, we load Etot
-        switch which_data
-            case {'Ca69_v1' , 'Ca69_v2' , 'Ca69_v3'}
-                load E_ori_69;
-                E_ori = E_ori_69;
-                
-            case {'Ca05_v1' , 'Ca05_v2' , 'Ca05_v3'}
-                load E_or_05
-                E_ori = E_ori_05;
-                
-            case {'K1_v1' , 'K1_v2' , 'K1_v3' , 'K2_v1' , 'K2_v2' , 'K2_v3'}
-                load E_ori_K;
-                E_ori = E_ori_K;
-                
-            case 'new'
-                E_ori = E_op;
-                
-            otherwise
-                disp('input the right data')
+        if isnumeric(which_data)
+            load(sprintf('E_ori_%02d.mat', which_data(1)), 'E_ori');
+        elseif strcmp(which_data, 'new')
+            E_ori = E_op;
+        else
+            disp('input the right data')
         end
         
         % Then we begin our model fitting with random start point.
@@ -166,24 +108,13 @@ switch which_type
         s = squeeze(mean(d , 1)) ; %  example x stimili
         
     case 'space'
-        switch which_data
-            case {'Ca69_v1' , 'Ca69_v2' , 'Ca69_v3'}
-                load e_xy_69;
-                E_space = E_xy_69;
-                
-            case {'Ca05_v1' , 'Ca05_v2' , 'Ca05_v3'}
-                load e_xy_05;
-                E_space = E_xy_05;
-                
-            case {'K1_v1' , 'K1_v2' , 'K1_v3' , 'K2_v1' , 'K2_v2' , 'K2_v3'}
-                load e_xy_K;
-                E_space = E_xy_K;
-                               
-            case 'new'
-                E_space = E_op;
-                
-            otherwise
-                disp('Please select the right mode for fitting')
+        if isnumeric(which_data)
+            load(sprintf('E_xy_%02d.mat', which_data(1)), 'E_xy');
+            E_space = E_xy;
+        elseif strcmp(which_data, 'new')
+            E_space = E_op;
+        else
+            disp('input the right data')
         end
         
         %DISK

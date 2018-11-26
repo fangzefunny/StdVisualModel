@@ -46,9 +46,9 @@ save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus cla
 if ~exist(save_address, 'dir'), mkdir(save_address); end
         
 
-for data_index = 1: size(alldataset , 2) 
+for data_index = 1%: size(alldataset , 2) 
     
-    for model_index = 1:size(allmodel , 2) % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
+    for model_index = 5%1:size(allmodel , 2) % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
         figure(1); clf;
         subplot(2,1,1); bar(1:data_index); set(gca, 'XTick', 1:size(alldataset,2), 'XLim', [0 size(alldataset,2)+1]);
@@ -75,8 +75,8 @@ for data_index = 1: size(alldataset , 2)
             load(sprintf('dataset%02d.mat', which_data(1)));
             v_mean_op = v_mean(which_data(2) , : );
             
-            % %  Treat the dataset as if it is a new data
-            % which_data = 'new';
+            %  Treat the dataset as if it is a new data
+            which_data = 'new';
             
             % generate a disk to prevent edge effect
             [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );

@@ -2,26 +2,29 @@ function [ para_set , BOLD_prediction , Rsquare ]=cross_validation(which_data, w
 
 % Load the data and create a vector to knock out the
 
-fname = sprintf('E_ori_%02d.mat', which_data(1));
-load(fname, 'E_ori');
-E_test = E_ori;
-
-fname = sprintf('dataset%02d.mat', which_data(1));
-load(fname, 'v_mean');
-v_mean = v_mean(which_data(2) , : );
-
-switch which_data(1)
-    case 1, knock_out = [1:50];
-        
-    case 2, knock_out = [1:48];
-    case 3, knock_out = [1:39];
-    case 4, knock_out = [1:39];
-    case 'new'
-        v_mean = v_mean_op;
-        E_test = E_op;
-        knock_out = [1 : size(v_mean , 2)];        
-    otherwise
-        disp('Choose the right dataset')
+if isnumeric(which_data)
+    
+    fname = sprintf('dataset%02d.mat', which_data(1));
+    load(fname, 'v_mean');
+    v_mean = v_mean(which_data(2) , : );
+    
+    fname = sprintf('E_ori_%02d.mat', which_data(1));
+    load(fname, 'E_ori');
+    E_test = E_ori;
+           
+    switch which_data(1)
+        case 1, knock_out = [1:50];
+            
+        case 2, knock_out = [1:48];
+        case 3, knock_out = [1:39];
+        case 4, knock_out = [1:39];
+    end
+elseif strcmp(which_data, 'new')
+    v_mean = v_mean_op;
+    E_test = E_op;
+    knock_out = [1 : size(v_mean , 2)];
+else
+    disp('Choose the right dataset')
 end
 
 
@@ -96,7 +99,9 @@ for knock_index  = knock_out
                 mean_vali = v_mean([1:knock_index-1, knock_index + 1:end]);
             end
             
-            para = cal_prediction('new', which_model, which_type, fittime ,mean_vali , E_vali , w_d);
+            w_d_vali = w_d(:,:,:,1:end-1);
+            
+            para = cal_prediction('new', which_model, which_type, fittime ,mean_vali , E_vali , w_d_vali);
             
             % fix the parameter and predict the leave-out response
             c = para(1);
