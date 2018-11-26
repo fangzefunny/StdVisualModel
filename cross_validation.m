@@ -1,70 +1,25 @@
 function [ para_set , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type, fittime, v_mean_op , E_op , w_d)
 
-addpath(genpath(fullfile(pwd,'ROImean')));
-addpath(genpath(fullfile(pwd,'E')));
 % Load the data and create a vector to knock out the
 
-switch which_data
-    case {'Ca69_v1' , 'Ca69_v2' , 'Ca69_v3'}
-        load E_ori_69
-        E_test = E_ori_69;
-        knock_out = [1:50];
+fname = sprintf('E_ori_%02d.mat', which_data(1));
+load(fname, 'E_ori');
+E_test = E_ori;
+
+fname = sprintf('dataset%02d.mat', which_data(1));
+load(fname, 'v_mean');
+v_mean = v_mean(which_data(2) , : );
+
+switch which_data(1)
+    case 1, knock_out = [1:50];
         
-        load v_mean_69
-        switch which_data
-            case 'Ca69_v1'
-                v_mean = v_mean_69(1 , : );
-                
-            case 'Ca69_v2'
-                v_mean = v_mean_69(2 , : );
-            case 'Ca69_v3'
-                v_mean = v_mean_69(3 , : );
-        end
-        
-    case {'Ca05_v1' , 'Ca05_v2' , 'Ca05_v3'}
-        
-        load E_ori_05;
-        E_test = E_ori_05;
-        knock_out = [1:48];
-        
-        load v_mean_05;
-        switch which_data
-            case 'Ca05_v1'
-                v_mean = v_mean_05(1 , : );
-            case 'Ca05_v2'
-                v_mean = v_mean_05(2 , : );
-            case 'Ca05_v3'
-                v_mean = v_mean_05(3 , : );
-        end
-        
-        
-    case {'K1_v1' , 'K1_v2' , 'K1_v3', 'K2_v1' , 'K2_v2' , 'K2_v3'}
-        load E_ori_K;
-        E_test=  E_ori_K;
-        knock_out = [1:39];
-        
-        load v_mean_K1;
-        load v_mean_K2;
-        switch which_data
-            case 'K1_v1'
-                v_mean = v_mean_K1(1 , : );
-            case 'K1_v2'
-                v_mean = v_mean_K1(2 , : );
-            case 'K1_v3'
-                v_mean = v_mean_K1(3 , : );
-            case 'K2_v1'
-                v_mean = v_mean_K2( 1 , : );
-            case 'K2_v2'
-                v_mean = v_mean_K2(2 , : );
-            case 'K2_v3'
-                v_mean = v_mean_K2(3 , : );
-        end
-        
+    case 2, knock_out = [1:48];
+    case 3, knock_out = [1:39];
+    case 4, knock_out = [1:39];
     case 'new'
         v_mean = v_mean_op;
         E_test = E_op;
-        knock_out = [1 : size(v_mean , 2)];
-        
+        knock_out = [1 : size(v_mean , 2)];        
     otherwise
         disp('Choose the right dataset')
 end

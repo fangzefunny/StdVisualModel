@@ -1,9 +1,5 @@
 
-clear all; close all;clc
-%% Add paths
-
-addpath(genpath(fullfile(pwd,'ROImean')));
-addpath(genpath(fullfile(pwd,'E')));
+clear; close all;clc
 
 %% Set up the dataset and the models we are going to test
 
@@ -29,23 +25,22 @@ fittime  = 5;
 %  function, which means we do not need to load the data by ourselves.
 %  However, loading E_xy data takes a lot of time, so here we load E_xy
 %  data first and then introduce them as a new data.
-load E_xy_69
-load E_xy_05
-load E_xy_K
 
-E_xy = {E_xy_69 , E_xy_05 , E_xy_K};
+E_xy = cell(1,4);
+for ii = 1:4
+    fname = sprintf('E_xy_%02d.mat', ii);
+    tmp = load(fname, 'E_xy');
+    E_xy{ii} = tmp.E_xy; clear tmp;
+end
 
-% Clear to save space
-clear E_xy_69
-clear E_xy_05
-clear E_xy_K
+
 
 %% Predict the BOLD response of given stimuli
 
 % Create empty matrix
 para_summary_all = zeros(3 , 50 , size(allmodel , 2) , size(alldataset , 2)); % 3(w or c or none) x n_stimuli x n_model x n_data
 pred_summary_all = zeros(50 , size(allmodel , 2) , size(alldataset , 2)); %  n_stimuli x n_model x n_data
-Rsqu_summary_all =  zeros(size(allmodel , 2) , size(alldataset , 2));  %  n_model x n_data
+Rsqu_summary_all = zeros(size(allmodel , 2) , size(alldataset , 2));  %  n_model x n_data
 
 
 for data_index = 1: size(alldataset , 2) 
@@ -53,13 +48,13 @@ for data_index = 1: size(alldataset , 2)
     for model_index = 1:size(allmodel , 2) % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
         % Select the model and show 
-        which_model = allmodel{model_index}
+        which_model = allmodel{model_index};
         
         % Select the type of the model
-        which_type = alltype{model_index}
+        which_type = alltype{model_index};
         
         % Select the dataset and show 
-        which_data = alldataset{data_index}
+        which_data = alldataset{data_index};
         
         if model_index ~= 5
 
@@ -206,8 +201,6 @@ end
 
 %% Plot the result (Figure S)
 % Here we choose results from contrast model, std model, SOC model for ploting
-
-addpath(genpath(fullfile(pwd,'plot')));
 
 legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'};
 

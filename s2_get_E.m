@@ -6,28 +6,18 @@ clear all; close all; clc
 % This script is the second step, to calculate the energy as the imput of
 % our later model;
 
-addpath(genpath(fullfile(pwd,'Stimuli')));
-save_address = fullfile(pwd, 'E' );
+save_address = fullfile(stdnormRootPath, 'Data', 'E');
+if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 %% Load the data
+datacell = cell(1,4);
+for ii = 1:4
+    fname = sprintf('stimuli-dataset%02d.mat', ii);
+    tmp = load(fname, 'stimuli');
+    datacell{ii} = double(tmp.stimuli)./255 - .5; clear tmp
+end
 
-
-load stimuli_K;
-stimuli_K = double(stimuli_K)./255 - .5;
-
-load stimuli-2015-06-19.mat
-stimuli_69 = double(stimuli.imStack)./255 - .5;
-
-load stimuli-2015-10-05.mat
-stimuli_05 = double(stimuli.imStack)./255 - .5;
-
-clear stimuli
-
-%% Integrate them into cell
-
-% Create
-datacell = {stimuli_69, stimuli_05, stimuli_K};
-labelall = {1:50 , 1:48 , 1:39};
+labelall = {1:50 , 1:48 , 1:39, 1:39};
 
 %%  Set up the parameters
 
@@ -45,23 +35,24 @@ nO=length(thetavec);
 for which_data = 1 : length(datacell)
     
     % Select the dataset
-    data = datacell{which_data};
+    data     = datacell{which_data};
     labelVec = labelall{which_data};
+    
+    E_ori_sum = zeros(8, 9, length(labelVec));
+    E_space_sum = [];
     
     for ii= 1:length(labelVec)
         
         label = labelVec(ii)
-        
+                
         for ep = 1 : 9 % Each have 9 examples.
-            
-            ep
-            
+                                    
             % Since the dimensions are not the same
-            if which_data == 3
+            if which_data > 2
                 stimulus_i = data( : , : , ep , label );
                 stimulus = imresize(stimulus_i, .5);
             else
-                stimulus = data( : , : , label , ep );
+                stimulus = data( : , : , ep, label );
             end
             
             size_s = size(stimulus , 1);
@@ -95,56 +86,25 @@ for which_data = 1 : length(datacell)
             
             % Assign the data into a matrix
             E_space_sum( : , : , ep , ii ) = E_space;
-            
-            
-            
-            
+                        
         end
     end
+    
     % We should have used a big matrix here, but holding extremely
     % large data require really decent configuration of the
     % computer (even hurt computer sometime), so I save each
     % dataset individually, and clear the variable to empty the
     % memory for future using.
+       
+    E_ori = E_ori_sum( : , : , labelall{which_data} );
+    E_xy  = E_space_sum( : , : , : , labelall{which_data}   );
     
-    switch which_data
-        case 1
-            E_ori_69 = E_ori_sum( : , : , labelall{1} );
-            E_xy_69 = E_space_sum( : , : , : , labelall{1}   );
-            
-            save([save_address, '\E_ori_69'] , 'E_ori_69')
-            save([save_address, '\E_xy_69'] , 'E_xy_69')
-            
-            clear E_ori_sum
-            clear E_space_sum
-            clear E_ori_69
-            clear E_xy_69
-            
-            
-        case 2
-            E_ori_05 = E_ori_sum( : , : , labelall{2}   );
-            E_xy_05 = E_space_sum( : , : , : , labelall{2}   );
-            
-            save([save_address, '\E_ori_05'] , 'E_ori_05')
-            save([save_address, '\E_xy_05'] , 'E_xy_05')
-            
-            clear E_ori_sum
-            clear E_space_sum
-            clear E_ori_05
-            clear E_xy_05
-            
-        case 3
-            E_ori_K = E_ori_sum( : , : , labelall{3}   );
-            E_xy_K = E_space_sum( : , : , : , labelall{3}  );
-            
-            save([save_address, '\E_ori_K'] , 'E_ori_K')
-            save([save_address, '\E_xy_K'] , 'E_xy_K')
-            
-            clear E_ori_sum
-            clear E_space_sum
-            clear E_ori_K
-            clear E_xy_K
-    end
+    
+    fname = sprintf('E_ori_%02d.mat', which_data);
+    save(fullfile(save_address, fname), 'E_ori')
+    fname = sprintf('E_xy_%02d.mat', which_data);
+    save(fullfile(save_address, fname), 'E_xy')
+    
 end
 
 
