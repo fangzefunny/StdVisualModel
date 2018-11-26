@@ -80,13 +80,13 @@ load('dataset04', 'betamn', 'roi');
 v_mean = [];
 
 % v1 mean
-v_mean_K2( 1 , : ) = mean(betamn(roi==2 , labelVec_K));
+v_mean( 1 , : ) = mean(betamn(roi==2 , labelVec_K));
 
 % v2 mean 
-v_mean_K2( 2 , : ) = mean(betamn(roi==3 , labelVec_K));
+v_mean( 2 , : ) = mean(betamn(roi==3 , labelVec_K));
 
 % v3 mean 
-v_mean_K2( 3 , : ) = mean(betamn(roi==4 , labelVec_K));
+v_mean( 3 , : ) = mean(betamn(roi==4 , labelVec_K));
 
 % save 
 save(fullfile(save_address , 'dataset04'), 'v_mean', '-append') 
