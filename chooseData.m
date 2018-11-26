@@ -4,7 +4,7 @@ function [ alldataset ,  allmodel , alltype] = chooseData( data_mod , model_mod)
 % dataset is [which_dataset (1-4) | which_roi (V1-V3)];
 defaultdataset = {[1 1] , [2 1] , [3 1] , [4 1], [1 2] , [2 3] , [3 2] , [4 2],[1 3] , [2 3] , [3 3] , [4 3]};
 defaultmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower', ' SOC'};
-defaulttype = {'orientation' , 'orientation' , 'orientation' , 'orientation'};
+defaulttype = {'orientation' , 'orientation' , 'orientation' , 'orientation', 'space'};
 
 switch data_mod
     case 'all'
