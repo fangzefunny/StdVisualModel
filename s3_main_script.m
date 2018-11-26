@@ -121,10 +121,10 @@ for data_index = 1: size(alldataset , 2)
         end
         
         % Ensure the dimension matches
-        if isequal( size(para_summary_all , 1) , size(parameters)) == 0
+        if ~isequal( size(para_summary_all , 1) , size(parameters,1))
             parameters = parameters';
         end
-        if isequal( size(pred_summary_all , 1) , size(BOLD_prediction)) == 0
+        if ~isequal( size(pred_summary_all , 1) , size(BOLD_prediction,1))
             BOLD_prediction = BOLD_prediction';
         end
 
