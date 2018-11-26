@@ -50,6 +50,11 @@ for data_index = 1: size(alldataset , 2)
     
     for model_index = 1:size(allmodel , 2) % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
+        figure(1); clf;
+        subplot(2,1,1); bar(1:data_index); set(gca, 'XTick', 1:size(alldataset,2), 'XLim', [0 size(alldataset,2)+1]);
+        subplot(2,1,2); bar(1:model_index); set(gca, 'XTick', 1:size(allmodel,2), 'XLim', [0 size(allmodel,2)+1]);
+        drawnow();
+        
         % Select the model and show 
         which_model = allmodel{model_index};
         
