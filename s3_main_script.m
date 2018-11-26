@@ -42,6 +42,9 @@ para_summary_all = zeros(3 , 50 , size(allmodel , 2) , size(alldataset , 2)); % 
 pred_summary_all = zeros(50 , size(allmodel , 2) , size(alldataset , 2)); %  n_stimuli x n_model x n_data
 Rsqu_summary_all = zeros(size(allmodel , 2) , size(alldataset , 2));  %  n_model x n_data
 
+save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus classes');
+if ~exist(save_address, 'dir'), mkdir(save_address); end
+        
 
 for data_index = 1: size(alldataset , 2) 
     
@@ -63,51 +66,9 @@ for data_index = 1: size(alldataset , 2)
             
         else
             
-            switch which_data
-                
-                case {'Ca69_v1', 'Ca69_v2' , 'Ca69_v3' }
-                    E_op = E_xy{1};
-                    load v_mean_69
-                    switch which_data
-                        case 'Ca69_v1'
-                            v_mean_op = v_mean_69(1 , : );
-                        case 'Ca69_v2'
-                            v_mean_op = v_mean_69(2 , : );
-                        case 'Ca69_v3'
-                            v_mean_op = v_mean_69(3 , : );
-                    end
-                    
-                case {'Ca05_v1', 'Ca05_v2' , 'Ca05_v3' }
-                    E_op = E_xy{2}; 
-                    load v_mean_05;
-                    switch which_data
-                        case 'Ca05_v1'
-                            v_mean_op = v_mean_05(1 , : );
-                        case 'Ca05_v2'
-                            v_mean_op = v_mean_05(2 , : );
-                        case 'Ca05_v3'
-                            v_mean_op = v_mean_05(3 , : );
-                    end
-                    
-                otherwise
-                    E_op = E_xy{3};     
-                    load v_mean_K1;
-                    load v_mean_K2;
-                    switch which_data
-                        case 'K1_v1'
-                            v_mean_op = v_mean_K1(1 , : );
-                        case 'K1_v2'
-                            v_mean_op = v_mean_K1(2 , : );
-                        case 'K1_v3'
-                            v_mean_op = v_mean_K1(3 , : );
-                        case 'K2_v1'
-                            v_mean_op = v_mean_K2( 1 , : );
-                        case 'K2_v2'
-                            v_mean_op = v_mean_K2(2 , : );
-                        case 'K2_v3'
-                            v_mean_op = v_mean_K2(3 , : );
-                    end
-            end
+            E_op = E_xy{1};
+            load(sprintf('dataset%02d.mat', which_data(1)));
+            v_mean_op = v_mean(which_data(2) , : );
             
             % Treat the dataset asif it is a new data
             which_data = 'new';
@@ -115,7 +76,7 @@ for data_index = 1: size(alldataset , 2)
             % generate a disk to prevent edge effect
             [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
             
-            % Make the prediction 
+            % Make the prediction
             [ parameters , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type, fittime, v_mean_op , E_op , w_d);
             
         end
@@ -135,18 +96,17 @@ for data_index = 1: size(alldataset , 2)
         % Rsquare Summary
         Rsqu_summary_all( model_index , data_index) = Rsquare;
         
+        
+        % Save the results
+        save(fullfile(save_address , 'para_summary_all.mat') , 'para_summary_all');
+        save(fullfile(save_address , 'pred_summary_all.mat') , 'pred_summary_all');
+        save(fullfile(save_address , 'Rsqu_summary_all.mat') , 'Rsqu_summary_all');
+
     end
     
 end
 
-%% Save the results
-save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus classes');
-if ~exist(save_address, 'dir'), mkdir(save_address); end
-
-save(fullfile(save_address , 'para_summary_all.mat') , 'para_summary_all');
-save(fullfile(save_address , 'pred_summary_all.mat') , 'pred_summary_all');
-save(fullfile(save_address , 'Rsqu_summary_all.mat') , 'Rsqu_summary_all');
-
+%
 %% Table 1 + Table S1 + Table S2: R Square
 
 % V1
