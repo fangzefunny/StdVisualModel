@@ -71,12 +71,12 @@ for data_index = 1: size(alldataset , 2)
             
         else
             
-            E_op = E_xy{1};
+            E_op = E_xy{which_data(1)};
             load(sprintf('dataset%02d.mat', which_data(1)));
             v_mean_op = v_mean(which_data(2) , : );
             
-            % Treat the dataset asif it is a new data
-            which_data = 'new';
+            % %  Treat the dataset as if it is a new data
+            % which_data = 'new';
             
             % generate a disk to prevent edge effect
             [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
