@@ -90,9 +90,9 @@ for data_index = 1: size(alldataset , 2)
         end
 
         % Parameters Estimation
-        para_summary_all( : , 1:size(BOLD_prediction, 2) , model_index , data_index) = parameters;
+        para_summary_all( : , 1:size(BOLD_prediction, 1) , model_index , data_index) = parameters;
         % BOLD predictions Prediction
-        pred_summary_all(1:size(BOLD_prediction, 2) , model_index , data_index) = BOLD_prediction;
+        pred_summary_all(1:size(BOLD_prediction, 1) , model_index , data_index) = BOLD_prediction;
         % Rsquare Summary
         Rsqu_summary_all( model_index , data_index) = Rsquare;
         
