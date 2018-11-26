@@ -140,22 +140,23 @@ for data_index = 1: size(alldataset , 2)
 end
 
 %% Save the results
-save_address = fullfile(pwd, 'fitResults' );
+save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus classes');
+if ~exist(save_address, 'dir'), mkdir(save_address); end
 
-save([save_address , '\All stimulus classes\para_summary_all'] , 'para_summary_all');
-save([save_address , '\All stimulus classes\pred_summary_all'] , 'pred_summary_all');
-save([save_address , '\All stimulus classes\Rsqu_summary_all'] , 'Rsqu_summary_all');
+save(fullfile(save_address , 'para_summary_all.mat') , 'para_summary_all');
+save(fullfile(save_address , 'pred_summary_all.mat') , 'pred_summary_all');
+save(fullfile(save_address , 'Rsqu_summary_all.mat') , 'Rsqu_summary_all');
 
 %% Table 1 + Table S1 + Table S2: R Square
 
 % V1
-showRsquare_v1 = Rsqu_summary_all(: , 1:4)
+showRsquare_v1 = Rsqu_summary_all(: , 1:4);
 
 % V2
-showRsquare_v2 = Rsqu_summary_all(: , 5:8 )
+showRsquare_v2 = Rsqu_summary_all(: , 5:8 );
 
 % V3
-showRsquare_v3 = Rsqu_summary_all(: , 9:12 )
+showRsquare_v3 = Rsqu_summary_all(: , 9:12 );
 
 
 %% Table S3 + Table S4 + Table S5: Estimated parameters
