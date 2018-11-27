@@ -1,37 +1,21 @@
-
-clear; close all;clc
-
 %% Set up the dataset and the models we are going to test
 
 % The default datasets and model types are shown below, but runing SOC
 % model is really time consuming and the model is not the model we focus
 % on, so here, we can fit partially. Use chooseData to fit partilly.
 
-%alldataset = {'Ca69_v1' , 'Ca05_v1' , 'K1_v1' , 'K2_v1' , 'Ca69_v2' , 'Ca05_v2' , 'K1_v2' , 'K2_v2' , 'Ca69_v3' , 'Ca05_v3' , 'K1_v3' , 'K2_v3'};
-%allmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower' , 'SOC'};
-%alltype = {'orientation' , 'orientation' , 'orientation' , 'orientation' , 'space'};
-
 % Function to choose dataset and model. the first value is to choose ROI,
 % choose from {'all' , 'v1' , 'v2', 'v3'}
 % Choose from {'fit_all' , 'fit_ori', 'fit_spa'}
 [ alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_all' );
+assert(isequal(length(allmodel), length(alltype)));
+
+numdatasets = length(alldataset);
+nummodels   = length(allmodel);
 
 % How many random start points.
 fittime  = 5;
 
-%% Load E_xy
-
-%  In model under orientation category, loading data is a built-in
-%  function, which means we do not need to load the data by ourselves.
-%  However, loading E_xy data takes a lot of time, so here we load E_xy
-%  data first and then introduce them as a new data.
-
-E_xy = cell(1,4);
-for ii = 1:4
-    fname = sprintf('E_xy_%02d.mat', ii);
-    tmp = load(fname, 'E_xy');
-    E_xy{ii} = tmp.E_xy; clear tmp;
-end
 
 
 
@@ -42,73 +26,50 @@ end
 save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus classes');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
-% 1: size(alldataset , 2)
-tmp = str2num(getenv('SLURM_ARRAY_TASK_ID'));
+hcp_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 
-data_index = tmp;
+data_idx    = mod(hcp_job_number-1, numdatasets)+1;
+which_data  = alldataset{data_idx};
 
-para_summary_all = zeros(3 , 50 , size(allmodel , 2)); % 3(w or c or none) x n_stimuli x n_model
-pred_summary_all = zeros(50 , size(allmodel , 2)); %  n_stimuli x n_model
-Rsqu_summary_all = zeros(size(allmodel , 2));  %  n_model
+model_index = mod(hcp_job_number-1, nummodels)+1;
+which_model = allmodel{model_index};
+which_type  = alltype{model_index};
 
-% Select the dataset and show
-which_data = alldataset{data_index};
 
-for model_index = 1:size(allmodel , 2) % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
-       
-    % Select the model and show
-    which_model = allmodel{model_index};
+if model_index ~= 5
     
-    % Select the type of the model
-    which_type = alltype{model_index};
+    % Make predictions
+    [ parameters , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type , fittime);
     
-   
+else
     
-    if model_index ~= 5
-        
-        % Make predictions
-        [ parameters , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type , fittime);
-        
-    else
-        
-        E_op = E_xy{which_data(1)};
-        load(sprintf('dataset%02d.mat', which_data(1)));
-        v_mean_op = v_mean(which_data(2) , : );
-        
-        %  Treat the dataset as if it is a new data
-        which_data = 'new';
-        
-        % generate a disk to prevent edge effect
-        [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
-        
-        % Make the prediction
-        [ parameters , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type, fittime, v_mean_op , E_op , w_d);
-        
-    end
+    % Load E_xy
     
-    % Ensure the dimension matches
-    if ~isequal( size(para_summary_all , 1) , size(parameters,1))
-        parameters = parameters';
-    end
-    if ~isequal( size(pred_summary_all , 1) , size(BOLD_prediction,1))
-        BOLD_prediction = BOLD_prediction';
-    end
+    %  In model under orientation category, loading data is a built-in
+    %  function, which means we do not need to load the data by ourselves.
+    %  However, loading E_xy data takes a lot of time, so here we load E_xy
+    %  data first and then introduce them as a new data.
+        
+    fname = sprintf('E_xy_%02d.mat', which_data(1));
+    tmp = load(fname, 'E_xy');
+    E_op = tmp.E_xy; clear tmp;
     
-    % Parameters Estimation
-    para_summary_all( : , 1:size(BOLD_prediction, 1) , model_index) = parameters;
-    % BOLD predictions Prediction
-    pred_summary_all(1:size(BOLD_prediction, 1) , model_index) = BOLD_prediction;
-    % Rsquare Summary
-    Rsqu_summary_all( model_index) = Rsquare;
+    load(sprintf('dataset%02d.mat', which_data(1)));
+    v_mean_op = v_mean(which_data(2) , : );
+        
+    % generate a disk to prevent edge effect
+    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
     
-    
-    % Save the results
-    save(fullfile(save_address , sprintf('para_summary_all_%d_%d.mat',which_data(1), which_data(2) )) , 'para_summary_all');
-    save(fullfile(save_address , sprintf('pred_summary_all_%d_%d.mat',which_data(1), which_data(2) )) , 'pred_summary_all');
-    save(fullfile(save_address , sprintf('Rsqu_summary_all_%d_%d.mat',which_data(1), which_data(2) )) , 'Rsqu_summary_all');
+    % Make the prediction
+    [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', which_model, which_type, fittime, v_mean_op , E_op , w_d);
     
 end
 
+
+% Save the results
+save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',which_data(1), which_data(2), model_index )) , 'parameters');
+save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',which_data(1), which_data(2), model_index )) , 'BOLD_prediction');
+save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   which_data(1), which_data(2), model_index )) , 'Rsquare');
 
 return
 %

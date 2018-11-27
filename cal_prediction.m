@@ -62,15 +62,15 @@ switch which_type
         % Choose the which model we are going to fit and assign it into
         % the function
         fun=@(x) FUNF(x, E_ori, v_mean, which_model , 'orientation' );
-        
+        opts.Display = 'final';
         % Run n times with multiple start points
         for ii = 1: size(x0_set, 1)
             
             % Sign
-            ii
+            ii;
             
             % Find the optimal point with BADS
-            [x(ii, :), SSE(ii)]=bads(fun,  x0_set(ii, :), LB, UB, PLB, PUB);
+            [x(ii, :), SSE(ii)]=bads(fun,  x0_set(ii, :), LB, UB, PLB, PUB, [], opts);
             %[x(ii, :), SSE(ii)]=fmincon(fun,  x0_set(ii, :), [], [], [],[], LB, UB);
             %[x(ii, :), SSE(ii)]=fminsearch(fun,  x0_set(ii, :));
             
