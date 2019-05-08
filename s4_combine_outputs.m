@@ -1,11 +1,18 @@
 %% Table 1 + Table S1 + Table S2: R Square
 
+[ alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_all' );
+assert(isequal(length(allmodel), length(alltype)));
+
+numdatasets = length(alldataset);
+nummodels   = length(allmodel);
+
+
 load_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus classes');
 
 para_summary_all = zeros(50,3,5,12); % stimuli x numparams x models x datasets
-for dataset = 1:4
+for dataset = 1:numdatasets
     for roi = 1:3
-        for model = 1:5
+        for model = 1:nummodels
             
             data_index = (roi-1)*4+dataset;
             
@@ -15,6 +22,11 @@ for dataset = 1:4
             
             para_summary_all( 1:size(parameters,1) , :, model , data_index) = parameters;
 
+             fname = sprintf('Rsquare_data-%d_roi-%d_model-%d.mat', ...
+                dataset, roi, model);
+            load(fullfile(load_address, fname), 'Rsquare');
+            
+            Rsqu_summary_all(model, data_index) = Rsquare;
         end
     end
 end
@@ -39,13 +51,13 @@ for data_index = 1: size(alldataset , 2) % dataset: (1-4: v1, 5-8: v2 , 9-12:v3)
         
         % all models except contrast model have three parameters.
         if model_index ~= 1
-            lambda_set = para_summary_all( 1 , : , model_index , data_index); % type of parameter x stimuli x which_model x which_data
+            lambda_set = para_summary_all(: , 1, model_index , data_index); % type of parameter x stimuli x which_model x which_data
         else
-            lambda_set = NaN( 1 , size(para_summary_all , 2) , 1 , 1 );
+            lambda_set = NaN( size(para_summary_all , 1), 1 , 1 , 1 );
         end
         
-        g_set = para_summary_all( 2 , : , model_index , data_index); % type of parameter x stimuli x which_model x which_data
-        n_set = para_summary_all( 3 , : , model_index , data_index); % type of parameter x stimuli x which_model x which_data
+        g_set = para_summary_all( :, 2 , model_index , data_index); % type of parameter x stimuli x which_model x which_data
+        n_set = para_summary_all( :, model_index , data_index); % type of parameter x stimuli x which_model x which_data
         
         % valid vector: not all dataset have 50 valid stimuli, some have 48
         % , and the other have 39
