@@ -50,7 +50,8 @@ hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 
 data_idx    = mod(hpc_job_number-1, numdatasets)+1;
 which_data  = alldataset{data_idx};
-
+dataset     = which_data(1);
+roi         = which_data(2);
 model_index = mod(hpc_job_number-1, nummodels)+1;
 which_model = allmodel{model_index};
 which_type  = alltype{model_index};
@@ -59,7 +60,7 @@ which_type  = alltype{model_index};
 if model_index ~= 5
     
     % Make predictions
-    [ parameters , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type , fittime);
+    [ parameters , BOLD_prediction , Rsquare ]=cross_validation(dataset, roi , which_model, which_type , fittime);
     
 else
     
@@ -70,18 +71,18 @@ else
     %  However, loading E_xy data takes a lot of time, so here we load E_xy
     %  data first and then introduce them as a new data.
         
-    fname = sprintf('E_xy_%02d.mat', which_data(1));
+    fname = sprintf('E_xy_%02d.mat', dataset);
     tmp = load(fname, 'E_xy');
     E_op = tmp.E_xy; clear tmp;
     
-    load(sprintf('dataset%02d.mat', which_data(1)));
-    v_mean_op = v_mean(which_data(2) , : );
+    load(sprintf('dataset%02d.mat', dataset));
+    v_mean_op = v_mean(roi , : );
         
     % generate a disk to prevent edge effect
     [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
     
     % Make the prediction
-    [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', which_model, which_type, fittime, v_mean_op , E_op , w_d);
+    [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
     
 end
 

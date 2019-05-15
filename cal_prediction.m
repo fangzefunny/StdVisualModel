@@ -1,4 +1,4 @@
-function [ para, BOLD_prediction, Rsquare ] = cal_prediction( which_data, which_model, which_type, fittime ,v2_mean_op , E_op ,w_d)
+function [ para, BOLD_prediction, Rsquare ] = cal_prediction( dataset, roi, which_model, which_type, fittime ,v2_mean_op , E_op ,w_d)
 % This function is used to calculate the BOLD prediction of each dataset.
 
 % The first value means dataset: e.p. Ca69_v1
@@ -9,13 +9,13 @@ function [ para, BOLD_prediction, Rsquare ] = cal_prediction( which_data, which_
 
 
 % load the right trainning data according to the dataset we choose
-if isnumeric(which_data)
+if isnumeric(dataset)
     
-    load(sprintf('dataset%02d.mat', which_data(1)), 'v_mean');
+    load(sprintf('dataset%02d.mat', dataset), 'v_mean');
     
-    v_mean = v_mean(which_data(2) , : );
+    v_mean = v_mean(roi , : );
     
-elseif strcmp(which_data, 'new')
+elseif strcmp(dataset, 'new')
     v_mean = v2_mean_op;
     
 else
@@ -34,9 +34,9 @@ switch which_type
         
         % Because this is a model care much about the variance of the
         % orientation, we load Etot
-        if isnumeric(which_data)
-            load(sprintf('E_ori_%02d.mat', which_data(1)), 'E_ori');
-        elseif strcmp(which_data, 'new')
+        if isnumeric(dataset)
+            load(sprintf('E_ori_%02d.mat', dataset), 'E_ori');
+        elseif strcmp(dataset, 'new')
             E_ori = E_op;
         else
             disp('input the right data')
@@ -108,10 +108,10 @@ switch which_type
         s = squeeze(mean(d , 1)) ; %  example x stimili
         
     case 'space'
-        if isnumeric(which_data)
-            load(sprintf('E_xy_%02d.mat', which_data(1)), 'E_xy');
+        if isnumeric(dataset)
+            load(sprintf('E_xy_%02d.mat', dataset), 'E_xy');
             E_space = E_xy;
-        elseif strcmp(which_data, 'new')
+        elseif strcmp(dataset, 'new')
             E_space = E_op;
         else
             disp('input the right data')

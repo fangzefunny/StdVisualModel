@@ -50,7 +50,7 @@ for knock_index  = knock_out
             end
             
             % fit the other data to get the parameters
-            para = cal_prediction('new', which_model, which_type, fittime ,mean_vali , E_vali);
+            para = cal_prediction('new', [], which_model, which_type, fittime ,mean_vali , E_vali);
             
             % fix the parameter and predict the leave-out response
             lambda = para(1);
@@ -100,7 +100,7 @@ for knock_index  = knock_out
             
             w_d_vali = w_d(:,:,:,1:end-1);
             
-            para = cal_prediction('new', which_model, which_type, fittime ,mean_vali , E_vali , w_d_vali);
+            para = cal_prediction('new', [], which_model, which_type, fittime ,mean_vali , E_vali , w_d_vali);
             
             % fix the parameter and predict the leave-out response
             c = para(1);
