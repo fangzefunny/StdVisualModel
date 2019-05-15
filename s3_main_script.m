@@ -47,7 +47,7 @@ save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus cla
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
-
+hpc_job_number = 60;
 data_idx    = mod(hpc_job_number-1, numdatasets)+1;
 which_data  = alldataset{data_idx};
 dataset     = which_data(1);
@@ -75,7 +75,7 @@ else
     tmp = load(fname, 'E_xy');
     E_op = tmp.E_xy; clear tmp;
     
-    load(sprintf('dataset%02d.mat', dataset));
+    load(sprintf('dataset%02d.mat', dataset), 'v_mean');
     v_mean_op = v_mean(roi , : );
         
     % generate a disk to prevent edge effect
