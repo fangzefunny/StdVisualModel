@@ -1,25 +1,24 @@
-function [ para_set , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type, fittime, v_mean_op , E_op , w_d)
+function [ para_set , BOLD_prediction , Rsquare ]=cross_validation(dataset, roi , which_model, which_type, fittime, v_mean_op , E_op , w_d)
 
 % Load the data and create a vector to knock out the
 
-if isnumeric(which_data)
+if isnumeric(dataset)
     
-    fname = sprintf('dataset%02d.mat', which_data(1));
+    fname = sprintf('dataset%02d.mat', dataset);
     load(fname, 'v_mean');
-    v_mean = v_mean(which_data(2) , : );
+    v_mean = v_mean(roi, : );
     
-    fname = sprintf('E_ori_%02d.mat', which_data(1));
+    fname = sprintf('E_ori_%02d.mat', dataset);
     load(fname, 'E_ori');
     E_test = E_ori;
            
-    switch which_data(1)
-        case 1, knock_out = [1:50];
-            
-        case 2, knock_out = [1:48];
-        case 3, knock_out = [1:39];
-        case 4, knock_out = [1:39];
+    switch dataset
+        case 1, knock_out = 1:50;            
+        case 2, knock_out = 1:48;
+        case 3, knock_out = 1:39;
+        case 4, knock_out = 1:39;
     end
-elseif strcmp(which_data, 'new')
+elseif strcmp(dataset, 'new')
     v_mean = v_mean_op;
     E_test = E_op;
     knock_out = [1 : size(v_mean , 2)];

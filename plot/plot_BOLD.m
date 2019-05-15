@@ -1,4 +1,4 @@
-function figureM1=plot_BOLD(which_data, all_prediction, legend_name , t_mean_op)
+function figureM1=plot_BOLD(dataset, roi, all_prediction, legend_name , t_mean_op)
 
 % Create a figure to carry the plot
 figureM1=figure('units', 'normalized', 'outerposition', [0.1 0.05 .6 .85], 'color',[1 1 1]);
@@ -9,21 +9,13 @@ col_vector = {'k' , 'r' , 'g' , 'b' , 'y','m'};
 addpath(genpath(fullfile(pwd,'data\ROImean')));
 
 % Load the data to see how the data looks like
+fname = sprintf('dataset%02d.mat', dataset);
+load(fname, 'v_mean');
+v_mean = v_mean(roi, : );
 
-switch which_data
+switch dataset
     
-    case {'Ca69_v1' , 'Ca69_v2' , 'Ca69_v3'}
-        load v_mean_69
-        switch which_data
-            case 'Ca69_v1'
-                v_mean = v_mean_69( 1 , : );
-            case 'Ca69_v2'
-                v_mean = v_mean_69( 2 , : );
-            case 'Ca69_v3'
-                v_mean = v_mean_69( 3 , : );
-        end
-        
-        
+    case 1                        
         % Use bar plot to visualize data
         
         b1 = bar(1:50 , v_mean);
@@ -40,7 +32,6 @@ switch which_data
             scatter(1:50,model_prediction,'filled','MarkerFaceColor', col)
             
         end
-        legend('data', legend_name)
         
         for which_prediction = 1:size( all_prediction ,2)
             model_prediction = all_prediction(  : , which_prediction );
@@ -74,7 +65,7 @@ switch which_data
             
         end
         
-        
+
         % Label the group
         set(gca,'xtick',[1, 6,11,16,22,25,28,31,35,39,43,47]);
         set(gca,'XTickLabel',{'Patterns-Sparsity','Grating-Sparsity','NoiseBars-Sparsity','Waves-Sparisity','Grating-Orientation','Noisebar-Orientation','Waves-Orientation','Grating-cross','Grating-Contrast','Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'});
@@ -115,21 +106,10 @@ switch which_data
         hold on
         line([50.4,50.4],[0,g])
         
-        % Add a title
-        ylabel('Predicted BOLD response')
         
         
-    case { 'Ca05_v1' , 'Ca05_v2' , 'Ca05_v3'}
+    case 2
         
-        load v_mean_05
-        switch which_data
-            case 'Ca05_v1'
-                v_mean = v_mean_05( 1 , : );
-            case 'Ca05_v2'
-                v_mean = v_mean_05( 2 , : );
-            case 'Ca05_v3'
-                v_mean = v_mean_05( 3 , : );
-        end
         % Use bar plot to produce data
         
         b1 = bar(1:48 , v_mean);
@@ -142,7 +122,6 @@ switch which_data
             col = col_vector{which_prediction};
             scatter(1:48,model_prediction(1:48),'filled','MarkerFaceColor', col)
         end
-        legend('data', legend_name)
         
         for which_prediction = 1:size( all_prediction ,2)
             model_prediction = all_prediction(  : , which_prediction );
@@ -174,6 +153,7 @@ switch which_data
             plot(45:48, model_prediction(45:48), col);
         end
         
+
         set(gca,'xtick',[1, 6,11,16,22,25,28,31,35,39,43,47]);
         set(gca,'XTickLabel',{'Patterns-Sparsity','Grating-Sparsity','NoiseBars-Sparsity','Waves-Sparisity','Grating-Orientation','Noisebar-Orientation','Waves-Orientation','Grating-cross','Grating-Contrast','Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'});
         
@@ -208,19 +188,8 @@ switch which_data
         hold on
         line([48.4,48.4],[0,g])
         
-        ylabel('Predicted BOLD response')
         
-        
-    case {'K1_v1' , 'K1_v2' , 'K1_v3'}
-        load v_mean_K1
-        switch which_data
-            case 'K1_v1'
-                v_mean = v_mean_K1( 1 , : );
-            case 'K1_v2'
-                v_mean = v_mean_K1( 2 , : );
-            case 'K1_v3'
-                v_mean = v_mean_K1( 3 , : );
-        end
+    case 3
         
         % Use bar plot to produce data
         
@@ -234,7 +203,7 @@ switch which_data
             col = col_vector{which_prediction};
             scatter(1:39,model_prediction(1:39),'filled','MarkerFaceColor', col)
         end
-        legend('data' , legend_name)
+        
         
         for which_prediction = 1:size( all_prediction ,2)
             model_prediction = all_prediction(  : , which_prediction );
@@ -260,6 +229,8 @@ switch which_data
         set(gca,'xtick',[1, 9,13,17,21,31,36]);
         set(gca,'XTickLabel',{'Grating-Orientation','Grating-Contrast','Chess-Contrast','Dust-Contrast','Pattern-Contrast','Grating-Sparsity(-)','Pattern-Sparsity(-)'});
         
+
+        
         h=gca;
         th=rotateticklabel(h,90);
         set (gca,'position',[0.1,0.2,.8,.75] );
@@ -279,22 +250,11 @@ switch which_data
         hold on
         line([35.4,35.4],[0,g])
         hold on
-        
-        ylabel('Predicted BOLD response')
+        legend('data' , legend_name)
         
         % Add a title
         
-    case {'K2_v1' , 'K2_v2' , 'K2_v3'}
-        load v_mean_K2
-        
-        switch which_data
-            case 'K2_v1'
-                v_mean = v_mean_K2( 1 , : );
-            case 'K2_v2'
-                v_mean = v_mean_K2( 2 , : );
-            case 'K2_v3'
-                v_mean = v_mean_K2( 3 , : );
-        end
+    case 4
         
         
         % Use bar plot to produce data
@@ -309,7 +269,7 @@ switch which_data
             col = col_vector{which_prediction};
             scatter(1:39,model_prediction(1:39),'filled','MarkerFaceColor', col)
         end
-        legend('data',legend_name)
+        
         
         for which_prediction = 1:size( all_prediction ,2)
             model_prediction = all_prediction(  : , which_prediction );
@@ -354,10 +314,7 @@ switch which_data
         hold on
         line([35.4,35.4],[0,g])
         hold on
-        
-        ylabel('Predicted BOLD response')
-        
-        
+                
     case {'K1_testSOC_v1' , 'K1_testSOC_v2' , 'K1_testSOC_v3' , 'K2_testSOC_v1' , 'K2_testSOC_v2' , 'K2_testSOC_v3'}
         load v_mean_K2
         load v_mean_K1
@@ -388,7 +345,7 @@ switch which_data
             col = col_vector{which_prediction};
             scatter(1:30 ,model_prediction(1:30),'filled','MarkerFaceColor', col)
         end
-        legend('data',legend_name)
+        
         
         for which_prediction = 1:size( all_prediction ,2)
             model_prediction = all_prediction(  : , which_prediction );
@@ -425,7 +382,7 @@ switch which_data
         line([16.4,16.4],[0,g])
         hold on
         line([20.4,20.4],[0,g])
-        
+                
     case { 'Ca69_target' , 'Ca05_target' }
 
         vec = length(t_mean_op);
@@ -439,7 +396,6 @@ switch which_data
             col = col_vector{which_prediction};
             scatter(1:vec,model_prediction(1:vec),'filled','MarkerFaceColor', col)
         end
-        legend('data', legend_name)
         
         for which_prediction = 1:size( all_prediction ,2)
             model_prediction = all_prediction(  : , which_prediction );
@@ -504,6 +460,10 @@ switch which_data
     otherwise
         disp('Choose the right dataset')
 end
+
+% Add a title
+ylabel('Predicted BOLD response')
+legend('data', legend_name)
 
 end
 
