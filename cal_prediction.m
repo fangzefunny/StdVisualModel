@@ -122,8 +122,8 @@ switch which_type
         % Set up the random start points.
         % Set up the boundary of paramters
         LB= [ 0, 0, 0];
-        UB= [3, 100, 10];
-        PLB= [0.00005, 0, 0];
+        UB= [1, 100, 10];
+        PLB= [0.5, 0, 0];
         PUB=[1, 10, 2];
         
         % Random the start point
