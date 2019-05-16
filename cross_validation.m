@@ -137,6 +137,6 @@ if ~isequal( size(v_mean) , size(BOLD_prediction))
 end
 
 % calculate the Rsquare
-Rsquare= 1 - var(v_mean - BOLD_prediction)/var(v_mean);
+Rsquare= 1 - sum(v_mean - BOLD_prediction).^2/sum(v_mean-mean(v_mean)).^2;
 
 end
