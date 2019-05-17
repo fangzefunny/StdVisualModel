@@ -2,10 +2,10 @@
 %
 % % For running on HPC, execute 
 %       sbatch  run.sh
-% % where run.sh is an executable file containing the following text
+% % where run2.sh is an executable file containing the following text
 %
 % #! /bin/bash
-% #SBATCH --job-name=StdModel
+% #SBATCH --job-name=StdModel2
 % #SBATCH -a 6,18,30,42,54 # these numbers are read in to SLURM_ARRAY_TASK_ID 
 % #SBATCH --nodes=1
 % #SBATCH --cpus-per-task=4
@@ -18,7 +18,7 @@
 % 
 % matlab <<EOF
 % addpath(genpath('~/toolboxes'));
-% s3_main_script
+% s5_fit_two_classes
 % EOF
 
 
@@ -43,10 +43,10 @@ fittime  = 5;
 
 % Create empty matrix
 
-save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus classes');
+save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'Two main stimulus classes');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
-hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
+hpc_job_number = 1; %str2num(getenv('SLURM_ARRAY_TASK_ID'));
 data_idx    = mod(hpc_job_number-1, numdatasets)+1;
 which_data  = alldataset{data_idx};
 dataset     = which_data(1);
@@ -55,11 +55,24 @@ model_index = mod(hpc_job_number-1, nummodels)+1;
 which_model = allmodel{model_index};
 which_type  = alltype{model_index};
 
+switch dataset
+    case {1, 2}
+        which_stim = 1:10;
+    case {3, 4}
+        which_stim = 31:39;
+end
 
 if model_index ~= 5
     
-    % Make predictions
-    [ parameters , BOLD_prediction , Rsquare ]=cross_validation(dataset, roi , which_model, which_type , fittime);
+    fname = sprintf('E_ori_%02d.mat', dataset);
+    tmp = load(fname, 'E_ori');
+    E_op = tmp.E_ori(:,:, which_stim); clear tmp;
+    
+    load(sprintf('dataset%02d.mat', dataset), 'v_mean');
+    v_mean_op = v_mean(roi , which_stim );
+    
+    w_d = 0;
+    
     
 else
     
@@ -72,24 +85,22 @@ else
         
     fname = sprintf('E_xy_%02d.mat', dataset);
     tmp = load(fname, 'E_xy');
-    E_op = tmp.E_xy; clear tmp;
+    E_op = tmp.E_xy(:,:, which_stim); clear tmp;
     
     load(sprintf('dataset%02d.mat', dataset), 'v_mean');
-    v_mean_op = v_mean(roi , : );
+    v_mean_op = v_mean(roi ,  which_stim );
         
     % generate a disk to prevent edge effect
     [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
-    
-    % Make the prediction
-    [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
-    
+        
 end
 
+[ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
 
 % Save the results
-save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',which_data(1), which_data(2), model_index )) , 'parameters');
-save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',which_data(1), which_data(2), model_index )) , 'BOLD_prediction');
-save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   which_data(1), which_data(2), model_index )) , 'Rsquare');
+save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_index )) , 'parameters');
+save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_index )) , 'BOLD_prediction');
+save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_index )) , 'Rsquare');
 
 return
 %
