@@ -85,7 +85,7 @@ else
         
     fname = sprintf('E_xy_%02d.mat', dataset);
     tmp = load(fname, 'E_xy');
-    E_op = tmp.E_xy(:,:, which_stim); clear tmp;
+    E_op = tmp.E_xy(:,:, :, which_stim); clear tmp;
     
     load(sprintf('dataset%02d.mat', dataset), 'v_mean');
     v_mean_op = v_mean(roi ,  which_stim );
