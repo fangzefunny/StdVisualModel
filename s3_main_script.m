@@ -1,21 +1,21 @@
 %% Set up the dataset and the models we are going to test
 %
-% % For running on HPC, execute 
+% % For running on HPC, execute
 %       sbatch  run.sh
 % % where run.sh is an executable file containing the following text
 %
 % #! /bin/bash
 % #SBATCH --job-name=StdModel
-% #SBATCH -a 6,18,30,42,54 # these numbers are read in to SLURM_ARRAY_TASK_ID 
+% #SBATCH -a 6,18,30,42,54 # these numbers are read in to SLURM_ARRAY_TASK_ID
 % #SBATCH --nodes=1
 % #SBATCH --cpus-per-task=4
 % #SBATCH --mem=16g
 % #SBATCH --time=08:00:00
 % #SBATCH --output=/scratch/jaw288/StdVisualModel/Data/HPC/out_%x-%a.txt
 % #SBATCH --error=/scratch/jaw288/StdVisualModel/Data/HPC/error_%x-%a.txt
-% 
+%
 % module load matlab/2018a
-% 
+%
 % matlab <<EOF
 % addpath(genpath('~/toolboxes'));
 % s3_main_script
@@ -56,12 +56,12 @@ which_model = allmodel{model_index};
 which_type  = alltype{model_index};
 
 
-if model_index ~= 5
+if strcmp( which_type, 'orientation' ) == 1
     
     % Make predictions
     [ parameters , BOLD_prediction , Rsquare ]=cross_validation(dataset, roi , which_model, which_type , fittime);
     
-else
+elseif strcmp( which_type, 'space') == 1
     
     % Load E_xy
     
@@ -69,20 +69,30 @@ else
     %  function, which means we do not need to load the data by ourselves.
     %  However, loading E_xy data takes a lot of time, so here we load E_xy
     %  data first and then introduce them as a new data.
-        
+    
     fname = sprintf('E_xy_%02d.mat', dataset);
     tmp = load(fname, 'E_xy');
     E_op = tmp.E_xy; clear tmp;
     
     load(sprintf('dataset%02d.mat', dataset), 'v_mean');
     v_mean_op = v_mean(roi , : );
-        
+    
     % generate a disk to prevent edge effect
     [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
     
     % Make the prediction
-    [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
-    
+    switch which_model
+        case 'SOC'
+            
+            [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
+        case 'ori_surround'
+            
+            % Load weight_e_sum
+            fname = sprintf('weight_e_sum%02d.mat', dataset);
+            tmp = load(fname, 'E_xy');
+            weight_e_sum = tmp.weight_e_sum; clear tmp;
+            [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d, weight_e_sum );
+    end
 end
 
 

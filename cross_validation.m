@@ -98,6 +98,7 @@ for knock_index  = knock_out
                 mean_vali = v_mean([1:knock_index-1, knock_index + 1:end]);
             end
             
+            
             w_d_vali = w_d(:,:,:,1:end-1);
             
             para = cal_prediction('new', [], which_model, which_type, fittime ,mean_vali , E_vali , w_d_vali);

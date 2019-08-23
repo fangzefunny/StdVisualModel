@@ -3,8 +3,8 @@ function [ alldataset ,  allmodel , alltype] = chooseData( data_mod , model_mod)
 
 % dataset is [which_dataset (1-4) | which_roi (V1-V3)];
 defaultdataset = {[1 1] , [2 1] , [3 1] , [4 1], [1 2] , [2 2] , [3 2] , [4 2],[1 3] , [2 3] , [3 3] , [4 3]};
-defaultmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower', 'SOC'};
-defaulttype = {'orientation' , 'orientation' , 'orientation' , 'orientation', 'space'};
+defaultmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower', 'SOC', 'ori_surround'};
+defaulttype = {'orientation' , 'orientation' , 'orientation' , 'orientation', 'space', 'space' };
 
 switch data_mod
     case 'all'
@@ -25,9 +25,12 @@ switch model_mod
     case 'fit_ori'
         allmodel = defaultmodel( 1:4 );
         alltype = defaulttype( 1:4 );
-    case 'fit_spa'
+    case 'fit_SOC'
         allmodel = defaultmodel(5);
         alltype = defaulttype(5);
+    case 'fit_ori_surround'
+        allmodel = defaultmodel(6);
+        alltype = defaulttype(6);
         
 end
 end
