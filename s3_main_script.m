@@ -93,13 +93,6 @@ elseif strcmp( which_type, 'space') == 1
             tmp = load(fname, 'weight_E');
             weight_E = tmp.weight_E; clear tmp;
             
-            %%%%%%%%%
-            E_op = E_op( :, :, :, :, 1:10 );
-            elva = sum( isnan(E_op(:)) )
-            weight_E  = weight_E( :, :, :, :, 1:10 );
-            v_mean_op = v_mean_op( 1:10 );  
-            %%%%%%%%%
-          
             [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d, weight_E );
     end
 end
