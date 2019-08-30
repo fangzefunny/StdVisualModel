@@ -1,4 +1,4 @@
-function sumSSE = FUNF(x, E, v2_mean, which_model, which_type ,w_d)
+function sumSSE = FUNF(x, E, v2_mean, which_model, which_type ,w_d, weight_E )
 
 switch which_type
     case 'orientation'
@@ -26,8 +26,8 @@ switch which_type
         % sum over orientation
         s = squeeze(mean(d , 1)) ; % examples x stimuli
         
-    case 'space'
-        c = x(1);
+ case 'space'
+        w = x(1);
         g = x(2);
         n = x(3);
         
@@ -35,11 +35,16 @@ switch which_type
             case 'SOC'
                 
                 % Do a variance-like calculation
-                v =  (E - c*mean(mean(E, 1) , 2)).^2; % X x Y x ep x stimuli
+                v =  (E - w*mean(mean(E, 1) , 2)).^2; % X x Y x ep x stimuli
                 d = w_d.*v;
                 
+            case 'ori_surround'
+                
+                % calculate d
+                d_theta = E./( 1 + w * weight_E ); %E: 3D 
+                d  = squeeze(mean( d_theta , 3) );
+ 
         end
-        
         % Sum over spatial position
         s = squeeze(mean(mean( d , 1) , 2)); % ep x stimuli
         

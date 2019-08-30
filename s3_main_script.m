@@ -30,8 +30,8 @@
 % Function to choose dataset and model. the first value is to choose ROI,
 % choose from {'all' , 'v1' , 'v2', 'v3'}
 % Choose from {'fit_all' , 'fit_ori', 'fit_spa'}
-[alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_all' );
-assert(isequal(length(allmodel), length(alltype)));
+[alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_ori_surround' );
+%assert(isequal(length(allmodel), length(alltype)));
 
 numdatasets = length(alldataset);
 nummodels   = length(allmodel);
@@ -48,10 +48,10 @@ if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 data_idx    = mod(hpc_job_number-1, numdatasets)+1;
-which_data  = alldataset{data_idx};
+which_data  = alldataset{1}%data_idx};
 dataset     = which_data(1);
 roi         = which_data(2);
-model_index = mod(hpc_job_number-1, nummodels)+1;
+model_index = 1%mod(hpc_job_number-1, nummodels)+1;
 which_model = allmodel{model_index};
 which_type  = alltype{model_index};
 
@@ -85,13 +85,22 @@ elseif strcmp( which_type, 'space') == 1
         case 'SOC'
             
             [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
+        
         case 'ori_surround'
             
-            % Load weight_e_sum
-            fname = sprintf('weight_e_sum%02d.mat', dataset);
-            tmp = load(fname, 'E_xy');
-            weight_e_sum = tmp.weight_e_sum; clear tmp;
-            [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d, weight_e_sum );
+            % Load weight_E
+            fname = sprintf('weight_E_%02d.mat', dataset);
+            tmp = load(fname, 'weight_E');
+            weight_E = tmp.weight_E; clear tmp;
+            
+            %%%%%%%%%
+            E_op = E_op( :, :, :, :, 1:10 );
+            elva = sum( isnan(E_op(:)) )
+            weight_E  = weight_E( :, :, :, :, 1:10 );
+            v_mean_op = v_mean_op( 1:10 );  
+            %%%%%%%%%
+          
+            [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d, weight_E );
     end
 end
 

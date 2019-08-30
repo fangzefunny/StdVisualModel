@@ -1,4 +1,4 @@
-function [ para, BOLD_prediction, Rsquare ] = cal_prediction( dataset, roi, which_model, which_type, fittime ,v2_mean_op , E_op ,w_d)
+function [ para, BOLD_prediction, Rsquare ] = cal_prediction( dataset, roi, which_model, which_type, fittime ,v2_mean_op , E_op ,w_d, weight_E )
 % This function is used to calculate the BOLD prediction of each dataset.
 
 % The first value means dataset: e.p. Ca69_v1
@@ -102,42 +102,58 @@ switch which_type
                 disp('Please select the right model')
         end
         
-        
-        
         % sum over orientation
         s = squeeze(mean(d , 1)) ; %  example x stimili
         
     case 'space'
-        if isnumeric(dataset)
-            load(sprintf('E_xy_%02d.mat', dataset), 'E_xy');
-            E_space = E_xy;
-        elseif strcmp(dataset, 'new')
-            E_space = E_op;
-        else
-            disp('input the right data')
+        
+        E_space = E_op;
+        
+        
+        switch which_model
+            case 'SOC'
+                %DISK
+                
+                % Set up the random start points.
+                % Set up the boundary of paramters
+                LB= [ 0, 0, 0];
+                UB= [1, 100, 10];
+                PLB= [0.5, 0, 0];
+                PUB=[1, 10, 2];
+                
+                % Random the start point
+                x0_c = LB(1) + (UB(1) - LB(1))*rand(fittime, 1);
+                x0_g = LB(2) + (UB(2) - LB(2))*rand(fittime, 1);
+                x0_n = LB(3) + (UB(3) - LB(3))*rand(fittime, 1);
+                
+                % Integrate them into sets
+                x0_set = [x0_c, x0_g, x0_n];
+                
+                % Choose the which model we are going to fit and assign it into
+                % the function
+                fun=@(x) FUNF(x, E_space, v_mean, which_model, 'space', w_d);
+            case 'ori_surround'
+                %DISK
+                
+                % Set up the random start points.
+                % Set up the boundary of paramters
+                LB= [ 0, 0, 0];
+                UB= [80, 100, 10];
+                PLB= [0.5, 0, 0];
+                PUB=[20, 10, 2];
+                
+                % Random the start point
+                x0_w = LB(1) + (UB(1) - LB(1))*rand(fittime, 1);
+                x0_g = LB(2) + (UB(2) - LB(2))*rand(fittime, 1);
+                x0_n = LB(3) + (UB(3) - LB(3))*rand(fittime, 1);
+                
+                % Integrate them into sets
+                x0_set = [x0_w, x0_g, x0_n];
+                
+                % Choose the which model we are going to fit and assign it into
+                % the function
+                fun=@(x) FUNF(x, E_space, v_mean, which_model, 'space', [], weight_E );
         end
-        
-        %DISK
-        
-        % Set up the random start points.
-        % Set up the boundary of paramters
-        LB= [ 0, 0, 0];
-        UB= [1, 100, 10];
-        PLB= [0.5, 0, 0];
-        PUB=[1, 10, 2];
-        
-        % Random the start point
-        x0_c = LB(1) + (UB(1) - LB(1))*rand(fittime, 1);
-        x0_g = LB(2) + (UB(2) - LB(2))*rand(fittime, 1);
-        x0_n = LB(3) + (UB(3) - LB(3))*rand(fittime, 1);
-        
-        % Integrate them into sets
-        x0_set = [x0_c, x0_g, x0_n];
-        
-        % Choose the which model we are going to fit and assign it into
-        % the function
-        fun=@(x) FUNF(x, E_space, v_mean, which_model, 'space', w_d);
-        
         % Run n times with multiple start points
         for ii = 1: size(x0_set, 1)
             
@@ -155,19 +171,27 @@ switch which_type
         trials = find(SSE == min(SSE));
         para(:) = x(trials(1), :);
         
-        % Assign the parameter
-        c = para(1);
-        g = para(2);
-        n = para(3);
-        
         switch which_model
+            
             case 'SOC'
+                % Assign the parameter
+                c = para(1);
+                g = para(2);
+                n = para(3);
                 % Do a variance-like calculation
                 v =  (E_space - c*mean(mean(E_space, 1) , 2)).^2; % X x Y x ep x stimuli
-                
                 % Create a disk as weight
-                
                 d = w_d.*v; % X x Y x ep x stimuli
+                
+            case 'ori_surround'
+                % Assign the parameter
+                w = para(1);
+                g = para(2);
+                n = para(3);
+                
+                d_theta = E_space./(1+ w * weight_E ); %E: X x Y x theta x ep x stimuli
+                
+                d = squeeze( mean( d_theta, 3 ) ); % X x Y x ep x stimuli
                 
             otherwise
                 disp('choose the right model')
