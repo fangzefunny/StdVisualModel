@@ -13,7 +13,7 @@ ys     = linspace(-1,1,numx);% y axis
 for theta = thetas
     % build kernel for first theta
     theta_prime = theta*numthetas/pi +1;
-    disp('.')
+    
     for ii = 1:numthetas
         R{ii} = [cos(thetas(ii)) sin(thetas(ii));
                  -sin(thetas(ii)) cos(thetas(ii))];

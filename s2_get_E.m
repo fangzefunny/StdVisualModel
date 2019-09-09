@@ -1,5 +1,5 @@
 
-clear all; close all; clc
+clear; close all; clc
 
 %% Introduction
 
@@ -66,7 +66,7 @@ for which_data = 1: length(datacell)
     clear E_space_sum
     clear E_xy
     clear weight_E_sum
-    claer weight_E
+    clear weight_E
 end
 
 

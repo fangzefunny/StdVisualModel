@@ -1,6 +1,5 @@
 %% Focus on two target stimuli
 
-clear all; close all; clc
 %% Add paths
 
 addpath(genpath(fullfile(pwd,'ROImean')));
@@ -114,7 +113,7 @@ for data_index = 1:size(alldataset , 2)
         t_mean_op = t_mean( choose_ROI , : );
         
         % Because we are not going to use the built-in dataset,
-        which_data = 'new'
+        which_data = 'new';
         
         % Make the prediction using cross-validation
         [ parameters , BOLD_prediction , Rsquare ]=cross_validation(which_data, which_model, which_type, fittime, t_mean_op , E_op , w_d);

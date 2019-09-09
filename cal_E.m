@@ -19,9 +19,15 @@ switch mode
         end
 end
 
+idx = round((1:10)/10*length(labelVec));
+
+fprintf('\n');
 for ii= 1:length(labelVec)
+    if ismember(ii, idx), fprintf('.'); end
     
-    label = labelVec(ii)
+    label = labelVec(ii);
+    
+    
     
     for ep = 1 : 9 % Each have 9 examples.
         
@@ -66,3 +72,4 @@ for ii= 1:length(labelVec)
         end
     end
 end
+fprintf('\n');

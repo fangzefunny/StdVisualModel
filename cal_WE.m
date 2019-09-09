@@ -17,14 +17,16 @@ elseif which_data == 2
     w_e_sum_theta = nan( 680, 680, 8 );
 end
 
+idx = round((1:10)/10*length(labelVec));
+fprintf('\n');
+
 for ii= 1:length(labelVec)
     
-    label = labelVec(ii)
-    
+    label = labelVec(ii);
+    if ismember(ii, idx), fprintf('.'); end
+
     for ep = 1: 9
-        
-        ep
-        
+                        
         % select E
         E = E_xy( :, :, :, ep, label ); % Reduce from 5D to 3D
         
@@ -37,6 +39,8 @@ for ii= 1:length(labelVec)
         
         % Make a 3 dimension convolution, with x, y and \theta_prime
         for theta = 1:nL
+            
+            fprintf('Label: %d\tEP: %d\ttheta: %d\n', ii, ep, theta);
             
             % Choose the appropriate kernerl_weight and e_1 contrast energy image
             kernel_w_prime = squeeze( kernel_w( :, :, theta, : ));
@@ -56,5 +60,5 @@ for ii= 1:length(labelVec)
         E( :, :, :, ep, label) =  w_e_sum_theta;
     end
 end
-
+fprintf('\n');
 
