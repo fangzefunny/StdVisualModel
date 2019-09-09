@@ -51,7 +51,7 @@ data_idx    = mod(hpc_job_number-1, numdatasets)+1;
 which_data  = alldataset{data_idx};
 dataset     = which_data(1);
 roi         = which_data(2);
-model_index = 6;%mod(hpc_job_number-1, nummodels)+1;
+model_index = mod(hpc_job_number-1, nummodels)+1;
 which_model = allmodel{model_index};
 which_type  = alltype{model_index};
 
