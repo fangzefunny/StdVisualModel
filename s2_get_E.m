@@ -55,11 +55,11 @@ for which_data = 1: length(datacell)
         
     elseif strcmp( mode, 'space' ) == 1
         % E numerator 
-        E_xy  = E_space_sum( : , : , : , :, 1:10);%labelall{which_data}   );
+        E_xy  = E_space_sum( : , : , : , :, labelall{which_data}   );
         fname = sprintf('E_xy_%02d.mat', which_data);
         save(fullfile(save_address, fname), 'E_xy','-v7.3')
         % W_E denominator
-        weight_E  = weight_E_sum( : , : , : , :, 1:10);%labelall{which_data}); 
+        weight_E  = weight_E_sum( : , : , : , :, labelall{which_data}); 
         fname = sprintf('weight_E_%02d.mat', which_data);
         save(fullfile(save_address, fname), 'weight_E','-v7.3')
     end
