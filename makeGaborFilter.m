@@ -1,30 +1,33 @@
-function [G_c,G_s]= makeGaborFilter(n, sfvec, thetavec)
+function [Gabor_cos,Gabor_sin]= makeGaborFilter(ppcvec, thetavec, support)
  
-% Orientaion
-nO = length(thetavec);
-% Spatial frequency
-nF=length(sfvec);
+if ~exist('support', 'var') || isempty(support)
+    support = 2; % 2 cycles per filter
+end
+
+numOrientations = length(thetavec);
+numFrequencies  = length(ppcvec);
 
 % cell arrays for filters
-G_c = cell(nO,nF); % Cosinusoid gabor filters
-G_s = cell(nO,nF); % Sinsoid gabor filters
+Gabor_cos = cell(numOrientations,numFrequencies); 
+Gabor_sin = cell(numOrientations,numFrequencies); 
 
-for sfind = 1:nF
-    sf = sfvec(sfind);    
-    n1=n/(sf/2);
-    [x, y] = meshgrid(linspace(1/n, 1/(sf/2), n1));
-    for thetaind = 1:nO
-        theta = thetavec(thetaind);
+
+for f = 1:numFrequencies
+    ppc = ppcvec(f);    
+    numPix= round(ppc * support); % number of pixels in 2 cycles
+    [x, y] = meshgrid((1:numPix)/ppc);
+    for o = 1:numOrientations
+        theta = thetavec(o);
         
         % Rotation the 2D gabors
         wave_c = cos(theta);
         wave_s = sin(theta);
 
         % complex harmonic
-        h = exp(1i*(wave_c*x+wave_s*y)*pi*2*sf);
+        h = exp(1i*(wave_c*x+wave_s*y)*pi*2);
         
-        % Gauss with spatial frequence
-        Gauss = fspecial('gauss',n1, n1/4);
+        % Gauss with spatial frequency
+        Gauss = fspecial('gauss',numPix, numPix/4);
         
         % 2D Gabor
         Gabor_A = Gauss.*h;
@@ -42,8 +45,8 @@ for sfind = 1:nF
        
         
         % Scale the gobors
-        G_c{ thetaind,sfind}=norm_Gabor_c;
-        G_s{thetaind,sfind}=norm_Gabor_s;
+        Gabor_cos{ o,f}=norm_Gabor_c;
+        Gabor_sin{o,f}=norm_Gabor_s;
         
     end
 end

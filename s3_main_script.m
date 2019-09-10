@@ -47,6 +47,7 @@ save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus cla
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
+hpc_job_number =   1;
 data_idx    = mod(hpc_job_number-1, numdatasets)+1;
 which_data  = alldataset{data_idx};
 dataset     = which_data(1);
@@ -85,7 +86,7 @@ elseif strcmp( which_type, 'space') == 1
         case 'SOC'
             
             [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
-        
+            
         case 'ori_surround'
             
             % Load weight_E
@@ -96,9 +97,9 @@ elseif strcmp( which_type, 'space') == 1
             %%%%%%%%% Testing the 10 target stimuli%%%%%%%%
             %E_op = E_op( :, :, :, :, 1:10 );
             %weight_E  = weight_E( :, :, :, :, 1:10 );
-            %v_mean_op = v_mean_op( 1:10 );  
+            %v_mean_op = v_mean_op( 1:10 );
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-          
+            
             [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d, weight_E );
     end
 end

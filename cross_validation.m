@@ -13,7 +13,7 @@ if isnumeric(dataset)
     E_test = E_ori;
     
     switch dataset
-        case 1, knock_out = 1:10;%1:50;
+        case 1, knock_out = 1:50;
         case 2, knock_out = 1:48;
         case 3, knock_out = 1:39;
         case 4, knock_out = 1:39;
@@ -30,7 +30,8 @@ BOLD_prediction = nan( length( knock_out ), 1 );
 
 for knock_index  = knock_out
      
-    
+    keep_index = setdiff(knock_out, knock_index);
+
     switch which_type
         
         case 'orientation'
@@ -39,16 +40,8 @@ for knock_index  = knock_out
             knock_index
             
             % Discuss three possible situations
-            if knock_index ==1
-                E_vali = E_test(: , :  , 2:end);
-                mean_vali = v_mean(2:end);
-            elseif knock_index == knock_out(end)
-                E_vali = E_test(: , :  ,1:end-1);
-                mean_vali = v_mean(1:end-1);
-            else
-                E_vali = E_test( : , : , [1:knock_index-1, knock_index + 1:end]);
-                mean_vali = v_mean([1:knock_index-1, knock_index + 1:end]);
-            end
+            E_vali = E_test(: , :  , keep_index);
+            mean_vali = v_mean(keep_index);
             
             % fit the other data to get the parameters
             para = cal_prediction('new', [], which_model, which_type, fittime ,mean_vali , E_vali);
@@ -88,24 +81,10 @@ for knock_index  = knock_out
             knock_index
             
             % Discuss three possible situations
-            if knock_index ==1
-                E_vali = E_test(: , :  , : , :, 2:end); % x x y x theta x ep x stimuli
-                mean_vali = v_mean(2:end);
-                if strcmp( which_model, 'ori_surround' ) == 1
-                    weight_E_vali = weight_E_test(: , :  , : , :, 2:end);
-                end
-            elseif knock_index == knock_out(end)
-                E_vali = E_test(: , :  , : , :, 1:end-1);
-                mean_vali = v_mean(1:end-1);
-                if strcmp( which_model, 'ori_surround' ) == 1
-                    weight_E_vali = weight_E_test(: , :  , : , :, 1:end-1);
-                end
-            else
-                E_vali = E_test( : , : , : , :, [1:knock_index-1, knock_index + 1:end]);
-                mean_vali = v_mean([1:knock_index-1, knock_index + 1:end]);
-                if strcmp( which_model, 'ori_surround' ) == 1 
-                    weight_E_vali = weight_E_test(: , :  , : , :, [1:knock_index-1, knock_index + 1:end]);
-                end
+            E_vali = E_test(: , :  , : , :, keep_index); % x x y x theta x ep x stimuli
+            mean_vali = v_mean(keep_index);
+            if strcmp( which_model, 'ori_surround' )
+                weight_E_vali = weight_E_test(: , :  , : , :, keep_index);
             end
             
             w_d_vali = w_d(:,:,:,1:end-1);

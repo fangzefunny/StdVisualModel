@@ -96,16 +96,23 @@ end
 % Here we choose results from contrast model, std model, SOC model for ploting
 
 legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'};
+legend_name = {'data', 'contrast' ,  'normVar'};
 
 for dataset = 1:numdatasets
-    for roi = 1:numrois        
     
+    figure(dataset); clf
+    set(gcf, 'Position',  [273   630   1000   500]);
+    for roi = 1:numrois
         
+        subplot(3,1,roi)
         % Plot
-        plot_BOLD(dataset, roi , pred_summary_all(: , : , dataset, roi) , legend_name);
+        plot_BOLD(dataset, roi , pred_summary_all(: ,  [1 3] , dataset, roi) , legend_name);
+       % plot_BOLD(dataset, roi , pred_summary_all(: , :, dataset, roi) , legend_name);
         % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
         title(sprintf('V%d, Dataset %d', roi, dataset));
     end
+    
+    hgexport(gcf, sprintf('~/Desktop/allstims_dataset_%d.eps', dataset))
 end
 
