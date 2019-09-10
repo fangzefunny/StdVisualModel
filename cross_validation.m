@@ -117,7 +117,7 @@ for knock_index  = knock_out
                     
                 case 'ori_surround'
                     
-                    para = cal_prediction('new', [], which_model, which_type, fittime ,mean_vali , E_vali , w_d_vali, weight_E_vali );
+                    para = cal_prediction('new', [], which_model, which_type, fittime ,mean_vali , E_vali , w_d, weight_E_vali );
                  
                     w = para(1);
                     g = para(2);
