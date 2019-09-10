@@ -36,12 +36,16 @@ save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus cla
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
-hpc_job_number = 6;
+
+if isempty(hpc_job_number), hpc_job_number = 1; end
+
 dataset     = T.dataset(hpc_job_number);
 roi         = T.roiNum(hpc_job_number);
 which_model = T.modelName{hpc_job_number};
 which_type  = T.typeName{hpc_job_number};
+model_idx   = T.modelNum(hpc_job_number);
 
+disp(T(hpc_job_number,:));
 
 if strcmp( which_type, 'orientation' )
     
@@ -92,9 +96,9 @@ end
 
 
 % Save the results
-save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',which_data(1), which_data(2), model_index )) , 'parameters');
-save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',which_data(1), which_data(2), model_index )) , 'BOLD_prediction');
-save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   which_data(1), which_data(2), model_index )) , 'Rsquare');
+save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'parameters');
+save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'BOLD_prediction');
+save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'Rsquare');
 
 return
 %
