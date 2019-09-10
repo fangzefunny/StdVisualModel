@@ -23,18 +23,7 @@
 
 
 
-% The default datasets and model types are shown below, but runing SOC
-% model is really time consuming and the model is not the model we focus
-% on, so here, we can fit partially. Use chooseData to fit partilly.
-
-% Function to choose dataset and model. the first value is to choose ROI,
-% choose from {'all' , 'v1' , 'v2', 'v3'}
-% Choose from {'fit_all' , 'fit_ori', 'fit_spa'}
-[alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_all' );
-%assert(isequal(length(allmodel), length(alltype)));
-
-numdatasets = length(alldataset);
-nummodels   = length(allmodel);
+T = chooseData();
 
 % How many random start points.
 fittime  = 5;
@@ -47,21 +36,19 @@ save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus cla
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
-data_idx    = mod(hpc_job_number-1, numdatasets)+1;
-which_data  = alldataset{data_idx};
-dataset     = which_data(1);
-roi         = which_data(2);
-model_index = mod(hpc_job_number-1, nummodels)+1;
-which_model = allmodel{model_index};
-which_type  = alltype{model_index};
+hpc_job_number = 6;
+dataset     = T.dataset(hpc_job_number);
+roi         = T.roiNum(hpc_job_number);
+which_model = T.modelName{hpc_job_number};
+which_type  = T.typeName{hpc_job_number};
 
 
-if strcmp( which_type, 'orientation' ) == 1
+if strcmp( which_type, 'orientation' )
     
     % Make predictions
     [ parameters , BOLD_prediction , Rsquare ]=cross_validation(dataset, roi , which_model, which_type , fittime);
     
-elseif strcmp( which_type, 'space') == 1
+elseif strcmp( which_type, 'space')
     
     % Load E_xy
     
@@ -78,7 +65,7 @@ elseif strcmp( which_type, 'space') == 1
     v_mean_op = v_mean(roi , : );
     
     % generate a disk to prevent edge effect
-    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
+    [ w_d ] = gen_disk( size(E_op , 1));
     
     % Make the prediction
     switch which_model

@@ -26,7 +26,7 @@ else
     disp('Choose the right dataset')
 end
 
-BOLD_prediction = nan( length( knock_out ), 1 );
+BOLD_prediction = nan(size(v_mean));
 
 for knock_index  = knock_out
      
@@ -80,19 +80,23 @@ for knock_index  = knock_out
             % The stimuli we leave
             knock_index
             
-            % Discuss three possible situations
+            % E for training stimuli
             E_vali = E_test(: , :  , : , :, keep_index); % x x y x theta x ep x stimuli
+            
+            % BOLD data for training stimuli
             mean_vali = v_mean(keep_index);
+            
             if strcmp( which_model, 'ori_surround' )
                 weight_E_vali = weight_E_test(: , :  , : , :, keep_index);
             end
-            
-            w_d_vali = w_d(:,:,:,1:end-1);
-            
+                        
             switch which_model
                 case 'SOC'
                     
-                    para = cal_prediction('new', [], which_model, which_type, fittime ,mean_vali , E_vali , w_d_vali);
+                    % mean over orientation
+                    E_vali = squeeze(mean (E_vali, 3));
+                    
+                    para = cal_prediction('new', [], which_model, which_type, fittime ,mean_vali , E_vali , w_d);
                     
                     % fix the parameter and predict the leave-out response
                     c = para(1);
@@ -102,12 +106,14 @@ for knock_index  = knock_out
                     % Assign into the right dataset
                     E_space = E_test( : , :  , : , knock_index); % ori x example x 1
                     
+                    % mean over orientation
+                    E_space = squeeze(mean (E_space, 3));
+                    
                     % Do a variance-like calculation
                     v =  (E_space - c*mean(mean(E_space, 1) , 2)).^2; % X x Y x ep x stimuli
                     
                     % Create a disk to prevent edge effect
-                    lambda = gen_disk(size(E_space , 1) , size(E_space , 3), 1 );
-                    d = lambda.*v;  % X x Y x ep x 1
+                    d = w_d.*v;  % X x Y x ep x 1
                     
                 case 'ori_surround'
                     
