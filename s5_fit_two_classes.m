@@ -35,6 +35,8 @@ fittime  = 5;
 save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'Two main stimulus classes');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
+hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
+
 if isempty(hpc_job_number), hpc_job_number = 1; end
 
 dataset     = T.dataset(hpc_job_number);
