@@ -79,7 +79,7 @@ switch dataset
         set(gca,'XTickLabel',{'Patterns-Sparsity','Grating-Sparsity','NoiseBars-Sparsity','Waves-Sparisity','Grating-Orientation','Noisebar-Orientation','Waves-Orientation','Grating-cross','Grating-Contrast','Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'});
         
         h=gca;
-        th=rotateticklabel(h,90);
+        th=rotateticklabel(h,45);
         %set (gca,'position',[0.1,0.2,.8,.75] );
         box off
         hold on
@@ -163,7 +163,7 @@ switch dataset
         
 
         set(gca,'xtick',[1, 6,11,16,22,25,28,31,35,39,43,47]);
-        set(gca,'XTickLabel',{'Patterns-Sparsity','Grating-Sparsity','NoiseBars-Sparsity','Waves-Sparisity','Grating-Orientation','Noisebar-Orientation','Waves-Orientation','Grating-cross','Grating-Contrast','Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'});
+        set(gca,'XTickLabel',{('Patterns-Sparsity'),'Grating-Sparsity','NoiseBars-Sparsity','Waves-Sparisity','Grating-Orientation','Noisebar-Orientation','Waves-Orientation','Grating-cross','Grating-Contrast','Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'});
         
         h=gca;
         th=rotateticklabel(h,90);
@@ -258,7 +258,7 @@ switch dataset
         hold on
         line([35.4,35.4],[0,g])
         hold on
-      %  legend('data' , legend_name)
+      legend('data' , legend_name, 'Location', 'EastOutside')
         
         % Add a title
         
@@ -373,8 +373,8 @@ switch dataset
 end
 
 % Add a title
-ylabel('Predicted BOLD response')
-%legend('data', legend_name)
+% ylabel('Predicted BOLD response')
+legend('data', legend_name, 'Location', 'EastOutside')
 
 end
 
