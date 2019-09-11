@@ -1,36 +1,41 @@
-function [ alldataset ,  allmodel , alltype] = chooseData( data_mod , model_mod)
+function T = chooseData()
 % This is a simple function to help select model
 
 % dataset is [which_dataset (1-4) | which_roi (V1-V3)];
-defaultdataset = {[1 1] , [2 1] , [3 1] , [4 1], [1 2] , [2 2] , [3 2] , [4 2],[1 3] , [2 3] , [3 3] , [4 3]};
-defaultmodel = {'contrast' ,  'normStd' , 'normVar' , 'normPower', 'SOC', 'ori_surround'};
-defaulttype = {'orientation' , 'orientation' , 'orientation' , 'orientation', 'space', 'space' };
-
-switch data_mod
-    case 'all'
-        alldataset = defaultdataset;
-    case 'v1'
-        alldataset = defaultdataset( 1:4 );
-    case 'v2'
-        alldataset = defaultdataset( 5:8 );
-    case 'v3'
-        alldataset = defaultdataset( 9:12 );
-end
+datasets = 1:4;
+ROIs     = {'V1' 'V2' 'V3'};
+models   = {'contrast' ,  'normStd' , 'normVar' , 'normPower', 'SOC', 'ori_surround'};
+types    = {'orientation' , 'orientation' , 'orientation' , 'orientation', 'space', 'space' };
 
 
-switch model_mod
-    case 'fit_all'
-        allmodel = defaultmodel;
-        alltype = defaulttype;
-    case 'fit_ori'
-        allmodel = defaultmodel( 1:4 );
-        alltype = defaulttype( 1:4 );
-    case 'fit_SOC'
-        allmodel = defaultmodel(5);
-        alltype = defaulttype(5);
-    case 'fit_ori_surround'
-        allmodel = defaultmodel(6);
-        alltype = defaulttype(6);
+
+n = length(datasets) * length(ROIs) * length(models);
+
+dataset     = NaN(n,1);
+roiNum      = NaN(n,1);
+roiName     = cell(n,1);
+modelNum    = NaN(n,1);
+modelName   = cell(n,1);
+typeName    = cell(n,1);
+
+idx = 0;
+for d = 1:length(datasets)
+    for r = 1:length(ROIs)
+        for m = 1:length(models)
+             
+            idx = idx+1;
         
+            dataset(idx)     = d;
+            roiNum(idx)      = r;
+            roiName(idx)     = ROIs(r);
+            modelNum(idx)    = m;
+            modelName(idx)   = models(m);
+            typeName(idx)    = types(m);
+
+        end
+    end
 end
+
+T = table(dataset, roiNum, roiName, modelNum, modelName, typeName);
+
 end

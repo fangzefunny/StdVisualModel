@@ -5,17 +5,13 @@ sigma_p=.1;
 sigma_g=.85;
 sigma_s=.01;
 
-kernel_w = kernel_weight( sigma_p, sigma_g, sigma_s );
+sz = round(size(E_xy, 1) / 20)*2;
+kernel_w = kernel_weight( sigma_p, sigma_g, sigma_s, sz );
 
 %% Run the ori-suround
 
-if which_data  ~= 2
-    E = nan( 480, 480, 8, 9, length( labelVec ) );
-    w_e_sum_theta = nan( 480, 480, 8 );
-elseif which_data == 2
-    E = nan( 680, 680, 8, 9, length( labelVec ) );
-    w_e_sum_theta = nan( 680, 680, 8 );
-end
+E = nan( size(E_xy));
+w_e_sum_theta = nan( size(E_xy,1), size(E_xy,2), size(E_xy,3) );
 
 idx = round((1:10)/10*length(labelVec));
 fprintf('\n');
@@ -25,7 +21,7 @@ for ii= 1:length(labelVec)
     label = labelVec(ii);
     if ismember(ii, idx), fprintf('.'); end
 
-    for ep = 1: 9
+    for ep = 1: size(E_xy,4)
                         
         % select E
         E = E_xy( :, :, :, ep, label ); % Reduce from 5D to 3D
@@ -40,7 +36,7 @@ for ii= 1:length(labelVec)
         % Make a 3 dimension convolution, with x, y and \theta_prime
         for theta = 1:nL
             
-            fprintf('Label: %d\tEP: %d\ttheta: %d\n', ii, ep, theta);
+            % fprintf('Label: %d\tEP: %d\ttheta: %d\n', ii, ep, theta);
             
             % Choose the appropriate kernerl_weight and e_1 contrast energy image
             kernel_w_prime = squeeze( kernel_w( :, :, theta, : ));

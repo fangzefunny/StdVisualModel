@@ -36,7 +36,7 @@ switch which_type
                 
                 % Do a variance-like calculation
                 v =  (E - w*mean(mean(E, 1) , 2)).^2; % X x Y x ep x stimuli
-                d = w_d.*v;
+                d = bsxfun(@times, v, w_d);
                 
             case 'ori_surround'
                 
@@ -58,12 +58,6 @@ BOLD_prediction_ind = g.*s.^n; % ep x stimuli
 
 % Sum over different examples
 BOLD_prediction = squeeze(mean(BOLD_prediction_ind, 1)); % stimuli
-
-% Ensure that the size of BOLD_prediction and v2_mean are vectors with same
-% size
-if isequal( size(v2_mean) , size(BOLD_prediction)) == 0
-    BOLD_prediction = BOLD_prediction';
-end
 
 % Compare with the data
 SSE=(v2_mean - BOLD_prediction).^2;

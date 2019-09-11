@@ -23,18 +23,7 @@
 
 
 
-% The default datasets and model types are shown below, but runing SOC
-% model is really time consuming and the model is not the model we focus
-% on, so here, we can fit partially. Use chooseData to fit partilly.
-
-% Function to choose dataset and model. the first value is to choose ROI,
-% choose from {'all' , 'v1' , 'v2', 'v3'}
-% Choose from {'fit_all' , 'fit_ori', 'fit_spa'}
-[alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_all' );
-%assert(isequal(length(allmodel), length(alltype)));
-
-numdatasets = length(alldataset);
-nummodels   = length(allmodel);
+T = chooseData();
 
 % How many random start points.
 fittime  = 5;
@@ -47,21 +36,23 @@ save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus cla
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
-data_idx    = mod(hpc_job_number-1, numdatasets)+1;
-which_data  = alldataset{data_idx};
-dataset     = which_data(1);
-roi         = which_data(2);
-model_index = mod(hpc_job_number-1, nummodels)+1;
-which_model = allmodel{model_index};
-which_type  = alltype{model_index};
 
+if isempty(hpc_job_number), hpc_job_number = 1; end
 
-if strcmp( which_type, 'orientation' ) == 1
+dataset     = T.dataset(hpc_job_number);
+roi         = T.roiNum(hpc_job_number);
+which_model = T.modelName{hpc_job_number};
+which_type  = T.typeName{hpc_job_number};
+model_idx   = T.modelNum(hpc_job_number);
+
+disp(T(hpc_job_number,:));
+
+if strcmp( which_type, 'orientation' )
     
     % Make predictions
     [ parameters , BOLD_prediction , Rsquare ]=cross_validation(dataset, roi , which_model, which_type , fittime);
     
-elseif strcmp( which_type, 'space') == 1
+elseif strcmp( which_type, 'space')
     
     % Load E_xy
     
@@ -78,14 +69,14 @@ elseif strcmp( which_type, 'space') == 1
     v_mean_op = v_mean(roi , : );
     
     % generate a disk to prevent edge effect
-    [ w_d ] = gen_disk( size(E_op , 1) ,  size(E_op , 3)  ,  size(E_op , 4) );
+    [ w_d ] = gen_disk( size(E_op , 1));
     
     % Make the prediction
     switch which_model
         case 'SOC'
             
             [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
-        
+            
         case 'ori_surround'
             
             % Load weight_E
@@ -96,18 +87,18 @@ elseif strcmp( which_type, 'space') == 1
             %%%%%%%%% Testing the 10 target stimuli%%%%%%%%
             %E_op = E_op( :, :, :, :, 1:10 );
             %weight_E  = weight_E( :, :, :, :, 1:10 );
-            %v_mean_op = v_mean_op( 1:10 );  
+            %v_mean_op = v_mean_op( 1:10 );
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-          
+            
             [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d, weight_E );
     end
 end
 
 
 % Save the results
-save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',which_data(1), which_data(2), model_index )) , 'parameters');
-save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',which_data(1), which_data(2), model_index )) , 'BOLD_prediction');
-save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   which_data(1), which_data(2), model_index )) , 'Rsquare');
+save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'parameters');
+save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'BOLD_prediction');
+save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'Rsquare');
 
 return
 %

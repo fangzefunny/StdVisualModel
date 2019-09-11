@@ -1,16 +1,16 @@
-%% Table 1 + Table S1 + Table S2: R Square
+%% Table ??: R square
 
-T= chooseData();
+[ alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_all' );
+assert(isequal(length(allmodel), length(alltype)));
 
 
-
-nummodels   = length(unique(T.modelNum));
-numrois     = length(unique(T.roiNum));
-numdatasets = length(unique(T.dataset));
-numstimuli  = 50;
+nummodels   = length(allmodel);
+numrois     = 3;
+numdatasets = 4;
+numstimuli  = 10;
 numparams   = 3;
 
-load_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus classes');
+load_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'Two main stimulus classes');
 
 para_summary_all = NaN(numstimuli,numparams,nummodels,numdatasets, numrois);
 pred_summary_all = NaN(numstimuli,nummodels,numdatasets, numrois);
@@ -52,11 +52,11 @@ showRsquare_v2 = Rsqu_summary_all(: , :, 2);
 showRsquare_v3 = Rsqu_summary_all(: , :, 3 );
 
 
-%% Table S4 + Table S5 + Table S6: Estimated parameters
+%% Table ??: Estimated parameters
 
 for dataset = 1:numdatasets
     for roi = 1:numrois
-        for model_index = 1:6 % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
+        for model_index = 1:5 % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
             
             % all models except contrast model have three parameters.
             if model_index ~= 1
@@ -67,20 +67,10 @@ for dataset = 1:numdatasets
             
             g_set = para_summary_all( :, 2 , model_index , dataset, roi); % type of parameter x stimuli x which_model x which_data
             n_set = para_summary_all( :, 3, model_index , dataset, roi); % type of parameter x stimuli x which_model x which_data
+           
             
-            % valid vector: not all dataset have 50 valid stimuli, some have 48
-            % , and the other have 39
-            
-            if dataset == 1
-                valid_vector = 1:50; %Ca69
-            elseif dataset ==2
-                valid_vector = 1:48; % Ca05
-            else
-                valid_vector = 1:39; %K1 & K2
-            end
-            
-            mean_para = [mean(lambda_set(valid_vector)) , mean(g_set(valid_vector)) , mean(n_set(valid_vector))];
-            std_para =[ std(lambda_set(valid_vector)) , std(g_set(valid_vector)) , std(n_set(valid_vector)) ];
+            mean_para = [nanmean(lambda_set) , nanmean(g_set) , nanmean(n_set)];
+            std_para =[ std(lambda_set, 'omitnan') , std(g_set, 'omitnan') , std(n_set, 'omitnan') ];
             
             
             showPara_mean( : , model_index , dataset, roi ) =  mean_para';
@@ -95,28 +85,33 @@ end
 %% Plot the result (Figure S)
 % Here we choose results from contrast model, std model, SOC model for ploting
 
-modelsToPlot = [ 3 5 6];
-legend_name = {'data'};
-for ii =1 :length(modelsToPlot)
-    legend_name = [legend_name T.modelName{modelsToPlot(ii)}];
-end
+%legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'};
+legend_name = {'data', 'contrast' ,  'normVar'};
 
+figure;set(gcf, 'Position', [1 1 800 1000])
 
-for dataset = 3%:numdatasets
-    
-    figure(dataset); clf
-    set(gcf, 'Position',  [273   630   1000   500]);
+for dataset = 1:4%:numdatasets
+    switch dataset
+        case {1, 2}
+            which_stim = 1:10;
+        case {3, 4}
+            which_stim = 31:39;
+    end
     for roi = 1:numrois
+
+        load(sprintf('dataset%02d.mat', dataset), 'v_mean');
+        v_mean_op = v_mean(roi ,  which_stim );
         
-        subplot(3,1,roi)
+        subplot(4,3, roi+ (dataset-1)*3);
+        %subplot(1,3, roi);
         % Plot
-        plot_BOLD(dataset, roi , pred_summary_all(: ,  modelsToPlot, dataset, roi) , legend_name);
-       % plot_BOLD(dataset, roi , pred_summary_all(: , :, dataset, roi) , legend_name);
+        %plot_BOLD(sprintf('%d_target', dataset), [], pred_summary_all(: , : , dataset, roi), legend_name , v_mean_op)
+        plot_BOLD(sprintf('%d_target', dataset), [], pred_summary_all(: , [1 3] , dataset, roi), legend_name , v_mean_op)
         % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
         title(sprintf('V%d, Dataset %d', roi, dataset));
     end
     
-    hgexport(gcf, sprintf('~/Desktop/allstims_dataset_%d.eps', dataset))
+    
 end
 

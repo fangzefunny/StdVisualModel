@@ -24,9 +24,6 @@ end
 
 % load  input of our model
 
-% Go forwads to the right fold
-addpath(genpath(fullfile(pwd,'E')));
-
 switch which_type
     
     % Load the input of the model according to the kinds of model we choose
@@ -181,7 +178,7 @@ switch which_type
                 % Do a variance-like calculation
                 v =  (E_space - c*mean(mean(E_space, 1) , 2)).^2; % X x Y x ep x stimuli
                 % Create a disk as weight
-                d = w_d.*v; % X x Y x ep x stimuli
+                d = bsxfun(@times, v, w_d); % X x Y x ep x stimuli
                 
             case 'ori_surround'
                 % Assign the parameter
@@ -209,12 +206,6 @@ BOLD_prediction_ind = g.*s.^n; % ep x stimuli
 
 % Sum over different examples
 BOLD_prediction = squeeze(mean(BOLD_prediction_ind, 1)); % stimuli
-
-% Ensure that the size of BOLD_prediction and v2_mean are the
-% same
-if isequal( size(v_mean) , size(BOLD_prediction)) == 0
-    BOLD_prediction = BOLD_prediction';
-end
 
 % calculate the Rsquare
 Rsquare= 1 - var(v_mean - BOLD_prediction)/var(v_mean);
