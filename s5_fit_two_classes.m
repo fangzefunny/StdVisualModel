@@ -65,7 +65,8 @@ if strcmp( which_type, 'orientation' )
     
     w_d = 0;
     
-    [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d, weight_E );
+    [ parameters , BOLD_prediction , Rsquare ]=cross_validation(dataset, roi , which_model, which_type , fittime);
+
 else
     
      % Load E_xy
