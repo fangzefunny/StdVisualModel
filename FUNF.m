@@ -43,7 +43,7 @@ switch which_type
                 % calculate d
                 d_theta = E./( 1 + w * weight_E ); %E: 3D 
                 d  = squeeze(mean( d_theta , 3) );
- 
+                % add disk
         end
         % Sum over spatial position
         s = squeeze(mean(mean( d , 1) , 2)); % ep x stimuli
