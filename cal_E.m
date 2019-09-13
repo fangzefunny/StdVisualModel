@@ -51,7 +51,7 @@ for ii= 1:length(labelVec)
         if strcmpi( mode, 'orientation' )           
             
             % Create a disk-like weight to prevent edge effect
-            w = gen_disk( size( con ,  1 ) , size( con , 3 ) , 1);  %3 - D x , y , theta
+            w = gen_disk( size( con ,  1 ));  %3 - D x , y , theta
             
             % Calculate E_ori for orientation-type model
             % Sum over space

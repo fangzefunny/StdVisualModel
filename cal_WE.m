@@ -1,4 +1,4 @@
-function E = cal_WE( E_xy, labelVec, which_data )
+function E = cal_WE( E_xy, labelVec )
 %% Set up filter and print
 
 sigma_p=.1;
@@ -24,14 +24,14 @@ for ii= 1:length(labelVec)
     for ep = 1: size(E_xy,4)
                         
         % select E
-        E = E_xy( :, :, :, ep, label ); % Reduce from 5D to 3D
+        E_im = E_xy( :, :, :, ep, label ); % Reduce from 5D to 3D
         
         % size of orientation
         nL=size(kernel_w, 4);
         
         % Remap response_3D to create a response have the same value on the 4th
         % dimension, \theta_prime
-        E_4D = repmat( E, [ 1, 1, 1, nL ]); % response_4D: x, y, \theta, \theta_prime
+        E_4D = repmat( E_im, [ 1, 1, 1, nL ]); % response_4D: x, y, \theta, \theta_prime
         
         % Make a 3 dimension convolution, with x, y and \theta_prime
         for theta = 1:nL

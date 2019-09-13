@@ -33,7 +33,7 @@ for which_data = 1:4 % 4 data sets
     save(fullfile(save_address, fname), 'E_xy','-v7.3')
     
     % W_E denominator
-    weight_E = cal_WE( E_xy, labelVec, which_data );
+    weight_E = cal_WE( E_xy, labelVec);
     fname = sprintf('weight_E_%02d.mat', which_data);
     save(fullfile(save_address, fname), 'weight_E','-v7.3')
 
