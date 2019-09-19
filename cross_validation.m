@@ -104,7 +104,7 @@ for knock_index  = knock_out
                     n = para(3);
                     
                     % Assign into the right dataset
-                    E_space = E_test( : , :  , : , knock_index); % ori x example x 1
+                    E_space = E_test( :, :, :, :, knock_index); % ori x example x 1
                     
                     % mean over orientation
                     E_space = squeeze(mean (E_space, 3));
