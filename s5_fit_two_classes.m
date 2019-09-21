@@ -6,7 +6,7 @@
 %
 % #! /bin/bash
 % #SBATCH --job-name=StdModel2
-% #SBATCH -a 6,18,30,42,54 # these numbers are read in to SLURM_ARRAY_TASK_ID 
+% #SBATCH -a 1-72 # these numbers are read in to SLURM_ARRAY_TASK_ID 
 % #SBATCH --nodes=1
 % #SBATCH --cpus-per-task=4
 % #SBATCH --mem=16g
@@ -37,7 +37,7 @@ if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 
-if isempty(hpc_job_number), hpc_job_number = 11; end
+if isempty(hpc_job_number), hpc_job_number = 6; end
 
 dataset     = T.dataset(hpc_job_number);
 roi         = T.roiNum(hpc_job_number);
@@ -78,7 +78,7 @@ else
     
     fname = sprintf('E_xy_%02d.mat', dataset);
     tmp = load(fname, 'E_xy');
-    E_op = tmp.E_xy(:,:,:,which_stim); clear tmp;
+    E_op = tmp.E_xy(:,:,:,:,which_stim); clear tmp;
     
     load(sprintf('dataset%02d.mat', dataset), 'v_mean');
     v_mean_op = v_mean(roi , which_stim );
