@@ -96,17 +96,17 @@ end
 % Here we choose results from contrast model, std model, SOC model for ploting
 disp(T.modelName(1:6))
 
-modelsToPlot = [1 5]% [1:6];
+modelsToPlot = [1 3 5 6];% [1:6];
 legend_name = {'data'};
 for ii =1 :length(modelsToPlot)
     legend_name = [legend_name T.modelName{modelsToPlot(ii)}];
 end
 
 
-for dataset = 1%:numdatasets
+for dataset = 1:numdatasets
     
     figure(dataset); clf
-    set(gcf, 'Position',  [273   630   1000   500]);
+    set(gcf, 'Position',  [273   630   1000   1000]);
     for roi = 1:numrois
         
         subplot(3,1,roi)

@@ -37,7 +37,7 @@ if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 
-if isempty(hpc_job_number), hpc_job_number = 6; end
+if isempty(hpc_job_number), hpc_job_number = 3; end
 
 dataset     = T.dataset(hpc_job_number);
 roi         = T.roiNum(hpc_job_number);
@@ -65,7 +65,7 @@ if strcmp( which_type, 'orientation' )
     
     w_d = 0;
     
-    [ parameters , BOLD_prediction , Rsquare ]=cross_validation(dataset, roi , which_model, which_type , fittime);
+    [ parameters , BOLD_prediction , Rsquare ]=cross_validation('new', [], which_model, which_type, fittime, v_mean_op , E_op , w_d);
 
 else
     

@@ -85,9 +85,11 @@ end
 %% Plot the result (Figure S)
 % Here we choose results from contrast model, std model, SOC model for ploting
 
-%legend_name = {'data', 'contrast' , 'normStd' , 'normVar' , 'normPower' , 'SOC'};
-legend_name = {'data', 'contrast' ,  'normVar'};
-
+modelsToPlot = [1 3];% [1:6];
+legend_name = {'patterns' 'gratings'};
+for ii =1 :length(modelsToPlot)
+    legend_name = [legend_name T.modelName{modelsToPlot(ii)}];
+end
 figure;set(gcf, 'Position', [1 1 800 1000])
 
 for dataset = 1:4%:numdatasets
@@ -106,7 +108,7 @@ for dataset = 1:4%:numdatasets
         %subplot(1,3, roi);
         % Plot
         %plot_BOLD(sprintf('%d_target', dataset), [], pred_summary_all(: , : , dataset, roi), legend_name , v_mean_op)
-        plot_BOLD(sprintf('%d_target', dataset), [], pred_summary_all(: , [1 3] , dataset, roi), legend_name , v_mean_op)
+        plot_BOLD(sprintf('%d_target', dataset), [], pred_summary_all(: , modelsToPlot , dataset, roi), legend_name , v_mean_op)
         % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
         title(sprintf('V%d, Dataset %d', roi, dataset));
