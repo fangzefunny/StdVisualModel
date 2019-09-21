@@ -1,12 +1,12 @@
 %% Table ??: R square
 
-[ alldataset ,  allmodel , alltype] = chooseData( 'all' , 'fit_all' );
-assert(isequal(length(allmodel), length(alltype)));
+T= chooseData();
 
 
-nummodels   = length(allmodel);
-numrois     = 3;
-numdatasets = 4;
+
+nummodels   = length(unique(T.modelNum));
+numrois     = length(unique(T.roiNum));
+numdatasets = length(unique(T.dataset));
 numstimuli  = 10;
 numparams   = 3;
 
