@@ -1,5 +1,7 @@
 function plot_BOLD(dataset, roi, all_prediction, legend_name , t_mean_op)
 
+disp(dataset)
+disp(legend_name)
 
 % Colors for each model
 col_vector = {'k' , 'r' , 'g' , 'b' , 'y','m'};

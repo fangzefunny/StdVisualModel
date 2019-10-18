@@ -86,7 +86,7 @@ end
 % Here we choose results from contrast model, std model, SOC model for ploting
 
 modelsToPlot = [1 3];% [1:6];
-legend_name = {'patterns' 'gratings'};
+legend_name = {};
 for ii =1 :length(modelsToPlot)
     legend_name = [legend_name T.modelName{modelsToPlot(ii)}];
 end
@@ -105,11 +105,7 @@ for dataset = 1:4%:numdatasets
         v_mean_op = v_mean(roi ,  which_stim );
         
         subplot(4,3, roi+ (dataset-1)*3);
-        %subplot(1,3, roi);
-        % Plot
-        %plot_BOLD(sprintf('%d_target', dataset), [], pred_summary_all(: , : , dataset, roi), legend_name , v_mean_op)
         plot_BOLD(sprintf('%d_target', dataset), [], pred_summary_all(: , modelsToPlot , dataset, roi), legend_name , v_mean_op)
-        % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
         
         title(sprintf('V%d, Dataset %d', roi, dataset));
     end

@@ -43,10 +43,10 @@ switch which_type
         
         % Set up the random start points.
         % Set up the boundary of paramters
-        LB= [ 0, 0, 0];
-        UB= [200, 700, 10];
-        PLB= [0.00005, 0, 0];
-        PUB=[150, 10, 2];
+        LB=  [  0,    0,  0.01];
+        UB=  [200,  100,  1];
+        PLB= [  0.1,  1,  0.10];
+        PUB= [150,   10,  0.50];
         
         % Random the start point
         x0_w = LB(1) + (UB(1) - LB(1))*rand(fittime, 1);
