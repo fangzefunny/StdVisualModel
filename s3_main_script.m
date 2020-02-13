@@ -23,7 +23,7 @@
 
 
 
-T = chooseData();
+T = chooseData('all');
 
 % How many random start points.
 fittime  = 5;
@@ -31,8 +31,8 @@ fittime  = 5;
 %% Predict the BOLD response of given stimuli
 
 % Create empty matrix
-
-save_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'All stimulus classes');
+[ currPath, prevPath ] = stdnormRootPath();
+save_address = fullfile(currPath, 'Data', 'fitResults', 'All stimulus classes');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));

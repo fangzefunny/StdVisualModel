@@ -1,6 +1,6 @@
 %% Table ??: R square
 
-T= chooseData();
+T = chooseData('orientation');
 
 
 
@@ -10,7 +10,9 @@ numdatasets = length(unique(T.dataset));
 numstimuli  = 10;
 numparams   = 3;
 
-load_address = fullfile(stdnormRootPath, 'Data', 'fitResults', 'Two main stimulus classes');
+
+[ currPath, prevPath ] = stdnormRootPath();
+load_address = fullfile(prevPath, 'Data', 'fitResults', 'Two main stimulus classes');
 
 para_summary_all = NaN(numstimuli,numparams,nummodels,numdatasets, numrois);
 pred_summary_all = NaN(numstimuli,nummodels,numdatasets, numrois);
@@ -46,17 +48,17 @@ end
 showRsquare_v1 = Rsqu_summary_all(: , :, 1);
 
 % V2
-showRsquare_v2 = Rsqu_summary_all(: , :, 2);
+%showRsquare_v2 = Rsqu_summary_all(: , :, 2);
 
 % V3
-showRsquare_v3 = Rsqu_summary_all(: , :, 3 );
+%showRsquare_v3 = Rsqu_summary_all(: , :, 3 );
 
 
 %% Table ??: Estimated parameters
 
 for dataset = 1:numdatasets
     for roi = 1:numrois
-        for model_index = 1:5 % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
+        for model_index = 1:2 % model: (1: contrast, 2:std, 3: var, 4: power, 5:SOC)
             
             % all models except contrast model have three parameters.
             if model_index ~= 1
@@ -85,7 +87,7 @@ end
 %% Plot the result (Figure S)
 % Here we choose results from contrast model, std model, SOC model for ploting
 
-modelsToPlot = [1 3];% [1:6];
+modelsToPlot = [1 2];% [1:6];
 legend_name = {};
 for ii =1 :length(modelsToPlot)
     legend_name = [legend_name T.modelName{modelsToPlot(ii)}];

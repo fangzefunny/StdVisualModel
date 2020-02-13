@@ -113,7 +113,7 @@ for knock_index  = knock_out
                     v =  (E_space - c*mean(mean(E_space, 1) , 2)).^2; % X x Y x ep x stimuli
                     
                     % Create a disk to prevent edge effect
-                    d = bsxfun(@times, v, w_d);  % X x Y x ep x 1
+                    d = w_d.*v;  % X x Y x ep x 1
                     
                 case 'ori_surround'
                     
@@ -124,13 +124,11 @@ for knock_index  = knock_out
                     n = para(3);
                     
                     % Assign into the right dataset
-                    E_space = E_test( :, :, :, :, knock_index); % X x Y x ori x example x 1
-                    weight_E = weight_E_test( :, :, :, :, knock_index ); % X x Y x ori x example x 1
+                    E_space = E_test( :, :, :, :, knock_index); % x x Y x ori x example x 1
+                    weight_E = weight_E_test( :, :, :, :, knock_index );
                     
                     d_theta = E_space ./(1 + w * weight_E ); %E: X x Y x theta x 1 
-                    v = squeeze( mean( d_theta, 3 ) );
-                    % Create a disk as weight
-                    d = bsxfun(@times, v, w_d); % X x Y x ep x stimuli
+                    d = squeeze( mean( d_theta, 3 ) );
                    
             end
  

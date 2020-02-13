@@ -4,6 +4,7 @@ function [ para, BOLD_prediction, Rsquare ] = cal_prediction( dataset, roi, whic
 % The first value means dataset: e.p. Ca69_v1
 % Second value means model: e.p. std
 % Thrid value means type of the model: e.p.
+% The fourth variables is the number of the fittime: default is 5.
 
 % Load the dataset for our training the model
 
@@ -12,7 +13,6 @@ function [ para, BOLD_prediction, Rsquare ] = cal_prediction( dataset, roi, whic
 if isnumeric(dataset)
     
     load(sprintf('dataset%02d.mat', dataset), 'v_mean');
-    
     v_mean = v_mean(roi , : );
     
 elseif strcmp(dataset, 'new')
@@ -20,10 +20,10 @@ elseif strcmp(dataset, 'new')
     
 else
     disp('Choose the right dataset')
+    
 end
 
 % load  input of our model
-
 switch which_type
     
     % Load the input of the model according to the kinds of model we choose
@@ -33,10 +33,13 @@ switch which_type
         % orientation, we load Etot
         if isnumeric(dataset)
             load(sprintf('E_ori_%02d.mat', dataset), 'E_ori');
+            
         elseif strcmp(dataset, 'new')
             E_ori = E_op;
+            
         else
             disp('input the right data')
+            
         end
         
         % Then we begin our model fitting with random start point.

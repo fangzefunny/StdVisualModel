@@ -1,12 +1,26 @@
-function T = chooseData()
+function T = chooseData(  model_type )
 % This is a simple function to help select model
 
-% dataset is [which_dataset (1-4) | which_roi (V1-V3)];
-datasets = 1:4;
-ROIs     = {'V1' 'V2' 'V3'};
-models   = {'contrast' ,  'normStd' , 'normVar' , 'normPower', 'SOC', 'ori_surround'};
-types    = {'orientation' , 'orientation' , 'orientation' , 'orientation', 'space', 'space' };
+% The input value means: selectioning one of the dataset: 
+% 'all'
+% 'orientation',
+% 'space' 
 
+% dataset is [which_dataset (1-4) | which_roi (V1-V3)];
+datasets = 1;
+ROIs     = {'V2'}; %'V2' 'V3'};
+
+switch model_type
+    case 'all'
+        models   = {'contrast' ,  'normStd' , 'normVar' , 'normPower', 'SOC', 'ori_surround'};
+        types    = {'orientation' , 'orientation' , 'orientation' , 'orientation', 'space', 'space' };
+    case 'orientation'
+        models   = {'contrast' ,  'normStd'};% , 'normVar' , 'normPower'};
+        types    = {'orientation' , 'orientation'};% , 'orientation' , 'orientation' };
+    case 'space'
+        models   = { 'SOC', 'ori_surround'};
+        types    = { 'space', 'space' };
+end
 
 
 n = length(datasets) * length(ROIs) * length(models);
