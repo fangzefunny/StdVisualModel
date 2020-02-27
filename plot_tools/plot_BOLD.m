@@ -1,4 +1,6 @@
-function plot_BOLD(dataset, roi, all_prediction, legend_name, t_mean_op)
+function plot_BOLD(all_prediction, BOLD_target, dataset, roi, legend_name , allset )
+
+if (nargin < 6), allset = true; end
 
 % Input 1: which datasets: dataset 1 or 2...
 % Input 2: which roi area: 'v1' or 'v2' ...
@@ -7,26 +9,26 @@ function plot_BOLD(dataset, roi, all_prediction, legend_name, t_mean_op)
 % Input 5: This is prepared for arbitrary input: like two class
 
 % print useful information
-disp(dataset)
-disp(legend_name)
+%disp(dataset);
+%disp(legend_name);
 
 % some hyper parameters:
 % colors for each model, we may want to change this in the future
 col_vector = {'k', 'r', 'g', 'b', 'y', 'm'};
 fontsize = 12;
 linewidth = 4;
-markersize = 10;
+markersize = 30;
 set (gca, 'FontSize', fontsize, 'LineWidth', linewidth); hold on;
 
 % Load the fit target: fMRI data voxel mean
-if isnumeric(dataset)
+if allset 
     % load data
-    fname = sprintf('dataset%02d.mat', dataset);
-    load(fname, 'v_mean');
-    v_mean = v_mean(roi, : ); %matrix: num_roi x num_stim
+    v_mean = BOLD_target; %matrix: num_roi x num_stim
     
     % obtain some useful parameters from the data
     numstim = size(v_mean, 2);
+    nummodels = size( all_prediction ,2);
+    
     
     switch dataset
         case 1
@@ -56,14 +58,12 @@ if isnumeric(dataset)
     
     
     bar1 = bar(1:numstim , v_mean);
-    set(bar1,'Facecolor', [.7, .7, .7],'EdgeColor',[.7, .7, .7])
+    set(bar1,'Facecolor', [.7, .7, .7], 'EdgeColor', [.7, .7, .7])
     
     hold on
     
-    if ~isempty(all_prediction)
-        
-        nummodels = size( all_prediction ,2);
-        all_prediction = all_prediction(1:numstim,:); %???
+    if ~isnan( all_prediction )
+        all_prediction = all_prediction(1:numstim, :); %???
         
         % visualized the prediction: scatter
         for which_prediction = 1:nummodels
@@ -71,9 +71,10 @@ if isnumeric(dataset)
             model_prediction = all_prediction(: , which_prediction );
             model_prediction = model_prediction';
             col = col_vector{which_prediction};
-            scatter(1:numstim, model_prediction, 'filled','MarkerFaceColor', col)
+            scatter(1:numstim, model_prediction, markersize, 'filled','MarkerFaceColor', col)
             
         end
+        
         
         % visualized the prediction: line plot
         for which_prediction = 1:nummodels
@@ -86,48 +87,46 @@ if isnumeric(dataset)
                 plot(idx, model_prediction(idx), col);
             end
         end
-        
     end
-    
-    % seperate the group of the data and label 
     
     % Label the group
     set(gca, 'xtick', xgroups(:,1));
     set(gca, 'XTickLabel', groupnames);
-
+    
     h=gca;
     th=rotateticklabel(h,45);
     box off
-    hold on
-
+    
     % The legend of the line
     g=max(v_mean)*1;
-
+    
     for ii = 1:size(xgroups,1)
         x = xgroups(ii,2)+.4;
         line([x x],[0,g])
     end
-        
-    if ~isempty(legend_name)
+    
+    if ~isnan( all_prediction )
         legend('data', legend_name, 'Location', 'EastOutside')
     end
     
+    hold off
+    
 else
-    markersize = 10;
+    markersize = 20;
     switch dataset
-        case { '1_target' , '2_target'}
+        case { 1 , 2 }
             x1 = 1:5;  y1 = 1:5;
             x2 = 6:10; y2 = 6:10;
-        case { '3_target' , '4_target'}
+        case { 3 , 4 }
             x1 = 1:4; y1 = 9:-1:6;
             x2 = 5:9; y2 = 5:-1:1;
     end
     
     
-    b1 = bar(x1, t_mean_op(y1)); hold on
-    b2 = bar(x2, t_mean_op(y2));
-    set(b1,'Facecolor', [86 44 136]/255);% [.7, .7, .7])
-    set(b2,'Facecolor', [66 140 203]/255);% [.7, .7, .7])
+    b1 = bar(x1, BOLD_target(y1)); hold on
+    b2 = bar(x2, BOLD_target(y2));
+    set(b1,'Facecolor', [86 44 136]/255,'Edgecolor', [86 44 136]/255);% [.7, .7, .7])
+    set(b2,'Facecolor', [66 140 203]/255,'Edgecolor', [66 140 203]/255);% [.7, .7, .7])
     hold on
     for which_prediction = 1:size( all_prediction ,2)
         model_prediction = all_prediction(  : , which_prediction );

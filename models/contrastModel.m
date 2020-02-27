@@ -15,10 +15,11 @@ classdef contrastModel
     methods
         
         % init the model
-        function model = contrastModel( param_bound, param_pbound, fittime )
-            if (nargin < 3), fittime = 5; end
-            if (nargin < 2), param_pbound = [ 1,  10;  .1, .5 ]; end
-            if (nargin < 1), param_bound  = [ 0, 100; 0,   1  ]; end
+        function model = contrastModel( fittime, param_bound, param_pbound )
+            
+            if (nargin < 3), param_pbound = [ 1,  10;  .1, .5 ]; end
+            if (nargin < 2), param_bound  = [ 0, 100; 0,   1  ]; end
+            if (nargin < 1), fittime = 30; end
             
             if size(param_bound,1) ~= model.num_param
                 disp('Wrong Bound')
@@ -56,13 +57,13 @@ classdef contrastModel
             d = x;
             
             % sum over orientation, s: exp x stim 
-            s = squeeze(mean(d, 1));
+            s = mean(d, 1);
             
             % add gain and nonlinearity, yi_hat: exp x stim
             yi_hat = g .* s .^ n; 
 
             % Sum over different examples, y_hat: stim 
-            y_hat = squeeze(mean(yi_hat, 1));
+            y_hat = squeeze(mean(yi_hat, 2))';
    
         end
             
@@ -130,9 +131,9 @@ classdef contrastModel
         end
         
         % fit the data
-        function [losses, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
+        function [losses, BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
             
-             if (nargin < 5), cross_valid = 'one'; end
+            if (nargin < 5), cross_valid = 'one'; end
             
             switch cross_valid
                 
@@ -141,18 +142,19 @@ classdef contrastModel
                     [loss, param] = model.optim( model, E_ori, BOLD_target, verbose );
                     params = param;
                     losses = loss;
+                    BOLD_pred = [];
                     Rsquare = [];
                     model  = model.fixparameters( model, param );
                     
                 case 'cross_valid'
-            
+                 
                     % achieve stim vector
                     stim_vector = 1 : size( E_ori, 3 );
-
+    
                     % storage
-                    BOLD_pred = nan( size( E_ori, 3 ) );
+                    BOLD_pred = nan( 1, size( E_ori, 3 ) );
                     params    = nan( model.num_param, size( E_ori, 3 ) );
-                    losses    = nan( size( E_ori, 3 ) );
+                    losses    = nan( 1, size( E_ori, 3 ) );
 
                     % cross_valid  
                     for knock_idx = stim_vector
@@ -160,12 +162,9 @@ classdef contrastModel
                         % train vector and train data
                         keep_idx = setdiff( stim_vector, knock_idx );
                         E_train  = E_ori( :, :, keep_idx );
-                        size(E_train)
                         target_train = BOLD_target( keep_idx );
                         E_test   = E_ori( :, :, knock_idx );
-                        size(E_test)
-                        
-
+                      
                         % fit the training data 
                         [loss, param] = model.optim( model, E_train, target_train, verbose );
                         params( :, knock_idx ) = param;

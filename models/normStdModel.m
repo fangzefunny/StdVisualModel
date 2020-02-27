@@ -1,4 +1,4 @@
-classdef normVarModel < contrastModel 
+classdef normStdModel < contrastModel 
     
     % The basic properties of the class
     properties 
@@ -8,10 +8,10 @@ classdef normVarModel < contrastModel
     methods
         
         % init the model
-        function model = normVarModel( fittime, param_bound, param_pbound )
+        function model = normStdModel( fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
-           
+         
             if (nargin < 3), param_pbound = [ .1, 10; 1,  10;  .1, .5 ]; end
             if (nargin < 2), param_bound  = [ 0, 30; 0, 100; 0,   1  ]; end
             if (nargin < 1), fittime = 30; end
@@ -29,20 +29,18 @@ classdef normVarModel < contrastModel
             model.fittime      = fittime;
             model.num_param    = param_num ;
             model.param_name   = [ 'w'; 'g'; 'n' ];
-            model.legend       = 'normVar'; 
+            model.legend       = 'normStd'; 
             model.param        = [];
         end
            
     end
-           
-    
            
     methods ( Static = true )
         
         % fix parameters
         function model = fixparameters( model, param )
             model.param = param;
-            model.legend = sprintf('normVar %s=%.2f %s=%.2f %s=%.2f',...
+            model.legend = sprintf('normStd %s=%.2f %s=%.2f %s=%.2f',...
                             model.param_name(1), param(1),...
                             model.param_name(2), param(2),...
                             model.param_name(3), param(3));
@@ -57,7 +55,7 @@ classdef normVarModel < contrastModel
             n = param(3);
             
             % d: ori x exp x stim
-            d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 
+            d = x ./ (1 + w .* std(x, 1) ); 
             
             % sum over orientation, s: exp x stim 
             s = mean(d, 1);

@@ -1,4 +1,4 @@
-function [data] = dataloader(prevPath, which_obj, dataset, roi, model, NeworOld )
+function [data] = dataloader(prevPath, which_obj, dataset, roi, model,  NeworOld )
 
 % This is the function to help load data
 % the first variable: the path need to input
@@ -6,10 +6,12 @@ function [data] = dataloader(prevPath, which_obj, dataset, roi, model, NeworOld 
 % BOLD_target, BOLD_pred, param, Rsquare
 % the last one is New fit or Old fit
 
+if (nargin < 6), NeworOld = 'new'; end
+if (nargin < 5), model = []; end
+
 addpath( genpath( fullfile( prevPath, 'Data', 'fMRIdata')))
 addpath( genpath( fullfile( prevPath, 'Data', 'Stimuli')))
 addpath( genpath( fullfile( prevPath, 'Data', 'E')))
-
 
 switch NeworOld
     case "new"
@@ -25,7 +27,9 @@ switch NeworOld
                 
                 fname = sprintf('prediction_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
                 pred = fullfile(prevPath, 'Data','fitResults', 'All stimulus classes', fname );
-                data  = pred;
+                load( pred, 'BOLD_prediction');
+                BOLD_pred = BOLD_prediction;
+                data  = BOLD_pred;
                 
             case 'param'
                 
@@ -42,7 +46,8 @@ switch NeworOld
             case 'E_ori'
                 
                 fname = sprintf('E_ori_%02d.mat', dataset);
-                E_ori = fullfile(prevPath, 'Data', 'E', fname );
+                path = fullfile(prevPath, 'Data', 'E', fname );
+                load( path, 'E_ori');
                 data  = E_ori;
                 
         end
@@ -60,7 +65,9 @@ switch NeworOld
                 
                 fname = sprintf('prediction_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
                 pred = fullfile(prevPath, 'Data','fitResult', 'All stimulus classes', fname );
-                data  = pred;
+                load( pred, 'BOLD_prediction');
+                BOLD_pred = BOLD_prediction;
+                data  = BOLD_pred;
                 
             case 'param'
                 
@@ -78,6 +85,7 @@ switch NeworOld
                 
                 fname = sprintf('E_ori_%02d.mat', dataset);
                 E_ori = fullfile(prevPath, 'Data', 'E', fname );
+                load( path, 'E_ori');
                 data  = E_ori;
                 
         end
