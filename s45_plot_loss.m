@@ -27,7 +27,7 @@ numparams = 3;
 %% start loop
 
 load_option = 'no_cross'; % 'old', 'new', 'no_cross'
-target = 'target'; % 'all', 'target'
+target = 'all'; % 'all', 'target'
 
 % storages
 para_summary = NaN( numdatasets, numrois );
