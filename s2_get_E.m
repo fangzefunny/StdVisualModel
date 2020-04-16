@@ -6,7 +6,8 @@ clear; close all; clc
 % This script is the second step, to calculate the energy as the input of
 % our later model;
 
-save_address = fullfile(stdnormRootPath, 'Data', 'E');
+[currPath, prevPath] = stdnormRootPath();
+save_address = fullfile(prevPath, 'Data', 'E_new');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 for which_data = 1:4 % 4 data sets

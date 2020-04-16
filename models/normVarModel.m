@@ -12,9 +12,9 @@ classdef normVarModel < contrastModel
             
             model = model@contrastModel();
            
-            if (nargin < 3), param_pbound = [ .1, 10; 1,  10;  .1, .5 ]; end
-            if (nargin < 2), param_bound  = [ 0, 30; 0, 100; 0,   1  ]; end
-            if (nargin < 1), fittime = 30; end
+            if (nargin < 3), param_pbound = [ .1, 8; 1,  10;  .1, .5 ]; end
+            if (nargin < 2), param_bound  = [ 0, 20; 0, 100; 0,   1  ]; end
+            if (nargin < 1), fittime = 40; end
             
             param_num = 3;
             
@@ -95,20 +95,20 @@ classdef normVarModel < contrastModel
         end
         
         % fit the data 
-        function [loss, model] = optim( model, E_ori, BOLD_target, verbose )
+        function [loss, param, loss_history] = optim( model, E_ori, BOLD_target, verbose )
             
             % call subclass
-            [loss, model] = optim@contrastModel( model, E_ori, BOLD_target, verbose );
+            [loss, param, loss_history] = optim@contrastModel( model, E_ori, BOLD_target, verbose );
         
         end
         
         % fcross valid
-        function [losses, BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
             
             if (nargin < 5), cross_valid = 'one'; end
            
             % call subclass
-            [losses, BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid );
+            [BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid );
             
         end
             

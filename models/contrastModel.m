@@ -3,13 +3,14 @@ classdef contrastModel
     % The basic properties of the class
     properties 
         fittime        
-        num_param         = 2
-        param_name        = ['g'; 'n']
-        param             = []
+        num_param           = 2
+        param_name         = ['g'; 'n']
+        param                      = []
         param_bound       = [ 0, 100; 0,   1  ]
-        param_pbound      = [ 1,  10;  .1, .5 ]
-        model_type        = 'orientation'
-        legend            = 'contrast'
+        param_pbound    = [ 1,  10;  .1, .5 ]
+        model_type           = 'orientation'
+        legend                     = 'contrast'
+        loss_log                   = []
     end
     
     methods
@@ -19,7 +20,7 @@ classdef contrastModel
             
             if (nargin < 3), param_pbound = [ 1,  10;  .1, .5 ]; end
             if (nargin < 2), param_bound  = [ 0, 100; 0,   1  ]; end
-            if (nargin < 1), fittime = 30; end
+            if (nargin < 1), fittime = 40; end
             
             if size(param_bound,1) ~= model.num_param
                 disp('Wrong Bound')
@@ -34,8 +35,6 @@ classdef contrastModel
            
     end
         
-        
-    
     methods ( Static = true )
         
         % fix parameters
@@ -95,7 +94,7 @@ classdef contrastModel
         end
         
         % fit the data 
-        function [loss, param] = optim( model, E_ori, BOLD_target, verbose )
+        function [loss, param, loss_history] = optim( model, E_ori, BOLD_target, verbose )
             
             % set up the loss function
             func=@(x) model.loss_fn( x, model, E_ori, BOLD_target );
@@ -127,11 +126,12 @@ classdef contrastModel
             loss  = min(sse);
             trial = find( sse == loss );
             param = x( trial(1), : ); 
+            loss_history = sse;
             
         end
         
         % fit the data
-        function [losses, BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
             
             if (nargin < 5), cross_valid = 'one'; end
             
@@ -139,11 +139,14 @@ classdef contrastModel
                 
                 case 'one'
                     
-                    [loss, param] = model.optim( model, E_ori, BOLD_target, verbose );
+                    % optimize to find the best 
+                    [loss, param, loss_history] = model.optim( model, E_ori, BOLD_target, verbose );
                     params = param;
-                    losses = loss;
-                    BOLD_pred = [];
-                    Rsquare = [];
+                    loss_histories = loss_history;
+                  
+                    % predict test data 
+                    BOLD_pred = model.forward( E_ori, param );
+                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
                     model  = model.fixparameters( model, param );
                     
                 case 'cross_valid'
@@ -155,6 +158,7 @@ classdef contrastModel
                     BOLD_pred = nan( 1, size( E_ori, 3 ) );
                     params    = nan( model.num_param, size( E_ori, 3 ) );
                     losses    = nan( 1, size( E_ori, 3 ) );
+                    loss_histories = nan( model.fittime, size(E_ori,3) );
 
                     % cross_valid  
                     for knock_idx = stim_vector
@@ -166,9 +170,10 @@ classdef contrastModel
                         E_test   = E_ori( :, :, knock_idx );
                       
                         % fit the training data 
-                        [loss, param] = model.optim( model, E_train, target_train, verbose );
+                        [loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
                         params( :, knock_idx ) = param;
                         losses( knock_idx ) = loss;
+                        loss_histories( :, knock_idx ) = loss_history;
                         
                         % predict test data 
                         BOLD_pred( knock_idx ) = model.forward( E_test, param );
@@ -182,8 +187,10 @@ classdef contrastModel
                     params_boot = mean( params, 1 );
                     model  = model.fixparameters( model, params_boot );
             end
+            
+            model.loss_log = loss_histories;
                       
         end
-        
+                
     end
 end

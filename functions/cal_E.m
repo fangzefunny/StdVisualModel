@@ -19,7 +19,7 @@ sz = numpix + padsize*2;
 
 switch mode
     case 'orientation'
-        E = zeros(8, 9, length(labelVec));
+        E = zeros(nO, 9, length(labelVec));
     case 'space'  
         E = nan( sz, sz, nO, 9, length( labelVec ) );
 end
@@ -32,9 +32,7 @@ for ii= 1:length(labelVec)
     if ismember(ii, idx), fprintf('.'); end
     
     label = labelVec(ii);
-    
-    
-    
+   
     for ep = 1 : 9 % Each have 9 examples.
         
         stimulus = data( : , : , ep , label );
@@ -60,7 +58,7 @@ for ii= 1:length(labelVec)
             % Store the data into a matrix
             E( : ,  ep , ii ) = E_ori';
             
-        elseif strcmp( mode, 'space' ) == 1
+        elseif strcmp( mode, 'space' )
             % Calculate E_space for space-type model
             % Assign the data into a matrix
             E( : , : , : , ep , ii ) = con;
