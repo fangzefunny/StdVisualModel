@@ -80,6 +80,14 @@ classdef contrastModel
             
         end
         
+        % measure the mse 
+        function loss = mse( BOLD_pred, BOLD_target )
+            
+            loss = mean((BOLD_pred- BOLD_target).^2);
+            
+        end
+        
+        
         % loss function with sum sqaure error: sum( y - y_hat ).^2
         function sse = loss_fn(param, model, E_ori, y_target )
             
@@ -119,6 +127,7 @@ classdef contrastModel
                 
                 % optimization
                 [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
+                %[ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 
             end
             

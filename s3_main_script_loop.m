@@ -1,7 +1,7 @@
 %% set path
 
 [curPath, prevPath] = stdnormRootPath();
-save_address = fullfile(prevPath, 'Data', 'noCross', 'All stimulus classes');
+save_address = fullfile(prevPath, 'Data', 'noCross', 'All stimulus classes', 'fmincon');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % add path to the function
@@ -40,7 +40,7 @@ for job = 1: len
     model = T.modelLoader{model_idx};
     
     % load training label
-    BOLD_target = dataloader( prevPath, 'BOLD_target', dataset, roi );
+    BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi );
     
     % load the input stimuli
     switch model.model_type
@@ -49,7 +49,7 @@ for job = 1: len
         case 'space'
             data_type = 'E_xy';
     end
-    E = dataloader( prevPath, data_type, dataset, roi, 'old' );
+    E = dataloader( prevPath, data_type, target, dataset, roi, 'old' );
     
     % fit the data without cross validation: knock-1-out, don't show the fit 
     [BOLD_pred, params, Rsquare, model] = ...

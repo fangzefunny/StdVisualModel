@@ -86,6 +86,14 @@ classdef normVarModel < contrastModel
             
         end
         
+        % measure the goodness of 
+        function loss= mse( BOLD_pred, BOLD_target )
+            
+            % call subclass
+            loss = mse@contrastModel( BOLD_pred, BOLD_target );
+            
+        end
+        
         % loss function with sum sqaure error: sum( y - y_hat ).^2
         function sse = loss_fn( param, model, E_ori, y_target )
             

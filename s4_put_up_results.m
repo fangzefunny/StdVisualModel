@@ -93,14 +93,14 @@ for dataset = 1:numdatasets
     
     if strcmp( target, 'target' ) ==0
         % define filename and save the file
-        save_figure = sprintf( 'figures/%s', load_option);
+        save_figure = sprintf( 'figures/%s/bads', load_option);
         if ~exist(save_figure, 'dir'), mkdir(save_figure); end
-        filename = sprintf( 'figures/%s/dataset%d-%s', load_option, dataset, target);
+        filename = sprintf( 'figures/%s/bads/dataset%d-%s', load_option, dataset, target);
         savefig(filename)
         %print
-        print_figure = sprintf( 'pdf/%s', load_option);
+        print_figure = sprintf( 'pdf/%s/bads', load_option);
         if ~exist(print_figure, 'dir'), mkdir(print_figure); end
-         filename = sprintf( 'pdf/%s/dataset%d-%s', load_option, dataset, target);
+         filename = sprintf( 'pdf/%s/bads/dataset%d-%s', load_option, dataset, target);
         print(filename,'-dpng')
     end
     
@@ -108,13 +108,13 @@ end
 
 if strcmp( target, 'target' )
         % define filename and save the file
-        save_figure = sprintf( 'figures/%s', load_option);
+        save_figure = sprintf( 'figures/%s/fmincon', load_option);
         if ~exist(save_figure, 'dir'), mkdir(save_figure); end
-        filename = sprintf( 'figures/%s/alldataset-%s', load_option, target);
+        filename = sprintf( 'figures/%s/fmincon-alldataset-%s', load_option, target);
         savefig(filename)
         %print
-        print_figure = sprintf( 'pdf/%s', load_option);
+        print_figure = sprintf( 'pdf/%s/fmincon', load_option);
         if ~exist(print_figure, 'dir'), mkdir(print_figure); end
-         filename = sprintf( 'pdf/%s/alldataset%d-%s', load_option, target);
+         filename = sprintf( 'pdf/%s/fmincon-alldataset%d-%s', load_option, target);
         print(filename,'-dpng')
     end

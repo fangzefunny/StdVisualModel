@@ -2,14 +2,16 @@
 close all; clear all; clc
 %% set path
 
-target = 'target'; %'all' target'
+optimizer = 'bads'; 
+
+target = 'all'; %'all' target'
 
 [curPath, prevPath] = stdnormRootPath();
 
 if strcmp( target, 'target' )
-    save_address = fullfile(prevPath, 'Data', 'noCross', 'Target stimulus classes');
+    save_address = fullfile(prevPath, 'Data', 'noCross', 'Target stimulus classes', optimizer);
 else
-    save_address = fullfile(prevPath, 'Data', 'noCross', 'All stimulus classes');
+    save_address = fullfile(prevPath, 'Data', 'noCross', 'All stimulus classes', optimizer);
 end
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
@@ -25,6 +27,7 @@ addpath( genpath( fullfile( curPath, 'plot_tools' )))
 %% choose data and hyperparameter
 
 T = chooseData( 'orientation' );
+fittime = 20;
 
 %% start loop
 

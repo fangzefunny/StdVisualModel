@@ -14,6 +14,30 @@ addpath( genpath( fullfile( prevPath, 'Data', 'Stimuli')))
 addpath( genpath( fullfile( prevPath, 'Data', 'E')))
 
 switch NeworOld
+    case 'fmincon' 
+        switch which_obj
+          case 'BOLD_pred'
+                
+                if strcmp(target,  'target')
+                    fname = sprintf('prediction_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
+                    path= fullfile(prevPath, 'Data','noCross', 'Target stimulus classes','fmincon', fname );
+                    load( path, 'BOLD_pred');
+                    data = BOLD_pred;
+                    
+                    switch dataset
+                        case {1, 2}
+                            data = data(1:10);
+                        case{3, 4, 5}
+                            data = data(31:39);
+                    end
+                else
+                    fname = sprintf('prediction_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
+                    path= fullfile(prevPath, 'Data','noCross', 'All stimulus classes', 'fmincon', fname );
+                    load( path, 'BOLD_pred');
+                    data = BOLD_pred;
+                end
+        end
+    
     case "new"
         switch which_obj
             
@@ -194,13 +218,13 @@ switch NeworOld
                 if strcmp(target,  'target')
                     fname = sprintf('parameters_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
                     path = fullfile(prevPath, 'Data','noCross', 'Target stimulus classes', fname );
-                    load( path, 'parameters' )
-                    data  = parameters;
+                    load( path, 'params' )
+                    data  = params;
                 else
                     fname = sprintf('parameters_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
                     path = fullfile(prevPath, 'Data','noCross', 'All stimulus classes', fname );
-                    load( path, 'parameters' )
-                    data  = parameters;
+                    load( path, 'params' )
+                    data  = params;
                 end
                 
             case 'Rsquare'
