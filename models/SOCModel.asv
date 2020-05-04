@@ -54,25 +54,11 @@ classdef SOCModel < contrastModel
         end
         
        % function: choose weight 
-       function model = disk_weight( model, size )
-           
-           % create a meshgrid
-           [ X , Y ] = meshgrid( linspace( -1 , 1, size_e));
-           
-           % Create a disk with certain size
-            w = zeros( size_e ,  size_e);
-            panel = X.^2 + Y.^2;
-
-            % Choose the radius of the disk ,  3 std of the edge size 
-            theresold = (( size_e - 80 ) - 36)/size_e ;
- 
-           model.receptive_weight = 
+       function weight = 
         
        % function: f()
-        function y_hat = forward(model, x, param, )
-            
-            if model.receptive_weight ==0:
-                weight_d = model.disk_weight()
+        function y_hat = forward( x, param )
+  
              
             c = param(1);
             g = param(2);

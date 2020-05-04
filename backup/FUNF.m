@@ -36,7 +36,7 @@ switch which_type
                 
                 % Do a variance-like calculation
                 v =  (E - w*mean(mean(E, 1) , 2)).^2; % X x Y x ep x stimuli
-                d = bsxfun(@times, v, w_d);
+                
                 
             case 'ori_surround'
                 

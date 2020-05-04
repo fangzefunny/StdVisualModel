@@ -49,7 +49,7 @@ classdef contrastModel
         end
         
         % the core model function 
-        function y_hat = forward( x, param )
+        function y_hat = forward(model, x, param )
             
             % set param
             g = param(1);
@@ -72,7 +72,7 @@ classdef contrastModel
         % predict the BOLD response: y_hat = f(x)
         function BOLD_pred = predict( model, E_ori )
             
-            BOLD_pred = model.forward( E_ori, model.param );
+            BOLD_pred = model.forward(model, E_ori, model.param );
             
         end
         
@@ -86,7 +86,7 @@ classdef contrastModel
         % measure the mse 
         function loss = mse( BOLD_pred, BOLD_target )
             
-            loss = mean((BOLD_pred- BOLD_target).^2);
+            loss = double(mean((BOLD_pred- BOLD_target).^2));
             
         end
         
@@ -95,7 +95,7 @@ classdef contrastModel
         function sse = loss_fn(param, model, E_ori, y_target )
             
             % predict y_hat: 1 x stim 
-            y_hat = model.forward( E_ori, param );
+            y_hat = model.forward(model, E_ori, param );
             
             % square error
             square_error = (y_target - y_hat).^2;
@@ -161,7 +161,7 @@ classdef contrastModel
                     loss_histories = loss_history;
                   
                     % predict test data 
-                    BOLD_pred = model.forward( E_ori, param );
+                    BOLD_pred = model.forward(model, E_ori, param );
                     Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
                     model  = model.fixparameters( model, param );
                     
@@ -192,7 +192,7 @@ classdef contrastModel
                         loss_histories( :, knock_idx ) = loss_history;
                         
                         % predict test data 
-                        BOLD_pred( knock_idx ) = model.forward( E_test, param );
+                        BOLD_pred( knock_idx ) = model.forward(model, E_test, param );
                         
                     end 
                     

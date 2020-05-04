@@ -3,8 +3,8 @@
 clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
-optimizer        = 'bads';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
+target               = 'All';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valiad   = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
@@ -148,7 +148,3 @@ for dataset = 1:numdatasets
     print(filename,'-dpng')
     
 end
-
-%% Loss landscape 
-
-

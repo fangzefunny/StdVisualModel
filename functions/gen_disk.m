@@ -8,13 +8,11 @@ function [ w ] = gen_disk( size_e)
         panel = X.^2 + Y.^2;
         
         % Choose the radius of the disk ,  3 std of the edge size 
-        theresold = (( size_e - 80 ) - 36)/size_e ;
+        theresold = .75;
         
         % Any pixels 
         [index] = find(panel < theresold);
         w(index) = 1;
-        
-       
-   
+     
 end
 

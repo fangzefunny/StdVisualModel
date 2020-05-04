@@ -65,6 +65,20 @@ switch which_obj
                     end
         end
         
+   case 'E_xy'
+        fname = sprintf('E_xy_%02d.mat', dataset);
+        path = fullfile(prevPath, 'Data', 'E_new', fname );
+        load( path, 'E_xy');
+        data  = E_xy;
+        if strcmp(target,  'target')
+                    switch dataset
+                        case {1, 2}
+                            data = data(:, :, :, 1:10);
+                        case{3, 4, 5}
+                            data = data(:, :, :, 31:39);
+                    end
+        end
+        
     case 'stimuli' 
         fname = sprintf('stimuli-dataset0%1d_orig', dataset);
         path=fullfile(prevPath, 'Data', 'Stimuli', fname);

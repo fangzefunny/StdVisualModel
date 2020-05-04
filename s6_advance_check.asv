@@ -3,8 +3,8 @@
 clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
-optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'All';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+optimizer        = 'bads';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
+target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valiad   = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
@@ -82,25 +82,18 @@ plot(x, loss_fmincon,'-o',...
              'MarkerFaceColor', 'r' )
  legend( 'bads', 'fmincon' )
  title( 'Compare Loss: bads vs. fmincon' )
- ylabel( 'min loss')
  set(gca, 'xtick', x);
  set(gca,'XTickLabel', xtick);
  h=gca;
 th=rotateticklabel(h,60);
-hold off 
-
-% define filename and save the file
-filename = fullfile( figure_address, sprintf(  '/loss_compare') );
-savefig(filename)
-%print
-filename = fullfile( pdf_address, sprintf(  '/loss_compare')  );
-print(filename,'-dpng')
-
-%% Loss landscape
-target = 'All';
-dataset = 1;
- roi = 2;
- model_idx = 1;
-param_pbound = [0,.2; .15,.4];
-plot_loss_landscape( target, dataset, roi, model_idx, param_pbound )
+ 
+ 
+         
+%     % save data
+%     save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'params');
+%     save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'BOLD_pred');
+%     save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'Rsquare');
+%     save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'loss_log');
+%   
+%     
 

@@ -50,7 +50,7 @@ classdef normStdModel < contrastModel
         end
         
         % function: f()
-        function y_hat = forward( x, param )
+        function y_hat = forward( model, x, param )
              
             w = param(1);
             g = param(2);

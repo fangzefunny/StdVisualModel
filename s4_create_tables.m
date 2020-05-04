@@ -104,5 +104,5 @@ end
 %% show table
 
 % show R square table  
-% show_table( prevPath, 'Rsquare_table', target, data_folder, optimizer); 
-% show_table( prevPath, 'param_table', target, data_folder, optimizer); 
+show_table( prevPath, 'Rsquare_table', target, data_folder, optimizer); 
+show_table( prevPath, 'param_table', target, data_folder, optimizer); 
