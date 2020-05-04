@@ -2,6 +2,7 @@ classdef contrastModel
     
     % The basic properties of the class
     properties 
+        optimizer               
         fittime        
         num_param           = 2
         param_name         = ['g'; 'n']
@@ -16,11 +17,12 @@ classdef contrastModel
     methods
         
         % init the model
-        function model = contrastModel( fittime, param_bound, param_pbound )
+        function model = contrastModel( optimizer, fittime, param_bound, param_pbound )
             
-            if (nargin < 3), param_pbound = [ 1,  10;  .1, .5 ]; end
-            if (nargin < 2), param_bound  = [ 0, 100; 0,   1  ]; end
-            if (nargin < 1), fittime = 40; end
+            if (nargin < 4), param_pbound = [ 1,  10;  .1, .5 ]; end
+            if (nargin < 3), param_bound  = [ 0, 100; 0,   1  ]; end
+            if (nargin < 2), fittime = 40; end
+            if (nargin < 1), optimizer = 'fmincon';end
             
             if size(param_bound,1) ~= model.num_param
                 disp('Wrong Bound')
@@ -31,6 +33,7 @@ classdef contrastModel
             model.param_bound  = param_bound;
             model.param_pbound = param_pbound; 
             model.fittime      = fittime;
+            model.optimizer = optimizer; 
         end
            
     end
@@ -126,8 +129,12 @@ classdef contrastModel
             for ii = 1:model.fittime
                 
                 % optimization
-                [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
-                %[ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                switch model.optimizer
+                    case 'bads'
+                        [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
+                    case 'fmincon'
+                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                end
                 
             end
             

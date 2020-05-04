@@ -1,19 +1,18 @@
+%% clear the memory
 
-close all; clear all; clc
+clear all; close all; clc 
+%% hyperparameter: each time, we only need to edit this section !! 
+
+optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon 
+target               = 'target';              % Two target stimuli or the whole dataset
+fittime              = 40;               % how many initialization 
+data_folder    = 'noCross';  % save in which folder
+cross_valiad   = 'one';           % choose what kind of cross validation, 'one' is no cross validation. 
+
 %% set path
-
-optimizer = 'bads'; 
-
-target = 'all'; %'all' target'
 
 [curPath, prevPath] = stdnormRootPath();
 
-if strcmp( target, 'target' )
-    save_address = fullfile(prevPath, 'Data', 'noCross', 'Target stimulus classes', optimizer);
-else
-    save_address = fullfile(prevPath, 'Data', 'noCross', 'All stimulus classes', optimizer);
-end
-if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % add path to the function
 addpath( genpath( fullfile( curPath, 'functions' )))
@@ -24,10 +23,14 @@ addpath( genpath( fullfile( curPath, 'models' )))
 % add path to the plot tool
 addpath( genpath( fullfile( curPath, 'plot_tools' )))
 
-%% choose data and hyperparameter
+ %% generate save address and  choose data 
 
-T = chooseData( 'orientation' );
-fittime = 20;
+% save address 
+save_address = fullfile(prevPath, 'Data', data_folder, target,  optimizer);
+if ~exist(save_address, 'dir'), mkdir(save_address); end
+
+% choose data as if we are doing parallel computing 
+T      = chooseData( 'orientation', optimizer, fittime );
 
 %% start loop
 
@@ -57,11 +60,11 @@ for job = 1: len
     % load the input stimuli
     switch model.model_type
         case 'orientation'
-            data_type ='E_ori';
+            which_obj ='E_ori';
         case 'space'
-            data_type = 'E_xy';
+            which_obj = 'E_xy';
     end
-    E = dataloader( prevPath, data_type, target, dataset, roi, 'old' );
+    E = dataloader( prevPath, which_obj, target, dataset, roi, 'old' );
     
     % fit the data without cross validation: knock-1-out, don't show the fit 
     [BOLD_pred, params, Rsquare, model] = ...

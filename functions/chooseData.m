@@ -1,4 +1,4 @@
-function T = chooseData(  quick_choice )
+function T = chooseData(  quick_choice, optimizer, fittime )
 % This is a simple function to help select model
 
 % The input value means: selectioning one of the dataset: 
@@ -14,11 +14,10 @@ addpath( genpath( fullfile( currPath, 'models' )))
 datasets = [1, 2, 3, 4];
 roi_idx = [1,2,3];
 ROIs     = {'V1' 'V2' 'V3'};
-fittime = 40;
 
-model1 = contrastModel(fittime);
-model2 = normStdModel(fittime);
-model3 = normVarModel(fittime);
+model1 = contrastModel(optimizer, fittime);
+model2 = normStdModel(optimizer, fittime);
+model3 = normVarModel(optimizer, fittime);
 
 switch quick_choice
     case 'all'

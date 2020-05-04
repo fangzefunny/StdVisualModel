@@ -8,13 +8,14 @@ classdef normStdModel < contrastModel
     methods
         
         % init the model
-        function model = normStdModel( fittime, param_bound, param_pbound)
+        function model = normStdModel( optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
          
-            if (nargin < 3), param_pbound = [ .1, 4; 1,  10;  .1, .5 ]; end
-            if (nargin < 2), param_bound  = [ 0, 10; 0, 100; 0,   1  ]; end
-            if (nargin < 1), fittime = 40; end
+            if (nargin < 4), param_pbound = [ .1, 4; 1,  10;  .1, .5 ]; end
+            if (nargin < 3), param_bound  = [ 0, 10; 0, 100; 0,   1  ]; end
+            if (nargin < 2), fittime = 40; end
+            if (nargin < 1), optimizer = 'fmincon';end
             
             param_num = 3;
             
@@ -27,6 +28,7 @@ classdef normStdModel < contrastModel
             model.param_bound  = param_bound;
             model.param_pbound = param_pbound; 
             model.fittime      = fittime;
+            model.optimizer = optimizer; 
             model.num_param    = param_num ;
             model.param_name   = [ 'w'; 'g'; 'n' ];
             model.legend       = 'normStd'; 
