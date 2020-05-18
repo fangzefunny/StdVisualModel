@@ -67,15 +67,29 @@ switch which_obj
         
    case 'E_xy'
         fname = sprintf('E_xy_%02d.mat', dataset);
-        path = fullfile(prevPath, 'Data', 'E_new', fname );
+        path = fullfile(prevPath, 'Data', 'E', fname );
         load( path, 'E_xy');
         data  = E_xy;
         if strcmp(target,  'target')
                     switch dataset
                         case {1, 2}
-                            data = data(:, :, :, 1:10);
+                            data = data(:, :, :, :, 1:10);
                         case{3, 4, 5}
-                            data = data(:, :, :, 31:39);
+                            data = data(:, :, :, :, 31:39);
+                    end
+        end
+        
+    case 'weight_E'
+        fname = sprintf('weight_E_%02d.mat', dataset);
+        path = fullfile(prevPath, 'Data', 'E', fname );
+        load( path, 'weight_E');
+        data  = weight_E;
+        if strcmp(target,  'target')
+                    switch dataset
+                        case {1, 2}
+                            data = data(:, :, :, :, 1:10);
+                        case{3, 4, 5}
+                            data = data(:, :, :, :, 31:39);
                     end
         end
         

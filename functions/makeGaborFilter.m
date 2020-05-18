@@ -40,8 +40,8 @@ for f = 1:numFrequencies
         Gabor_s = real(Gabor_A);
         
         %Normalization
-        norm_Gabor_c=Gabor_c./norm(Gabor_c(:));
-        norm_Gabor_s=Gabor_s./norm(Gabor_s(:));
+        norm_Gabor_c=Gabor_c.*1/norm(Gabor_c);
+        norm_Gabor_s=Gabor_s.*1/norm(Gabor_s);
        
         
         % Scale the gobors

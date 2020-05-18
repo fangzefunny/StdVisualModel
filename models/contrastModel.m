@@ -84,9 +84,9 @@ classdef contrastModel
         end
         
         % measure the mse 
-        function loss = mse( BOLD_pred, BOLD_target )
+        function loss = rmse( BOLD_pred, BOLD_target )
             
-            loss = double(mean((BOLD_pred- BOLD_target).^2));
+            loss = double(sqrt(mean((BOLD_pred- BOLD_target).^2)));
             
         end
         
@@ -102,6 +102,7 @@ classdef contrastModel
             
             % sse
             sse = double(mean(square_error));
+            
         end
         
         % fit the data 

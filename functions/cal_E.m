@@ -1,7 +1,7 @@
 function E = cal_E( data, labelVec, mode, which_data )
 
 filter_cpd  = 3; % the images were band-passed at 3 cycles per degree
-fovs        = 12.5 * [1 3/2 1 1]; % deg (the second data set had a larger field of view than the others)
+fovs        = 12.5 * [1, 3/2, 1, 1]; % deg (the second data set had a larger field of view than the others)
 fov         = fovs(which_data);
 numpix      = size(data,1);
 pixperdeg   = numpix / fov;

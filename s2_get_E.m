@@ -7,7 +7,7 @@ clear; close all; clc
 % our later model;
 
 [currPath, prevPath] = stdnormRootPath();
-save_address = fullfile(prevPath, 'Data', 'E_new');
+save_address = fullfile(prevPath, 'Data', 'E');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 for which_data = 1:4 % 4 data sets
@@ -16,7 +16,8 @@ for which_data = 1:4 % 4 data sets
     
     % Load the stimuli
     fname = sprintf('stimuli-dataset%02d.mat', which_data);
-    load(fname, 'stimuli');
+    path=fullfile(prevPath, 'Data', 'Stimuli', fname);
+    load(path, 'stimuli')
     labelVec = 1:size(stimuli, 4);
        
     % Compute energy (E) for models that pool over space (one value per

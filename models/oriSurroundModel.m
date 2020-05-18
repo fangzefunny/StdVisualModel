@@ -1,20 +1,23 @@
-classdef normVarModel < contrastModel 
+classdef oriSurroundModel < contrastModel 
     
     % The basic properties of the class
     properties 
+        
+        receptive_weight = false
        
     end
     
     methods
         
         % init the model
-        function model = normVarModel( fittime, param_bound, param_pbound )
+        function model = oriSurroundModel( optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
            
-            if (nargin < 3), param_pbound = [ .1, 8; 1,  10;  .1, .5 ]; end
-            if (nargin < 2), param_bound  = [ 0, 20; 0, 100; 0,   1  ]; end
-            if (nargin < 1), fittime = 40; end
+            if (nargin < 4), param_pbound = [ .1,   4; 1,    5;  .1,  .5 ]; end
+            if (nargin < 3), param_bound   = [ 0,  350; 0,  100;  0,   1  ]; end
+            if (nargin < 2), fittime = 40; end
+            if (nargin < 1), optimizer = 'fmincon';end
             
             param_num = 3;
             
@@ -24,18 +27,19 @@ classdef normVarModel < contrastModel
                 error('Wrong Possible Bound')
             end
             
-            model.param_bound  = param_bound;
+            model.param_bound    = param_bound;
             model.param_pbound = param_pbound; 
-            model.fittime      = fittime;
-            model.num_param    = param_num ;
-            model.param_name   = [ 'w'; 'g'; 'n' ];
-            model.legend       = 'normVar'; 
-            model.param        = [];
+            model.fittime                   = fittime;
+            model.optimizer             = optimizer; 
+            model.num_param        = param_num ;
+            model.param_name      = [ 'w'; 'g'; 'n' ];
+            model.legend                  = 'oriSurround'; 
+            model.model_type        = 'space';
+            model.param                   = [];
+            model.receptive_weight = false; 
         end
-           
+                       
     end
-           
-    
            
     methods ( Static = true )
         
@@ -49,32 +53,164 @@ classdef normVarModel < contrastModel
                             
         end
         
-        % function: f()
-        function y_hat = forward( x, param )
+       % function: choose weight 
+       function model = disk_weight( model, height)
+           
+           % create a meshgrid
+           [ X , Y ] = meshgrid( linspace( -1 , 1, height));
+           
+           % Create a disk with certain size
+            w = zeros( height,  height);
+            panel = X.^2 + Y.^2;
+
+            % Choose the radius of the disk ,  3 std of the edge size 
+            theresold = .75;
+            
+            % pixels < theresold
+            [index ] = find( panel < theresold);
+            w( index) = 1;
+            
+            % assgin weight 
+           model.receptive_weight = w;
+       end
+       
+       % create kernerl weight: 
+       function Gauss1= kernel_weight (sigma_p,sigma_g,sigma_s, numx )
+           
+           numthetas   = 8; % The number of the \theta in the parameter
+           thetas      = (0:numthetas-1)*pi/numthetas; % \theta vector
+           
+           if ~exist('numx', 'var') || isempty(numx)
+               numx = 40; % How large the kernel should be
+           end
+           
+           xs          = linspace(-1,1,numx);% x axis
+           ys          = linspace(-1,1,numx);% y axis
+           
+           [x, y, th] = meshgrid(xs, ys, thetas) ; % Build a 3-D matrix, which is the based of our kernel
+           
+           for theta = thetas
+               % build kernel for first theta
+               theta_prime = theta*numthetas/pi +1;
+               
+               for ii = 1:numthetas
+                   R{ii} = [cos(thetas(ii)) sin(thetas(ii));
+                       -sin(thetas(ii)) cos(thetas(ii))];
+               end
+               
+               x2 = zeros(size(x));
+               y2 = zeros(size(y));
+               
+               for ii = 1:numthetas
+                   thisx = x(:,:,ii);
+                   thisy = y(:,:,ii);
+                   tmp = R{ii} * [thisx(:), thisy(:)]';
+                   x2(:,:,ii) = reshape(tmp(1,:), [numx, numx]);
+                   y2(:,:,ii) = reshape(tmp(2,:), [numx, numx]);
+               end
+               
+               
+               % Build an unoriented suppression field near the image center
+               G = exp(- ( y.^2./(2*sigma_s^2)+ x.^2./(2*sigma_s^2)));
+               
+               % Make the surround suppression orientation tuned
+               idx = thetas == theta;
+               G(:,:,idx) = exp(- ( y2(:,:,idx).^2./(2*sigma_p^2) + x2(:,:,idx).^2./(2*sigma_g^2)));
+               
+               Gauss(:,:,:,theta_prime) = G(:,:,:) / sum( G(:) );
+           end
+           Gauss1 = 8.*Gauss./sum(Gauss(:));
+       end
+  
+       
+       %function: calculate weight of E 
+       function weight_E = cal_weight_E( model, E_xy)
+           
+           sigma_p = .1;
+           sigma_g = .85;
+           sigma_s = .01;
+           
+           sz = round( size( E_xy, 1) / 10) * 2;
+           kernel_w = model.kernel_weight( sigma_p, sigma_g, sigma_s, sz );
+           height = size( E_xy, 1);
+           weight = size( E_xy, 2);
+           numori = size( E_xy, 3); 
+           numep = size( E_xy, 4);
+           stimvec = 1:size( E_xy, 5);
+           
+           % create storage 
+           we_sum_theta = nan(  height, weight, numori );
+           weight_E = nan( height, weight, numori, numep, stimvec);
+           
+           for ii = stimvec
+               
+               for ep = 1:numep
+                   
+                   % select E
+                   E_im = E_xy( :, :, :, ep, ii ); %reduce from 5D to 3D
+                   
+                   % Remap response_3D to create a response have the same value on the 4th
+                    % dimension, \theta_prime
+                    E_4D = repmat( E_im, [ 1, 1, 1, numori ]); % response_4D: x, y, \theta, \theta_prime
+                    
+                    for theta = 1:numori
+                        
+                         % fprintf('Label: %d\tEP: %d\ttheta: %d\n', ii, ep, theta);
+
+                        % Choose the appropriate kernerl_weight and e_1 contrast energy image
+                        kernel_w_prime = squeeze( kernel_w( :, :, theta, : ));
+                        image_3D_S = squeeze( E_4D( :, :, theta, : )); %3D,
+
+                        % Do the convolution to combine weight and e_1 contrast energy image
+                        w_e = convn( image_3D_S, kernel_w_prime, 'same' ); %weigthed_e_1:  x, y, \theta_prime
+
+                        % Squeeze this 3-D weighted energy map into 2-D (In another word, sum
+                        % over \theta_prime
+                        we_sum = squeeze( mean( w_e, 3 ) );  %weighted_e_1:  x, y 
+                        
+                        % Assign the result into d_1
+                        we_sum_theta( :, :, theta) = we_sum; % weighted_e_1: x, y, theta
+                    end
+                    weight_E( :, :, :, ep, ii) = we_sum_theta;
+               end
+           end 
+       end
+        
+       % function: f()
+        function y_hat = forward(model, E, weight_E, param )
+            
+            if model.receptive_weight ==false
+                height = size(E, 1) ;
+                model = model.disk_weight(model, height);
+            end
              
             w = param(1);
             g = param(2);
             n = param(3);
             
-            % d: ori x exp x stim
-            d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 
+            % calculate weight of E 
+            %weight_E = model.cal_weight_E( model, E);
             
-            % sum over orientation, s: exp x stim 
-            s = mean(d, 1);
+            % x x y x ori x exp x stim --> x x y x exp x stim
+            d_theta = E ./ ( 1 + w * weight_E); %E :3d
+            v = squeeze( mean( d_theta, 3));
+            d = bsxfun(@times, v, model.receptive_weight);
+                        
+            % Sum over spatial position
+            s = squeeze(mean(mean( d , 1) , 2)); % ep x stimuli
             
             % add gain and nonlinearity, yi_hat: exp x stim
             yi_hat = g .* s .^ n; 
 
             % Sum over different examples, y_hat: stim 
-            y_hat = squeeze(mean(yi_hat, 2))';
+            y_hat = squeeze(mean(yi_hat, 1));
            
         end
             
-        % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_ori )
+         % predict the BOLD response: y_hat = f(x)
+        function BOLD_pred = predict( model, E_xy, weight_E )
             
-            % call subclass
-            BOLD_pred = predict@contrastModel( model, E_ori);
+            BOLD_pred = model.forward(model, E_xy, weight_E, model.param );
             
         end
         
@@ -86,30 +222,131 @@ classdef normVarModel < contrastModel
             
         end
         
+         % measure the goodness of 
+        function loss= mse( BOLD_pred, BOLD_target )
+            
+            % call subclass
+            loss = mse@contrastModel( BOLD_pred, BOLD_target );
+            
+        end
+        
         % loss function with sum sqaure error: sum( y - y_hat ).^2
-        function sse = loss_fn( param, model, E_ori, y_target )
+        function sse = loss_fn(param, model, E_xy, weight_E, y_target )
             
-            % call subclass 
-            sse = loss_fn@contrastModel( param, model, E_ori, y_target );
+            % predict y_hat: 1 x stim 
+            y_hat = model.forward(model, E_xy, weight_E, param );
             
+            % square error
+            square_error = (y_target - y_hat).^2;
+            
+            % sse
+            sse = double(mean(square_error));
         end
         
         % fit the data 
-        function [loss, model] = optim( model, E_ori, BOLD_target, verbose )
+        function [loss, param, loss_history]  = optim( model, E_xy, weight_E,  BOLD_target, verbose )
             
-            % call subclass
-            [loss, model] = optim@contrastModel( model, E_ori, BOLD_target, verbose );
-        
+           % set up the loss function
+            func=@(x) model.loss_fn( x, model, E_xy, weight_E, BOLD_target );
+            
+            opts.Display = verbose;
+            
+            % set up the bound
+            lb  = model.param_bound( :, 1 );
+            ub  = model.param_bound( :, 2 );
+            plb = model.param_pbound( :, 1 );
+            pub = model.param_pbound( :, 2 );
+            
+            % init param
+            x0_set = ( lb + ( ub - lb ) .* rand( model.num_param, model.fittime ) )';
+            
+            % storage
+            x   = NaN( model.fittime, model.num_param );
+            sse = NaN( model.fittime, 1 );
+            
+            % fit with n init
+            for ii = 1:model.fittime
+                
+                % optimization
+                switch model.optimizer
+                    case 'bads'
+                        [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
+                    case 'fmincon'
+                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                end
+                
+            end
+            
+            % find the lowest sse
+            loss  = min(sse);
+            trial = find( sse == loss );
+            param = x( trial(1), : ); 
+            loss_history = sse;
+            
         end
         
         % fcross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, weight_E, BOLD_target, verbose, cross_valid )
             
-            if (nargin < 5), cross_valid = 'one'; end
-           
-            % call subclass
-            [BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid );
+            if (nargin < 6), cross_valid = 'one'; end
             
+            switch cross_valid
+                
+                case 'one'
+                    
+                    % optimize to find the best 
+                    [loss, param, loss_history] = model.optim( model, E_xy, weight_E, BOLD_target, verbose );
+                    params = param;
+                    loss_histories = loss_history;
+                  
+                    % predict test data 
+                    BOLD_pred = model.forward(model, E_xy, weight_E, param );
+                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    model  = model.fixparameters( model, param );
+                    
+                case 'cross_valid'
+                 
+                    % achieve stim vector
+                    last_idx = length(size( E_xy ));
+                    stim_dim = size( E_xy, last_idx ); 
+                    stim_vector = 1 : size( E_xy, last_idx );
+    
+                    % storage
+                    BOLD_pred = nan( 1, stim_dim);
+                    params    = nan( model.num_param, stim_dim);
+                    losses    = nan( 1, stim_dim);
+                    loss_histories = nan( model.fittime, stim_dim);
+
+                    % cross_valid  
+                    for knock_idx = stim_vector
+
+                        % train vector and train data
+                        keep_idx = setdiff( stim_vector, knock_idx );
+                        E_train  = E_xy( :, :, :, :, keep_idx );
+                        target_train = BOLD_target( keep_idx );
+                        E_test   = E_xy( :, :, :, :, knock_idx );
+                      
+                        % fit the training data 
+                        [loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
+                        params( :, knock_idx ) = param;
+                        losses( knock_idx ) = loss;
+                        loss_histories( :, knock_idx ) = loss_history;
+                        
+                        % predict test data 
+                        BOLD_pred( knock_idx ) = model.forward(model, E_test, param );
+                        
+                    end 
+                    
+                    % evaluate performance of the algorithm on test data
+                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    
+                    % bootstrap to get the param
+                    params_boot = mean( params, 1 );
+                    model  = model.fixparameters( model, params_boot );
+            end
+            
+            model.loss_log = loss_histories;
+                      
         end
             
     end

@@ -10,12 +10,12 @@ classdef SOCModel < contrastModel
     methods
         
         % init the model
-        function model = SOCModel( fittime, param_bound, param_pbound)
+        function model = SOCModel( optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
            
             if (nargin < 4), param_pbound = [ .5, 1; 0,     2;  .1,  .5 ]; end
-            if (nargin < 3), param_bound   = [ 0,   1; 0,  10;  0,   1  ]; end
+            if (nargin < 3), param_bound   = [ 0.1,   1; 0,  100;  0,   5  ]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -54,42 +54,53 @@ classdef SOCModel < contrastModel
         end
         
        % function: choose weight 
-       function model = disk_weight( model, size )
+       function model = disk_weight( model, height)
            
            % create a meshgrid
-           [ X , Y ] = meshgrid( linspace( -1 , 1, size_e));
+           [ X , Y ] = meshgrid( linspace( -1 , 1, height));
            
            % Create a disk with certain size
-            w = zeros( size_e ,  size_e);
+            w = zeros( height,  height);
             panel = X.^2 + Y.^2;
 
             % Choose the radius of the disk ,  3 std of the edge size 
-            theresold = (( size_e - 80 ) - 36)/size_e ;
- 
-           model.receptive_weight = 
+            theresold = .75;
+            
+            % pixels < theresold
+            [index ] = find( panel < theresold);
+            w( index) = 1;
+            
+            % assgin weight 
+           model.receptive_weight = w;
+       end
         
        % function: f()
-        function y_hat = forward(model, x, param, )
+        function y_hat = forward(model, E, param )
             
-            if model.receptive_weight ==0:
-                weight_d = model.disk_weight()
+            if model.receptive_weight ==false
+                height = size(E, 1) ;
+                model = model.disk_weight(model, height);
+            end
              
             c = param(1);
             g = param(2);
             n = param(3);
             
-            % d: ori x exp x stim
-            v = (E - c * mean( mean(E, 1), 2)).^2; 
-            d = bsxfun(@times, v, w_d);
+            % x x y x ori x exp x stim --> x x y x exp x stim
+            E = squeeze( mean( E, 3));
             
-            % sum over orientation, s: exp x stim 
-            s = mean(d, 1);
+            % d: x x y x exp x stim
+            v = (E - c * mean( mean(E, 1), 2)).^2; 
+            d = bsxfun(@times, v, model.receptive_weight);
+            
+            % Sum over spatial position
+            s = squeeze(mean(mean( d , 1) , 2)); % ep x stimuli
             
             % add gain and nonlinearity, yi_hat: exp x stim
             yi_hat = g .* s .^ n; 
 
             % Sum over different examples, y_hat: stim 
-            y_hat = squeeze(mean(yi_hat, 2))';
+            y_hat = squeeze(mean(yi_hat, 1));
            
         end
             

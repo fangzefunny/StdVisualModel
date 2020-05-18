@@ -15,24 +15,31 @@ datasets = [1, 2, 3, 4];
 roi_idx = [1,2,3];
 ROIs     = {'V1' 'V2' 'V3'};
 
-model1 = contrastModel(optimizer, fittime);
-model2 = normStdModel(optimizer, fittime);
-model3 = normVarModel(optimizer, fittime);
+model1 = contrastModel( optimizer, fittime);
+%model2 = normStdModel( optimizer, fittime);
+model3 = normVarModel( optimizer, fittime);
+model4 = SOCModel( optimizer, fittime);
+model5  = oriSurroundModel( optimizer, fittime);
 
 switch quick_choice
     case 'all'
-        models   = {'contrast' ,  'normStd', 'normPower', 'SOC', 'ori_surround'};
-        model_idx = [ 1, 2, 3, 4, 5 ];
+        datasets = [ 1, 2, 3, 4];
+        models   = { model1, model3, model4, model5};
+        model_idx = [ 1, 3, 4, 5];
     case 'orientation'
-        models   = {model1,  model2, model3};% , 'normPower'};
-        model_idx = [ 1, 2, 3];
+        models   = {model1,  model3};% , 'normPower'};
+        model_idx = [ 1, 3];
     case 'space'
-        models   = { 'SOC', 'ori_surround'};
+        models   = { 'SOC', 'oriSurround'};
         model_idx = [ 4, 5 ];
-    case 'data5'
-        datasets = [5];
-        models   = {model1,  model2, model3};
-        model_idx = [ 1, 2, 3];
+    case {'SOC', 'soc'}
+        datasets = [ 1, 2, 3, 4];
+        models   = {model4};
+        model_idx = [ 4];
+    case 'oriSurround'
+        datasets = [ 1, 2, 3, 4];
+        models = {model5};
+        model_idx = [ 5];
 end
 
 

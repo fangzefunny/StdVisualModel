@@ -3,16 +3,16 @@
 clear all; close all; clc 
 %% hyperparameter: each time, we only need to edit this section !! 
 
-optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon 
-target               = 'target';              % Two target stimuli or the whole dataset
-fittime              = 40;               % how many initialization 
-data_folder    = 'noCross';  % save in which folder
-cross_valiad   = 'one';           % choose what kind of cross validation, 'one' is no cross validation. 
+optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
+target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+fittime              = 40;               % how many initialization. value space: Integer
+data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
+cross_valid      = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
+choose_data = 'oriSurround';          % choose some preset data 
 
 %% set path
 
 [curPath, prevPath] = stdnormRootPath();
-
 
 % add path to the function
 addpath( genpath( fullfile( curPath, 'functions' )))
@@ -30,7 +30,7 @@ save_address = fullfile(prevPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing 
-T      = chooseData( 'orientation', optimizer, fittime );
+T      = chooseData( choose_data, optimizer, fittime );
 
 %% start loop
 
@@ -52,7 +52,7 @@ for job = 1: len
     disp( display )
     
     % load model
-    model = T.modelLoader{model_idx};
+    model = T.modelLoader{job};
     
     % load training label
     BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi );
@@ -66,18 +66,32 @@ for job = 1: len
     end
     E = dataloader( prevPath, which_obj, target, dataset, roi, 'old' );
     
-    % fit the data without cross validation: knock-1-out, don't show the fit 
-    [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, BOLD_target, 'off' );
+    if strcmp( model.legend, 'oriSurround')
+        disp( 'ori_surround')
+
+        % gain weight E
+        weight_E = dataloader( prevPath, 'weight_E', target, dataset, roi );
+        
+        % fit the data without cross validation: knock-1-out, don't show the fit
+        [BOLD_pred, params, Rsquare, model] = ...
+            model.fit( model, E, weight_E, BOLD_target, 'off' );
+    else 
+        % fit the data without cross validation: knock-1-out, don't show the fit
+        [BOLD_pred, params, Rsquare, model] = ...
+            model.fit( model, E, BOLD_target, 'off', cross_valid);
+    end
     
-    loss_log = model.loss_log;
+    if strcmp( cross_valid, 'one')
+        loss_log = model.loss_log;
+    end
     
     % save data
     save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'params');
     save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'BOLD_pred');
     save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'Rsquare');
-    save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'loss_log');
-  
+    if strcmp( cross_valid, 'one')
+        save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'loss_log');
+    end
     
 end
 
