@@ -20,7 +20,7 @@ classdef contrastModel
         function model = contrastModel( optimizer, fittime, param_bound, param_pbound )
             
             if (nargin < 4), param_pbound = [ 1,  10;  .1, .5 ]; end
-            if (nargin < 3), param_bound  = [ 0, 100; 0,   1  ]; end
+            if (nargin < 3), param_bound  = [ -6, 5;  -6,   1  ]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -52,8 +52,8 @@ classdef contrastModel
         function y_hat = forward(model, x, param )
             
             % set param
-            g = param(1);
-            n = param(2);
+            g = exp(param(1));
+            n = exp(param(2));
             
             % d: ori x exp x stim
             d = x;
@@ -84,7 +84,7 @@ classdef contrastModel
         end
         
         % measure the mse 
-        function loss = rmse( BOLD_pred, BOLD_target )
+        function loss = mse( BOLD_pred, BOLD_target )
             
             loss = double(sqrt(mean((BOLD_pred- BOLD_target).^2)));
             

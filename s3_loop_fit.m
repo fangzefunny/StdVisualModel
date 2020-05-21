@@ -4,11 +4,11 @@ clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !! 
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid      = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_data = 'oriSurround';          % choose some preset data 
+choose_data = 'soc';          % choose some preset data 
 
 %% set path
 
@@ -75,6 +75,17 @@ for job = 1: len
         % fit the data without cross validation: knock-1-out, don't show the fit
         [BOLD_pred, params, Rsquare, model] = ...
             model.fit( model, E, weight_E, BOLD_target, 'off' );
+        
+    elseif strcmp( model.legend, 'SOC1')
+        disp( 'soc1')
+        
+         % gain E_mean
+        E_mean = dataloader( prevPath, 'E_mean', target, dataset, roi );
+        
+        % fit the data without cross validation: knock-1-out, don't show the fit
+        [BOLD_pred, params, Rsquare, model] = ...
+            model.fit( model, E, E_mean, BOLD_target, 'off' );
+        
     else 
         % fit the data without cross validation: knock-1-out, don't show the fit
         [BOLD_pred, params, Rsquare, model] = ...

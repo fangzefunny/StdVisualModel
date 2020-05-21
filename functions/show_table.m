@@ -28,5 +28,15 @@ switch which_obj
             param_table
         end
         
+     case 'RMSE_table'
+        for roi = 1:3
+            fname = sprintf('rmse_table-%d_roi.mat',roi );
+            load_path = fullfile( prevPath, 'Data', data_folder, target, optimizer, fname);
+            load( load_path, 'rmse_table');
+            roi_name = sprintf('-------------------------------------V%d------------------------------', roi);
+            disp( roi_name )
+            rmse_table
+        end
+        
 end
 

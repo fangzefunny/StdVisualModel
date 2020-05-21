@@ -32,6 +32,20 @@ switch which_obj
                     end
         end
         
+    case 'BOLD_target_error' 
+        fname = sprintf('dataset%02d.mat', dataset);
+        load_path = fullfile(prevPath, 'Data','fMRIdata', fname );
+        load(load_path, 'BOLD_se');
+        data = BOLD_se( roi, :);
+        if strcmp(target,  'target')
+                    switch dataset
+                        case {1, 2}
+                            data = data(1:10);
+                        case{3, 4, 5}
+                            data = data(31:39);
+                    end
+        end
+        
     case 'param'
         fname = sprintf('parameters_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
         load_path = fullfile(prevPath, 'Data', data_folder, target, optimizer, fname );
@@ -84,6 +98,20 @@ switch which_obj
         path = fullfile(prevPath, 'Data', 'E', fname );
         load( path, 'weight_E');
         data  = weight_E;
+        if strcmp(target,  'target')
+                    switch dataset
+                        case {1, 2}
+                            data = data(:, :, :, :, 1:10);
+                        case{3, 4, 5}
+                            data = data(:, :, :, :, 31:39);
+                    end
+        end
+        
+   case 'E_mean'
+        fname = sprintf('E_mean_%02d.mat', dataset);
+        path = fullfile(prevPath, 'Data', 'E', fname );
+        load( path, 'E_mean');
+        data  = E_mean;
         if strcmp(target,  'target')
                     switch dataset
                         case {1, 2}

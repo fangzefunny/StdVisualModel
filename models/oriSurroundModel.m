@@ -15,7 +15,7 @@ classdef oriSurroundModel < contrastModel
             model = model@contrastModel();
            
             if (nargin < 4), param_pbound = [ .1,   4; 1,    5;  .1,  .5 ]; end
-            if (nargin < 3), param_bound   = [ 0,  350; 0,  100;  0,   1  ]; end
+            if (nargin < 3), param_bound   = [ 0,  400; 0,  200;  0,   1  ]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -72,108 +72,6 @@ classdef oriSurroundModel < contrastModel
             
             % assgin weight 
            model.receptive_weight = w;
-       end
-       
-       % create kernerl weight: 
-       function Gauss1= kernel_weight (sigma_p,sigma_g,sigma_s, numx )
-           
-           numthetas   = 8; % The number of the \theta in the parameter
-           thetas      = (0:numthetas-1)*pi/numthetas; % \theta vector
-           
-           if ~exist('numx', 'var') || isempty(numx)
-               numx = 40; % How large the kernel should be
-           end
-           
-           xs          = linspace(-1,1,numx);% x axis
-           ys          = linspace(-1,1,numx);% y axis
-           
-           [x, y, th] = meshgrid(xs, ys, thetas) ; % Build a 3-D matrix, which is the based of our kernel
-           
-           for theta = thetas
-               % build kernel for first theta
-               theta_prime = theta*numthetas/pi +1;
-               
-               for ii = 1:numthetas
-                   R{ii} = [cos(thetas(ii)) sin(thetas(ii));
-                       -sin(thetas(ii)) cos(thetas(ii))];
-               end
-               
-               x2 = zeros(size(x));
-               y2 = zeros(size(y));
-               
-               for ii = 1:numthetas
-                   thisx = x(:,:,ii);
-                   thisy = y(:,:,ii);
-                   tmp = R{ii} * [thisx(:), thisy(:)]';
-                   x2(:,:,ii) = reshape(tmp(1,:), [numx, numx]);
-                   y2(:,:,ii) = reshape(tmp(2,:), [numx, numx]);
-               end
-               
-               
-               % Build an unoriented suppression field near the image center
-               G = exp(- ( y.^2./(2*sigma_s^2)+ x.^2./(2*sigma_s^2)));
-               
-               % Make the surround suppression orientation tuned
-               idx = thetas == theta;
-               G(:,:,idx) = exp(- ( y2(:,:,idx).^2./(2*sigma_p^2) + x2(:,:,idx).^2./(2*sigma_g^2)));
-               
-               Gauss(:,:,:,theta_prime) = G(:,:,:) / sum( G(:) );
-           end
-           Gauss1 = 8.*Gauss./sum(Gauss(:));
-       end
-  
-       
-       %function: calculate weight of E 
-       function weight_E = cal_weight_E( model, E_xy)
-           
-           sigma_p = .1;
-           sigma_g = .85;
-           sigma_s = .01;
-           
-           sz = round( size( E_xy, 1) / 10) * 2;
-           kernel_w = model.kernel_weight( sigma_p, sigma_g, sigma_s, sz );
-           height = size( E_xy, 1);
-           weight = size( E_xy, 2);
-           numori = size( E_xy, 3); 
-           numep = size( E_xy, 4);
-           stimvec = 1:size( E_xy, 5);
-           
-           % create storage 
-           we_sum_theta = nan(  height, weight, numori );
-           weight_E = nan( height, weight, numori, numep, stimvec);
-           
-           for ii = stimvec
-               
-               for ep = 1:numep
-                   
-                   % select E
-                   E_im = E_xy( :, :, :, ep, ii ); %reduce from 5D to 3D
-                   
-                   % Remap response_3D to create a response have the same value on the 4th
-                    % dimension, \theta_prime
-                    E_4D = repmat( E_im, [ 1, 1, 1, numori ]); % response_4D: x, y, \theta, \theta_prime
-                    
-                    for theta = 1:numori
-                        
-                         % fprintf('Label: %d\tEP: %d\ttheta: %d\n', ii, ep, theta);
-
-                        % Choose the appropriate kernerl_weight and e_1 contrast energy image
-                        kernel_w_prime = squeeze( kernel_w( :, :, theta, : ));
-                        image_3D_S = squeeze( E_4D( :, :, theta, : )); %3D,
-
-                        % Do the convolution to combine weight and e_1 contrast energy image
-                        w_e = convn( image_3D_S, kernel_w_prime, 'same' ); %weigthed_e_1:  x, y, \theta_prime
-
-                        % Squeeze this 3-D weighted energy map into 2-D (In another word, sum
-                        % over \theta_prime
-                        we_sum = squeeze( mean( w_e, 3 ) );  %weighted_e_1:  x, y 
-                        
-                        % Assign the result into d_1
-                        we_sum_theta( :, :, theta) = we_sum; % weighted_e_1: x, y, theta
-                    end
-                    weight_E( :, :, :, ep, ii) = we_sum_theta;
-               end
-           end 
        end
         
        % function: f()

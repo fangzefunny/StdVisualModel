@@ -13,7 +13,7 @@ classdef normVarModel < contrastModel
             model = model@contrastModel();
            
             if (nargin < 4), param_pbound = [ .1, 8; 1,  10;  .1, .5 ]; end
-            if (nargin < 3), param_bound  = [ 0, 400; 0, 100; 0,   1  ]; end
+            if (nargin < 3), param_bound  = [ -6, 11; -6, 7; -6,  2  ]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -54,9 +54,9 @@ classdef normVarModel < contrastModel
         % function: f()
         function y_hat = forward( model, x, param )
              
-            w = param(1);
-            g = param(2);
-            n = param(3);
+            w = exp(param(1));
+            g = exp(param(2));
+            n = exp(param(3));
             
             % d: ori x exp x stim
             d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 

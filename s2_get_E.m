@@ -34,12 +34,18 @@ for which_data = 1:4 % 4 data sets
     fname = sprintf('E_xy_%02d.mat', which_data);
     save(fullfile(save_address, fname), 'E_xy','-v7.3')
     
-    % W_E denominator
+    % E_mean for SOC
+    E_mean = cal_Emean( E_xy);
+    fname = sprintf('E_mean_%02d.mat', which_data);
+    save(fullfile(save_address, fname), 'E_mean','-v7.3')
+    
+    % W_E denominator for orSurround
     weight_E = cal_WE( E_xy, labelVec);
     fname = sprintf('weight_E_%02d.mat', which_data);
     save(fullfile(save_address, fname), 'weight_E','-v7.3')
 
     clear E_xy
+    clear E_mean
     clear weight_E
 end
 

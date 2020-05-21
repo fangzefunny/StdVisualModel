@@ -52,9 +52,9 @@ classdef normStdModel < contrastModel
         % function: f()
         function y_hat = forward( model, x, param )
              
-            w = param(1);
-            g = param(2);
-            n = param(3);
+            w = exp(param(1));
+            g = exp(param(2));
+            n = exp(param(3));
             
             % d: ori x exp x stim
             d = x ./ (1 + w .* std(x, 1) ); 

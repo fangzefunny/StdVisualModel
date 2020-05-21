@@ -5,11 +5,12 @@ clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid   = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
 choose_data = 'all';          % choose some preset data
+error_bar = true;
 print_loss = true;
 
 %% set path
@@ -74,6 +75,11 @@ for dataset = 1:numdatasets
             BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi );
             len_stim = length( BOLD_target );
             
+            % load errorbar 
+            if error_bar
+                 BOLD_target_error = dataloader( prevPath, 'BOLD_target_error', target, dataset, roi );
+            end
+            
             % load BOLD prediction
             BOLD_pred = dataloader( prevPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
             pred_summary_all(1:len_stim, idx, dataset, roi) = BOLD_pred';
@@ -85,7 +91,11 @@ for dataset = 1:numdatasets
             % subplot dataset, roi, idx
             idx = (dataset-1)*(numrois+1) + roi;
             subplot( numdatasets, numrois+1, idx)
-            plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target );
+            if error_bar 
+                plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target, BOLD_target_error );
+            else
+                plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target );
+            end
             show_title = sprintf( 'Dataset%d-V%d', dataset, roi );
             title( show_title )
             if idx ==numrois
@@ -96,7 +106,11 @@ for dataset = 1:numdatasets
         else
             % subplot nroi, 1, roi
             subplot( numrois, 1, roi )
-            plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target )
+            if error_bar
+                plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target, BOLD_target_error )
+            else
+                plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target )
+            end
             show_title = sprintf( 'Dataset%d-V%d', dataset, roi );
             title( show_title )
         end
@@ -105,22 +119,39 @@ for dataset = 1:numdatasets
     
     if strcmp( target, 'target' ) ==0
         % define filename and save the file
-        filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, choose_data) );
-        savefig(filename)
-        %print
-        filename = fullfile( pdf_address, sprintf( '/BOLD_fit-dataset%d-%s', dataset, choose_data) );
-        print(filename,'-dpng')
+        if error_bar
+            filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s-error', dataset, target) );
+            savefig(filename)
+            %print
+            filename = fullfile( pdf_address, sprintf( '/BOLD_fit-dataset%d-%s-error', dataset, target) );
+            print(filename,'-dpng')
+        else
+            filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, target) );
+            savefig(filename)
+            %print
+            filename = fullfile( pdf_address, sprintf( '/BOLD_fit-dataset%d-%s', dataset, target) );
+            print(filename,'-dpng')
+        end
     end
     
 end
 
 if strcmp( target, 'target' )
-    % define filename and save the file
-    filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, choose_data) );
-    savefig(filename)
-    %print
-    filename = fullfile( pdf_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, choose_data) );
-    print(filename,'-dpng')
+    if error_bar
+        % define filename and save the file
+        filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s-error', dataset, target) );
+        savefig(filename)
+        %print
+        filename = fullfile( pdf_address, sprintf(  '/BOLD_fit-dataset%d-%s-error', dataset, target) );
+        print(filename,'-dpng')
+    else
+        % define filename and save the file
+        filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, target) );
+        savefig(filename)
+        %print
+        filename = fullfile( pdf_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, target) );
+        print(filename,'-dpng')
+    end
 end
 
 %% plot loss histogram
@@ -140,7 +171,7 @@ if print_loss
                 
                 % load loss_log
                 loss_log = dataloader( prevPath, 'Loss_log', target, dataset, roi, data_folder , model_idx, optimizer);
-                min_num = sum((loss_log - min(loss_log))<10e-3);
+                min_num = sum((loss_log - min(loss_log))<.01);
                 
                 % subplot dataset, roi, idx
                 idx = (roi-1)*nummodels + ii;
@@ -156,10 +187,10 @@ if print_loss
         end
         
         % define filename and save the file
-        filename = fullfile( figure_address, sprintf(  '/loss_log-dataset%d', dataset) );
+        filename = fullfile( figure_address, sprintf(  '/loss_log-dataset%d-%s', dataset, target) );
         savefig(filename)
         %print
-        filename = fullfile( pdf_address, sprintf(  '/loss_log-dataset%d', dataset) );
+        filename = fullfile( pdf_address, sprintf(  '/loss_log-dataset%d-%s', dataset, target) );
         print(filename,'-dpng')
         
     end
