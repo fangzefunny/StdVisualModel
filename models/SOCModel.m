@@ -15,7 +15,7 @@ classdef SOCModel < contrastModel
             model = model@contrastModel();
            
             if (nargin < 4), param_pbound = [ .5, 1; 0,     2;  .1,  .5 ]; end
-            if (nargin < 3), param_bound   = [ 0.1,   1; 0,  200;  0,   5  ]; end
+            if (nargin < 3), param_bound   = [ -8,  3; -10, 10;  -6,   2  ]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -82,9 +82,9 @@ classdef SOCModel < contrastModel
                 model = model.disk_weight(model, height);
             end
              
-            c = param(1);
-            g = param(2);
-            n = param(3);
+            c = exp(param(1));
+            g = exp(param(2));
+            n = exp(param(3));
             
             % x x y x ori x exp x stim --> x x y x exp x stim
             E = squeeze( mean( E, 3));
@@ -145,13 +145,67 @@ classdef SOCModel < contrastModel
         end
         
         % fcross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, BOLD_target, verbose, cross_valid )
             
             if (nargin < 5), cross_valid = 'one'; end
-           
-            % call subclass
-            [BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid );
             
+            switch cross_valid
+                
+                case 'one'
+                    
+                    % optimize to find the best 
+                    [loss, param, loss_history] = model.optim( model, E_xy, BOLD_target, verbose );
+                    params = param;
+                    loss_histories = loss_history;
+                  
+                    % predict test data 
+                    BOLD_pred = model.forward(model, E_xy, param );
+                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    model  = model.fixparameters( model, param );
+                    
+                case 'cross_valid'
+                 
+                    % achieve stim vector
+                    last_idx = length(size( E_xy ));
+                    stim_dim = size( E_xy, last_idx ); 
+                    stim_vector = 1 : size( E_xy, last_idx );
+    
+                    % storage
+                    BOLD_pred = nan( 1, stim_dim);
+                    params    = nan( model.num_param, stim_dim);
+                    losses    = nan( 1, stim_dim);
+                    loss_histories = nan( model.fittime, stim_dim);
+
+                    % cross_valid  
+                    for knock_idx = stim_vector
+
+                        % train vector and train data
+                        keep_idx = setdiff( stim_vector, knock_idx );
+                        E_train  = E_xy( :, :, :, :, keep_idx );
+                        target_train = BOLD_target( keep_idx );
+                        E_test   = E_xy( :, :, :, :, knock_idx );
+                      
+                        % fit the training data 
+                        [loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
+                        params( :, knock_idx ) = param;
+                        losses( knock_idx ) = loss;
+                        loss_histories( :, knock_idx ) = loss_history;
+                        
+                        % predict test data 
+                        BOLD_pred( knock_idx ) = model.forward(model, E_test, param );
+                        
+                    end 
+                    
+                    % evaluate performance of the algorithm on test data
+                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    
+                    % bootstrap to get the param
+                    params_boot = mean( params, 1 );
+                    model  = model.fixparameters( model, params_boot );
+            end
+            
+            model.loss_log = loss_histories;
+                      
         end
             
     end

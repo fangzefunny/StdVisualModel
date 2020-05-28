@@ -7,11 +7,11 @@ clear all; close all; clc
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
-data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
-cross_valid   = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
+data_folder    = 'Cross';  % save in which folder. value space: 'noCross', .....
+cross_valid   = 'cross_valid';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
 choose_data = 'all';          % choose some preset data
-error_bar = true;
-print_loss = true;
+error_bar = false;
+print_loss = false;
 
 %% set path
 

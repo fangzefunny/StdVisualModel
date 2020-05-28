@@ -18,27 +18,25 @@ ROIs     = {'V1' 'V2' 'V3'};
 model1 = contrastModel( optimizer, fittime);
 %model2 = normStdModel( optimizer, fittime);
 model3 = normVarModel( optimizer, fittime);
-model4 = SOCModel1( optimizer, fittime);
+model4 = SOCModel( optimizer, fittime);
 model5  = oriSurroundModel( optimizer, fittime);
+
+datasets = [ 1, 2, 3, 4];
 
 switch quick_choice
     case {'all', 'All' }
-        datasets = [ 1, 2, 3, 4];
         models   = { model1, model3, model4, model5};
         model_idx = [ 1, 3, 4, 5];
     case 'orientation'
         models   = {model1,  model3};% , 'normPower'};
         model_idx = [ 1, 3];
     case 'noOri'
-        datasets = [ 1, 2, 3, 4];
         models   = { model1, model3, model4};
         model_idx = [ 1, 3, 4];
     case {'SOC', 'soc'}
-        datasets = [ 1, 2, 3, 4];
         models   = {model4};
         model_idx = [ 4];
     case 'oriSurround'
-        datasets = [ 1, 2, 3, 4];
         models = {model5};
         model_idx = [ 5];
 end

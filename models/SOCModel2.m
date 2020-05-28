@@ -1,4 +1,4 @@
-classdef oriSurroundModel < contrastModel 
+classdef SOCModel2 < contrastModel 
     
     % The basic properties of the class
     properties 
@@ -10,12 +10,12 @@ classdef oriSurroundModel < contrastModel
     methods
         
         % init the model
-        function model = oriSurroundModel( optimizer, fittime, param_bound, param_pbound)
+        function model = SOCModel2( optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
            
-            if (nargin < 4), param_pbound = [ .1,   4; 1,    5;  .1,  .5 ]; end
-            if (nargin < 3), param_bound   = [ 0,  400; 0,  200;  0,   1  ]; end
+            if (nargin < 4), param_pbound = [ .5, 1; 0,     2;  .1,  .5 ]; end
+            if (nargin < 3), param_bound   = [ -8,  0.; -10, 10;  -6,   2  ]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -32,8 +32,8 @@ classdef oriSurroundModel < contrastModel
             model.fittime                   = fittime;
             model.optimizer             = optimizer; 
             model.num_param        = param_num ;
-            model.param_name      = [ 'w'; 'g'; 'n' ];
-            model.legend                  = 'oriSurround'; 
+            model.param_name      = [ 'c'; 'g'; 'n' ];
+            model.legend                  = 'SOC'; 
             model.model_type        = 'space';
             model.param                   = [];
             model.receptive_weight = false; 
@@ -75,25 +75,24 @@ classdef oriSurroundModel < contrastModel
        end
         
        % function: f()
-        function y_hat = forward(model, E, weight_E, param )
+        function y_hat = forward(model, E, param )
             
             if model.receptive_weight ==false
                 height = size(E, 1) ;
                 model = model.disk_weight(model, height);
             end
              
-            w = param(1);
-            g = param(2);
-            n = param(3);
-            
-            % calculate weight of E 
-            %weight_E = model.cal_weight_E( model, E);
+            c = exp(param(1));
+            g = exp(param(2));
+            n = exp(param(3));
             
             % x x y x ori x exp x stim --> x x y x exp x stim
-            d_theta = E ./ ( 1 + w * weight_E); %E :3d
-            v = squeeze( mean( d_theta, 3));
+            E = squeeze( mean( E, 3));
+            
+            % d: x x y x exp x stim
+            v = (E - c * mean( mean(E, 1), 2)).^2; 
             d = bsxfun(@times, v, model.receptive_weight);
-                        
+            
             % Sum over spatial position
             s = squeeze(mean(mean( d , 1) , 2)); % ep x stimuli
             
@@ -105,10 +104,11 @@ classdef oriSurroundModel < contrastModel
            
         end
             
-         % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_xy, weight_E )
+        % predict the BOLD response: y_hat = f(x)
+        function BOLD_pred = predict( model, E_ori )
             
-            BOLD_pred = model.forward(model, E_xy, weight_E, model.param );
+            % call subclass
+            BOLD_pred = predict@contrastModel( model, E_ori);
             
         end
         
@@ -129,76 +129,37 @@ classdef oriSurroundModel < contrastModel
         end
         
         % loss function with sum sqaure error: sum( y - y_hat ).^2
-        function sse = loss_fn(param, model, E_xy, weight_E, y_target )
+        function sse = loss_fn( param, model, E_ori, y_target )
             
-            % predict y_hat: 1 x stim 
-            y_hat = model.forward(model, E_xy, weight_E, param );
+            % call subclass 
+            sse = loss_fn@contrastModel( param, model, E_ori, y_target );
             
-            % square error
-            square_error = (y_target - y_hat).^2;
-            
-            % sse
-            sse = double(mean(square_error));
         end
         
         % fit the data 
-        function [loss, param, loss_history]  = optim( model, E_xy, weight_E,  BOLD_target, verbose )
+        function [loss, param, loss_history]  = optim( model, E_ori, BOLD_target, verbose )
             
-           % set up the loss function
-            func=@(x) model.loss_fn( x, model, E_xy, weight_E, BOLD_target );
-            
-            opts.Display = verbose;
-            
-            % set up the bound
-            lb  = model.param_bound( :, 1 );
-            ub  = model.param_bound( :, 2 );
-            plb = model.param_pbound( :, 1 );
-            pub = model.param_pbound( :, 2 );
-            
-            % init param
-            x0_set = ( lb + ( ub - lb ) .* rand( model.num_param, model.fittime ) )';
-            
-            % storage
-            x   = NaN( model.fittime, model.num_param );
-            sse = NaN( model.fittime, 1 );
-            
-            % fit with n init
-            for ii = 1:model.fittime
-                
-                % optimization
-                switch model.optimizer
-                    case 'bads'
-                        [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
-                    case 'fmincon'
-                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
-                end
-                
-            end
-            
-            % find the lowest sse
-            loss  = min(sse);
-            trial = find( sse == loss );
-            param = x( trial(1), : ); 
-            loss_history = sse;
-            
+            % call subclass
+            [loss, param, loss_history]  = optim@contrastModel( model, E_ori, BOLD_target, verbose );
+        
         end
         
         % fcross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, weight_E, BOLD_target, verbose, cross_valid )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, BOLD_target, verbose, cross_valid )
             
-            if (nargin < 6), cross_valid = 'one'; end
+           if (nargin < 5), cross_valid = 'one'; end
             
             switch cross_valid
                 
                 case 'one'
                     
                     % optimize to find the best 
-                    [loss, param, loss_history] = model.optim( model, E_xy, weight_E, BOLD_target, verbose );
+                    [loss, param, loss_history] = model.optim( model, E_xy, BOLD_target, verbose );
                     params = param;
                     loss_histories = loss_history;
                   
                     % predict test data 
-                    BOLD_pred = model.forward(model, E_xy, weight_E, param );
+                    BOLD_pred = model.forward(model, E_xy, param );
                     Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
                     model  = model.fixparameters( model, param );
                     
@@ -221,19 +182,17 @@ classdef oriSurroundModel < contrastModel
                         % train vector and train data
                         keep_idx = setdiff( stim_vector, knock_idx );
                         E_train  = E_xy( :, :, :, :, keep_idx );
-                        WE_train = weight_E( :, :, :, :, keep_idx);
                         target_train = BOLD_target( keep_idx );
                         E_test   = E_xy( :, :, :, :, knock_idx );
-                        WE_test = weight_E( :, :, :, :, knock_idx);
                       
                         % fit the training data 
-                        [loss, param, loss_history] = model.optim( model, E_train, WE_train, target_train, verbose );
+                        [loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
                         params( :, knock_idx ) = param;
                         losses( knock_idx ) = loss;
                         loss_histories( :, knock_idx ) = loss_history;
                         
                         % predict test data 
-                        BOLD_pred( knock_idx ) = model.forward(model, E_test, WE_test, param );
+                        BOLD_pred( knock_idx ) = model.forward(model, E_test, param );
                         
                     end 
                     

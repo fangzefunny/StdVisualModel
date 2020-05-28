@@ -21,51 +21,111 @@
 % s3_main_script
 % EOF
 
+%% hyperparameter: each time, we only need to edit this section !! 
 
-T = chooseData( 'orientation' );
+optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
+target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+fittime              = 40;               % how many initialization. value space: Integer
+data_folder    = 'Cross';  % save in which folder. value space: 'noCross', .....
+cross_valid      = 'cross_valid';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
+choose_data = 'all';          % choose some preset data 
 
-%% Predict the BOLD respose of the given stimuli
+%% set path
 
-% Create empty matrix
-[ currPath, prevPath ] = stdnormRootPath();
-save_dir = fullfile( currPath, 'Data', 'new', 'allstimClass' );
-if ~exist( save_dir, 'dir' ), mkdir( save_dir ); end 
+[curPath, prevPath] = stdnormRootPath();
+
+% add path to the function
+addpath( genpath( fullfile( curPath, 'functions' )))
+
+% add path to the model
+addpath( genpath( fullfile( curPath, 'models' )))
+
+% add path to the plot tool
+addpath( genpath( fullfile( curPath, 'plot_tools' )))
+
+ %% generate save address and  choose data 
+
+% save address 
+save_address = fullfile(prevPath, 'Data', data_folder, target,  optimizer);
+if ~exist(save_address, 'dir'), mkdir(save_address); end
+
+% choose data as if we are doing parallel computing 
+T      = chooseData( choose_data, optimizer, fittime );
+len = size( T, 1 );
 
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 
 if isempty(hpc_job_number), hpc_job_number = 5; end
 
-dataset     = T.dataset(hpc_job_number);
-roi         = T.roiNum(hpc_job_number);
-which_model = T.modelName{hpc_job_number};
+%% start loop
+
+dataset          = T.dataset(hpc_job_number);
+roi                   = T.roiNum(hpc_job_number);
 model_idx   = T.modelNum(hpc_job_number);
-model = T.modelLoader{model_idx};
+model           = T.modelLoader{model_idx};
 
 disp(T(hpc_job_number,:));
+
+% obain model index
+model_idx = T.modelNum(job);
 
 % display information to keep track
 display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
 disp( display )
 
 % load training label
-BOLD_target = dataloader( prevPath, 'BOLD_target', dataset, roi );
+BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi );
 
 % load the input stimuli
 switch model.model_type
     case 'orientation'
-        data_type ='E_ori';
+        which_obj ='E_ori';
     case 'space'
-        data_type = 'E_xy';
+        which_obj = 'E_xy';
 end
-E = dataloader( prevPath, data_type, dataset, roi, 'old' );
+E = dataloader( prevPath, which_obj, target, dataset, roi, 'old' );
 
-% fit the data with cross validation: knock-1-out, don't show the fit 
-[BOLD_pred, params, Rsquare, model] = ...
-    model.fit( model, E, BOLD_target, 'off', 'cross_valid' );
+if strcmp( model.legend, 'oriSurround')
+    disp( 'ori_surround')
+    
+    % gain weight E
+    weight_E = dataloader( prevPath, 'weight_E', target, dataset, roi );
+    
+    % fit the data without cross validation: knock-1-out, don't show the fit
+    [BOLD_pred, params, Rsquare, model] = ...
+        model.fit( model, E, weight_E, BOLD_target, 'off', cross_valid);
+    
+elseif strcmp( model.legend, 'SOC1')
+    disp( 'soc1')
+    
+    % gain E_mean
+    E_mean = dataloader( prevPath, 'E_mean', target, dataset, roi );
+    
+    % fit the data without cross validation: knock-1-out, don't show the fit
+    [BOLD_pred, params, Rsquare, model] = ...
+        model.fit( model, E, E_mean, BOLD_target, 'off', cross_valid);
+    
+else
+    % fit the data without cross validation: knock-1-out, don't show the fit
+    [BOLD_pred, params, Rsquare, model] = ...
+        model.fit( model, E, BOLD_target, 'off', cross_valid);
+end
+
+if strcmp( cross_valid, 'one')
+    loss_log = model.loss_log;
+end
 
 % save data
 save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'params');
 save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'BOLD_pred');
 save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'Rsquare');
+if strcmp( cross_valid, 'one')
+    save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'loss_log');
+end
+
+
+
+
+
 
 

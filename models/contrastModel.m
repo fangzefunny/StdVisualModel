@@ -169,13 +169,16 @@ classdef contrastModel
                 case 'cross_valid'
                  
                     % achieve stim vector
-                    stim_vector = 1 : size( E_ori, 3 );
+                    % achieve stim vector
+                    last_idx = length(size( E_ori ));
+                    stim_dim = size( E_ori, last_idx ); 
+                    stim_vector = 1 : size( E_ori, last_idx );
     
                     % storage
-                    BOLD_pred = nan( 1, size( E_ori, 3 ) );
-                    params    = nan( model.num_param, size( E_ori, 3 ) );
-                    losses    = nan( 1, size( E_ori, 3 ) );
-                    loss_histories = nan( model.fittime, size(E_ori,3) );
+                    BOLD_pred = nan( 1, size( E_ori, stim_dim ) );
+                    params    = nan( model.num_param, size( E_ori, stim_dim ) );
+                    losses    = nan( 1, size( E_ori, stim_dim ) );
+                    loss_histories = nan( model.fittime, size(E_ori, stim_dim) );
 
                     % cross_valid  
                     for knock_idx = stim_vector
