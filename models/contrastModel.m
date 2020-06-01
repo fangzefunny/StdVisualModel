@@ -79,7 +79,7 @@ classdef contrastModel
         % measure the goodness of 
         function Rsquare = metric( BOLD_pred, BOLD_target )
             
-            Rsquare = 1 - var( BOLD_target - BOLD_pred ) / var( BOLD_target );
+            Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
             
         end
         

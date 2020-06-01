@@ -144,33 +144,35 @@ classdef SOCModel < contrastModel
         
         end
         
-        % fcross valid
+        % fit and cross valid
         function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, BOLD_target, verbose, cross_valid )
             
-            if (nargin < 5), cross_valid = 'one'; end
+           if (nargin < 5), cross_valid = 'one'; end
             
             switch cross_valid
                 
                 case 'one'
                     
-                    % optimize to find the best 
-                    [loss, param, loss_history] = model.optim( model, E_xy, BOLD_target, verbose );
+                    % optimize to find the best local minima
+                    [loss, param, loss_history] = model.optim( model, E_xy, BOLD_target, verbose);
                     params = param;
                     loss_histories = loss_history;
-                  
                     % predict test data 
-                    BOLD_pred = model.forward(model, E_xy, param );
-                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    BOLD_pred = model.forward( model, E_xy, param);
+                    % measure the goodness of the fit
+                    Rsquare = model.metric( BOLD_pred, BOLD_target);
+                     % fix the parameter for the future prediction, usually
+                     % not used 
                     model  = model.fixparameters( model, param );
                     
                 case 'cross_valid'
                  
                     % achieve stim vector
-                    last_idx = length(size( E_xy ));
-                    stim_dim = size( E_xy, last_idx ); 
-                    stim_vector = 1 : size( E_xy, last_idx );
+                    last_idx = length( size( E_xy));
+                    stim_dim = size( E_xy, last_idx); 
+                    stim_vector = 1 : size( E_xy, last_idx);
     
-                    % storage
+                    % storages
                     BOLD_pred = nan( 1, stim_dim);
                     params    = nan( model.num_param, stim_dim);
                     losses    = nan( 1, stim_dim);
@@ -180,28 +182,29 @@ classdef SOCModel < contrastModel
                     for knock_idx = stim_vector
 
                         % train vector and train data
-                        keep_idx = setdiff( stim_vector, knock_idx );
-                        E_train  = E_xy( :, :, :, :, keep_idx );
-                        target_train = BOLD_target( keep_idx );
-                        E_test   = E_xy( :, :, :, :, knock_idx );
+                        keep_idx = setdiff( stim_vector, knock_idx);
+                        E_train  = E_xy( :, :, :, :, keep_idx);
+                        target_train = BOLD_target( keep_idx);
+                        E_test   = E_xy( :, :, :, :, knock_idx);
                       
                         % fit the training data 
-                        [loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
-                        params( :, knock_idx ) = param;
-                        losses( knock_idx ) = loss;
-                        loss_histories( :, knock_idx ) = loss_history;
+                        [ loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
+                        params( :, knock_idx) = param;
+                        losses( knock_idx) = loss;
+                        loss_histories( :, knock_idx) = loss_history;
                         
-                        % predict test data 
+                        % use the fitted parameter to predict test data 
                         BOLD_pred( knock_idx ) = model.forward(model, E_test, param );
                         
                     end 
                     
                     % evaluate performance of the algorithm on test data
-                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    Rsquare = model.metric( BOLD_pred, BOLD_target);
                     
                     % bootstrap to get the param
                     params_boot = mean( params, 1 );
                     model  = model.fixparameters( model, params_boot );
+                    
             end
             
             model.loss_log = loss_histories;

@@ -193,23 +193,25 @@ classdef oriSurroundModel < contrastModel
                 case 'one'
                     
                     % optimize to find the best 
-                    [loss, param, loss_history] = model.optim( model, E_xy, weight_E, BOLD_target, verbose );
+                    [loss, param, loss_history] = model.optim( model, E_xy, weight_E, BOLD_target, verbose);
                     params = param;
                     loss_histories = loss_history;
-                  
                     % predict test data 
                     BOLD_pred = model.forward(model, E_xy, weight_E, param );
-                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    % measure the goodness of the fit
+                    Rsquare = model.metric( BOLD_pred, BOLD_target);
+                     % fix the parameter for the future prediction, usually
+                     % not used 
                     model  = model.fixparameters( model, param );
                     
                 case 'cross_valid'
-                 
+                    
                     % achieve stim vector
-                    last_idx = length(size( E_xy ));
-                    stim_dim = size( E_xy, last_idx ); 
-                    stim_vector = 1 : size( E_xy, last_idx );
+                    last_idx = length( size( E_xy));
+                    stim_dim = size( E_xy, last_idx); 
+                    stim_vector = 1 : size( E_xy, last_idx);
     
-                    % storage
+                    % storages
                     BOLD_pred = nan( 1, stim_dim);
                     params    = nan( model.num_param, stim_dim);
                     losses    = nan( 1, stim_dim);
@@ -238,7 +240,7 @@ classdef oriSurroundModel < contrastModel
                     end 
                     
                     % evaluate performance of the algorithm on test data
-                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    Rsquare = model.metric( BOLD_pred, BOLD_target);
                     
                     % bootstrap to get the param
                     params_boot = mean( params, 1 );

@@ -20,13 +20,14 @@ model1 = contrastModel( optimizer, fittime);
 model3 = normVarModel( optimizer, fittime);
 model4 = SOCModel( optimizer, fittime);
 model5  = oriSurroundModel( optimizer, fittime);
+model6 = SOCModel2( optimzier, fittime);
 
 datasets = [ 1, 2, 3, 4];
 
 switch quick_choice
     case {'all', 'All' }
-        models   = { model1, model3, model4, model5};
-        model_idx = [ 1, 3, 4, 5];
+        models   = { model1, model3, model4, model5, model6};
+        model_idx = [ 1, 3, 4, 5, 6];
     case 'orientation'
         models   = {model1,  model3};% , 'normPower'};
         model_idx = [ 1, 3];
@@ -34,8 +35,8 @@ switch quick_choice
         models   = { model1, model3, model4};
         model_idx = [ 1, 3, 4];
     case {'SOC', 'soc'}
-        models   = {model4};
-        model_idx = [ 4];
+        models   = {model4, model6};
+        model_idx = [ 4, 6];
     case 'oriSurround'
         models = {model5};
         model_idx = [ 5];
