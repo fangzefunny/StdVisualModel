@@ -3,7 +3,7 @@ This is new repositories to carry all the codes we need
 
 ## Main code
 
-### step0: create a new folder, and git clone the code to the folder. 
+### step0: create a new folder, and git clone the code inside the created folder. 
 
 ### step1: run 's1_prepare_inputs'.
 Get a 'Data' folder that is parallel to the StdVisualModel inside the new folder you made. Inside the the data folder, there are 'E', 'Stimuli', 'fMRIdata'. (You should mannually delete the downloaded zip file to keep your disk clear and tidy)
