@@ -8,7 +8,7 @@ target               = 'all';              % Two target stimuli or the whole dat
 fittime              = 5;               % how manoy initialization. value space: Integer
 data_folder    = 'Cross';  % save in which folder. value space: 'noCross', .....
 cross_valid      = 'cross_valid';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_data = 'soc';          % choose some preset data 
+choose_data = 'all';          % choose some preset data 
 
 %% set path
 

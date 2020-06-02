@@ -3,8 +3,6 @@ classdef SOCModel2 < SOCModel
     % The basic properties of the class
     properties 
         
-        receptive_weight = false
-       
     end
     
     methods
