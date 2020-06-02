@@ -1,4 +1,4 @@
-# StdVisualModel at Zeming Fang
+# StdVisualModel at zeming branch
 This is new repositories to carry all the codes we need
 
 ## Main code
