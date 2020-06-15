@@ -15,7 +15,7 @@ classdef SOCModel < contrastModel
             model = model@contrastModel();
            
             if (nargin < 4), param_pbound = [ .5, 1; 0,     2;  .1,  .5 ]; end
-            if (nargin < 3), param_bound   = [ -8,  3; -10, 10;  -6,   2  ]; end
+            if (nargin < 3), param_bound   = [ -8,  10; -10, 20;  -6,   2  ]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -90,14 +90,18 @@ classdef SOCModel < contrastModel
             E = squeeze( mean( E, 3));
             
             % d: x x y x exp x stim
-            v = (E - c * mean( mean(E, 1), 2)).^2; 
+            E_mean = mean( mean(E, 1), 2);
+            v = (E - c * E_mean).^2; 
             d = bsxfun(@times, v, model.receptive_weight);
             
             % Sum over spatial position
             s = squeeze(mean(mean( d , 1) , 2)); % ep x stimuli
+        
+            % add nonlinearity, yi_hat: exp x stim
+            si_n = s .^n; 
             
-            % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = g .* s .^ n; 
+            % add gain: exp x stim
+            yi_hat = g .* si_n;
 
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));
@@ -121,10 +125,10 @@ classdef SOCModel < contrastModel
         end
         
          % measure the goodness of 
-        function loss= mse( BOLD_pred, BOLD_target )
+        function loss= rmse( BOLD_pred, BOLD_target )
             
             % call subclass
-            loss = mse@contrastModel( BOLD_pred, BOLD_target );
+            loss = rmse@contrastModel( BOLD_pred, BOLD_target );
             
         end
         

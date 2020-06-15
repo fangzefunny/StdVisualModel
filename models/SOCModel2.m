@@ -82,10 +82,10 @@ classdef SOCModel2 < SOCModel
         end
         
          % calculate the mse
-        function loss= mse( BOLD_pred, BOLD_target)
+        function loss= rmse( BOLD_pred, BOLD_target)
             
             % call subclass
-            loss = mse@SOCModel( BOLD_pred, BOLD_target);
+            loss = rmse@SOCModel( BOLD_pred, BOLD_target);
             
         end
         

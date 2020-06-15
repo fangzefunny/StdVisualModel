@@ -121,10 +121,10 @@ classdef oriSurroundModel < contrastModel
         end
         
          % measure the goodness of 
-        function loss= mse( BOLD_pred, BOLD_target )
+        function loss= rmse( BOLD_pred, BOLD_target )
             
             % call subclass
-            loss = mse@contrastModel( BOLD_pred, BOLD_target );
+            loss = rmse@contrastModel( BOLD_pred, BOLD_target );
             
         end
         

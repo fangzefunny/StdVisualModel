@@ -14,6 +14,9 @@ addpath( genpath( fullfile( currPath, 'models' )))
 datasets = [1, 2, 3, 4];
 roi_idx = [1, 2, 3 ];
 ROIs     = {'V1', 'V2', 'V3'};
+% datasets = [1];
+% roi_idx = [1];
+% ROIs     = {'V1'};
 
 model1 = contrastModel( optimizer, fittime);
 %model2 = normStdModel( optimizer, fittime);
@@ -23,9 +26,12 @@ model5  = oriSurroundModel( optimizer, fittime);
 model6 = SOCModel2( optimizer, fittime);
 
 switch quick_choice
+    case {'con'}
+        models = {model1};
+        model_idx = [1];
     case {'all', 'All' }
-        models   = { model1, model3, model4, model5, model6};
-        model_idx = [ 1, 3, 4, 5, 6];
+        models   = { model1, model4, model5, model3};
+        model_idx = [ 1, 4, 5, 3];
     case 'orientation'
         models   = {model1,  model3};% , 'normPower'};
         model_idx = [ 1, 3];
@@ -33,11 +39,14 @@ switch quick_choice
         models   = { model1, model3, model4};
         model_idx = [ 1, 3, 4];
     case {'SOC', 'soc'}
-        models   = {model4, model6};
-        model_idx = [ 4, 6];
+        models   = {model4};
+        model_idx = [ 4];
     case 'oriSurround'
         models = {model5};
         model_idx = [ 5];
+    case 'con'
+        model = { model1};
+        model_idx = 1;
 end
 
 

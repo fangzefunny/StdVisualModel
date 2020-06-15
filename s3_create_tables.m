@@ -3,21 +3,21 @@
 clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
-optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon. value space: 'bads', 'fmincon'
+target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid   = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
 choose_data = 'all';          % choose some preset data
 
 % define model name 
-model_name = { 'contrast', 'normVar', 'soc', 'oriSurrond'};
+model_name = { 'contrast', 'soc', 'oriSurrond', 'normVar'};
 
 % define param name
 param_name =  { 'contrastModel: g', 'contrastModel: n',  ...
-                                    'normVarModel: w', 'normVarModel: g', 'normVarModel: n', ...
                                      'socModel: c', 'socModel: g', 'socModel: n', ...
-                                    'oriSurroundModel: w', 'oriSurroundModel: g', 'oriSurroundModel: n'};
+                                    'oriSurroundModel: w', 'oriSurroundModel: g', 'oriSurroundModel: n',...
+                                    'normVarModel: w', 'normVarModel: g', 'normVarModel: n'};
 
 %% set path
 
@@ -45,7 +45,7 @@ T      = chooseData( choose_data, optimizer, fittime );
 
 % obtain some features of the storages
 nummodels   = length(unique(T.modelNum));
-model_vector = [ 1, 3, 4, 5];
+model_vector = [ 1, 4, 5, 3];
 numrois     = length(unique(T.roiNum));
 numdatasets = length(unique(T.dataset));
 numstimuli = 50;
@@ -119,7 +119,11 @@ for roi = 1: numrois
             row_idx = unique( max( 1, row_idx_array-1) );
             col_idx = (dataset-1) * 2 + 1;
             % load value  
-            param = exp(dataloader( prevPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
+            if model_idx < 5
+                param = exp(dataloader( prevPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
+            else
+                param = (dataloader( prevPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
+            end
             
             % assign value 
             if strcmp( cross_valid, 'one')

@@ -25,10 +25,15 @@ switch which_obj
         data = v_mean(roi, : ); %matrix: num_roi x num_stim --> vector: num_stimuli 
         if strcmp(target,  'target')
                     switch dataset
-                        case {1, 2}
-                            data = data(1:10);
-                        case{3, 4, 5}
-                            data = data(31:39);
+                        case {1}
+                            stim_idx = [1:10, 35:38, 47:50];
+                            data = data(stim_idx);
+                        case{2}
+                            stim_idx = [1:10, 33:36, 45:48];
+                            data = data(stim_idx);
+                        case{3, 4}
+                            stim_idx = [9:12, 26, 28:39];
+                            data = data(stim_idx);
                     end
         end
         
@@ -39,10 +44,15 @@ switch which_obj
         data = BOLD_se( roi, :);
         if strcmp(target,  'target')
                     switch dataset
-                        case {1, 2}
-                            data = data(1:10);
-                        case{3, 4, 5}
-                            data = data(31:39);
+                        case {1}
+                            stim_idx = [1:10, 35:38, 47:50];
+                            data = data(stim_idx);
+                        case{2}
+                            stim_idx = [1:10, 33:36, 45:48];
+                            data = data(stim_idx);
+                        case{3, 4}
+                            stim_idx = [9:12, 26, 28:39];
+                            data = data(stim_idx);
                     end
         end
         
@@ -72,10 +82,15 @@ switch which_obj
         data  = E_ori;
         if strcmp(target,  'target')
                     switch dataset
-                        case {1, 2}
-                            data = data(:, :, 1:10);
-                        case{3, 4, 5}
-                            data = data(:, :, 31:39);
+                        case {1}
+                            stim_idx = [1:10, 35:38, 47:50];
+                            data = data(:, :, stim_idx);
+                        case{2}
+                            stim_idx = [1:10, 33:36, 45:48];
+                            data = data(:, :, stim_idx);
+                        case{3, 4}
+                            stim_idx = [9:12, 26, 28:39];
+                            data = data(:, :, stim_idx);
                     end
         end
         
@@ -86,10 +101,15 @@ switch which_obj
         data  = E_xy;
         if strcmp(target,  'target')
                     switch dataset
-                        case {1, 2}
-                            data = data(:, :, :, :, 1:10);
-                        case{3, 4, 5}
-                            data = data(:, :, :, :, 31:39);
+                        case {1}
+                            stim_idx = [1:10, 35:38, 47:50];
+                            data = data(:, :, :, :, stim_idx);
+                        case{2}
+                            stim_idx = [1:10, 33:36, 45:48];
+                            data = data(:, :, :, :, stim_idx);
+                        case{3, 4}
+                            stim_idx = [9:12, 26, 28:39];
+                            data = data(:, :, :, :, stim_idx);
                     end
         end
         
@@ -100,10 +120,15 @@ switch which_obj
         data  = weight_E;
         if strcmp(target,  'target')
                     switch dataset
-                        case {1, 2}
-                            data = data(:, :, :, :, 1:10);
-                        case{3, 4, 5}
-                            data = data(:, :, :, :, 31:39);
+                        case {1}
+                            stim_idx = [1:10, 35:38, 47:50];
+                            data = data(:, :, :, :, stim_idx);
+                        case{2}
+                            stim_idx = [1:10, 33:36, 45:48];
+                            data = data(:, :, :, :, stim_idx);
+                        case{3, 4}
+                            stim_idx = [9:12, 26, 28:39];
+                            data = data(:, :, :, :, stim_idx);
                     end
         end
         
@@ -114,17 +139,22 @@ switch which_obj
         data  = E_mean;
         if strcmp(target,  'target')
                     switch dataset
-                        case {1, 2}
-                            data = data(:, :, :, :, 1:10);
-                        case{3, 4, 5}
-                            data = data(:, :, :, :, 31:39);
+                        case {1}
+                            stim_idx = [1:10, 35:38, 47:50];
+                            data = data(:, :, :, :, stim_idx);
+                        case{2}
+                            stim_idx = [1:10, 33:36, 45:48];
+                            data = data(:, :, :, :, stim_idx);
+                        case{3, 4}
+                            stim_idx = [9:12, 26, 28:39];
+                            data = data(:, :, :, :, stim_idx);
                     end
         end
         
     case 'stimuli' 
-        fname = sprintf('stimuli-dataset0%1d_orig', dataset);
+        fname = sprintf('stimuli-dataset0%1d', dataset);
         path=fullfile(prevPath, 'Data', 'Stimuli', fname);
-        load(path, 'stimuli')
+        load(path, 'stimuli');
         data = double(stimuli)./255 - .5;
         
 end

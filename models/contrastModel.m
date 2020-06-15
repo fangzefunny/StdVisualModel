@@ -60,10 +60,10 @@ classdef contrastModel
             
             % sum over orientation, s: exp x stim 
             s = mean(d, 1);
-            
-            % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = g .* s .^ n; 
 
+            % add gain and nonlinearity, yi_hat: exp x stim
+            yi_hat = g .* s.^n;
+      
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';
    
@@ -84,7 +84,7 @@ classdef contrastModel
         end
         
         % measure the mse 
-        function loss = mse( BOLD_pred, BOLD_target )
+        function loss = rmse( BOLD_pred, BOLD_target )
             
             loss = double(sqrt(mean((BOLD_pred- BOLD_target).^2)));
             
@@ -134,7 +134,7 @@ classdef contrastModel
                     case 'bads'
                         [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], [], [], [], opts);
                 end
                 
             end
