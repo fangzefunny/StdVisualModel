@@ -13,7 +13,7 @@ classdef normVarModel < contrastModel
             model = model@contrastModel();
            
             if (nargin < 4), param_pbound = [ .1, 8; 1,  10;  .1, .5 ]; end
-            if (nargin < 3), param_bound  = [ -6, 11; -6, 7; -6,  2  ]; end
+            if (nargin < 3), param_bound  = [ -6, 6; -6, 6; -6,  2  ]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             

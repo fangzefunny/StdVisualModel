@@ -39,7 +39,7 @@ switch quick_choice
         models   = { model1, model3, model4};
         model_idx = [ 1, 3, 4];
     case {'SOC', 'soc'}
-        models   = {model4};
+        models   = { model4};
         model_idx = [ 4];
     case 'oriSurround'
         models = {model5};

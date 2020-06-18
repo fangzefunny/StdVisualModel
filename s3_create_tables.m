@@ -4,7 +4,7 @@ clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon. value space: 'bads', 'fmincon'
-target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid   = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
@@ -119,7 +119,7 @@ for roi = 1: numrois
             row_idx = unique( max( 1, row_idx_array-1) );
             col_idx = (dataset-1) * 2 + 1;
             % load value  
-            if model_idx < 5
+            if model_idx < 6
                 param = exp(dataloader( prevPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
             else
                 param = (dataloader( prevPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));

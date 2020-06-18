@@ -5,13 +5,13 @@ clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid   = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_data = 'orientation';          % choose some preset data
+choose_data = 'all';          % choose some preset data
 error_bar = false;
-print_loss = false;
+print_loss = true;
 
 %% set path
 
@@ -171,13 +171,13 @@ if print_loss
                 
                 % load loss_log
                 loss_log = dataloader( prevPath, 'Loss_log', target, dataset, roi, data_folder , model_idx, optimizer);
-                min_num = sum((loss_log - min(loss_log))<.01);
+                min_num = sum((loss_log - min(loss_log))<.05);
                 
                 % subplot dataset, roi, idx
                 idx = (roi-1)*nummodels + ii;
                 subplot( numrois, nummodels, idx)
-                histogram( loss_log, 'BinWidth', 0.01 )
-                xlim( [0,.5]) 
+                histogram( loss_log, 'BinWidth', 0.05 )
+                xlim( [0,1]) 
                 show_title = sprintf( 'Dataset%d-V%d-M%d\n-min-%d', dataset, roi, model_idx, min_num );
                 title( show_title )
                 

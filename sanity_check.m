@@ -16,16 +16,16 @@ addpath( genpath( fullfile( curPath, 'plot' )))
 %% hyperparameter: each time, we only need to edit this section !!
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'target';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime              = 40;               % how many initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid     = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
-dataset            = 3;
+dataset            = 1;
 roi                      = 2;
-model               = contrastModel(optimizer, fittime);
-model_idx       = 3;
+model               = oriSurroundModel(optimizer, fittime);
+model_idx       = 5;
 params             = [ nan, 5.6058,  -1.6928];%0.1124
-checkparam_vector = 3%linspace(8, 13.1224, 10);%[-3, 0, 2, 3, 11.9] % linspace(0, 11, 5); % 
+checkparam_vector = 4%linspace(8, 13.1224, 10);%[-3, 0, 2, 3, 11.9] % linspace(0, 11, 5); % 
 which_param       = 1;
 landscape = true;
 
@@ -43,7 +43,7 @@ num = length(  checkparam_vector);
 
 % load target data
 BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi );
- plot_BOLD( [], BOLD_target, dataset, roi, target, nan )
+ %plot_BOLD( [], BOLD_target, dataset, roi, target, nan )
 
 
  % load the input stimuli
@@ -54,6 +54,9 @@ switch model.model_type
         which_obj = 'E_xy';
 end
 E = dataloader( prevPath, which_obj, target, dataset, roi );
+if model_idx == 5
+    weight_E = dataloader( prevPath, 'weight_E', target, dataset, roi);
+end
 
 % check the num of stimuli
 num_stim =length( BOLD_target);
@@ -65,17 +68,17 @@ loss_matrix = nan( 1, num);
 target_vector = nan( 1, num_stim + 1);
 
 
-switch dataset
-    case { 1 , 2 }
-        x1 = 1:5;  x2 = 6:10; x3 = 35:38; x4 = 47:50;
-        y1 = 1:5; y2 = 7:11;  y3 = 12:15; y4 = 17:20;
-    case { 3 , 4 }
-       y1 = 1:4; x1 = 9:-1:6;
-       y2 = 6:10; x2 = 5:-1:1;
-end
-
-target_vector( y1) = BOLD_target( x1);
-target_vector( y2) = BOLD_target( x2);
+% switch dataset
+%     case { 1 , 2 }
+%         x1 = 1:5;  x2 = 6:10; x3 = 35:38; x4 = 47:50;
+%         y1 = 1:5; y2 = 7:11;  y3 = 12:15; y4 = 17:20;
+%     case { 3 , 4 }
+%        y1 = 1:4; x1 = 9:-1:6;
+%        y2 = 6:10; x2 = 5:-1:1;
+% end
+% 
+% target_vector( y1) = BOLD_target( x1);
+% target_vector( y2) = BOLD_target( x2);
 
 for param_idx = 1 : num
     
@@ -86,7 +89,7 @@ for param_idx = 1 : num
     model = model.fixparameters( model, params);
     
     % make prediction using the fixed parameter
-    BOLD_pred = model.predict( model, E);
+    BOLD_pred = model.predict( model, E, weight_E);
     
     % check the num of stimuli
     num_stim =length( BOLD_target);
