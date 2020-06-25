@@ -1,6 +1,10 @@
 # StdVisualModel at zeming branch
 This is new repositories to carry all the codes we need
 
+## Testing
+
+edit the  s2_parrallel_fit file and run to see if we can replicate the fit. 
+
 ## Main code
 
 ### step0: create a new folder, and git clone the code inside the created folder. 
