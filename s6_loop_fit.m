@@ -8,7 +8,7 @@ target               = 'all';              % Two target stimuli or the whole dat
 fittime              = 40;               % how manoy initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid      = 'one';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_data = 'all';          % choose some preset data 
+choose_model = 'all';          % choose some preset data 
 
 %% set path
 
@@ -30,7 +30,7 @@ save_address = fullfile(prevPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing 
-T      = chooseData( choose_data, optimizer, fittime );
+T      = chooseData( choose_model, optimizer, fittime );
 
 %% start loop
 

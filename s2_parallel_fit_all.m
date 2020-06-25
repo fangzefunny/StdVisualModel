@@ -6,7 +6,7 @@
 %
 % #! /bin/bash
 % #SBATCH --job-name=StdModel
-% #SBATCH -a 6,18,30,42,54 # these numbers are read in to SLURM_ARRAY_TASK_ID
+% #SBATCH -a 1-48 # these numbers are read in to SLURM_ARRAY_TASK_ID
 % #SBATCH --nodes=1
 % #SBATCH --cpus-per-task=4
 % #SBATCH --mem=16g
@@ -14,11 +14,11 @@
 % #SBATCH --output=/scratch/jaw288/StdVisualModel/Data/HPC/out_%x-%a.txt
 % #SBATCH --error=/scratch/jaw288/StdVisualModel/Data/HPC/error_%x-%a.txt
 %
-% module load matlab/2018a
+% module load matlab/2019b
 %
 % matlab <<EOF
 % addpath(genpath('~/toolboxes'));
-% s3_main_script
+% s2_parallel_fit_all
 % EOF
 
 %% hyperparameter: each time, we only need to edit this section !! 
@@ -28,7 +28,7 @@ target               = 'all';              % Two target stimuli or the whole dat
 fittime              = 40;               % how manoy initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid      = 'one';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_data = 'all';          % choose some preset data 
+choose_model = 'all';          % choose some preset data 
 
 %% set path
 
@@ -53,21 +53,18 @@ if ~exist(save_address, 'dir'), mkdir(save_address); end
 T      = chooseData( choose_model, optimizer, fittime );
 len = size( T, 1 );
 
+%% start Fit
+
 hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 
 if isempty(hpc_job_number), hpc_job_number = 5; end
-
-%% start loop
 
 dataset          = T.dataset(hpc_job_number);
 roi                   = T.roiNum(hpc_job_number);
 model_idx   = T.modelNum(hpc_job_number);
 model           = T.modelLoader{model_idx};
 
-disp(T(hpc_job_number,:));
-
-% obain model index
-model_idx = T.modelNum(job);
+disp(T(hpc_job_number, :));
 
 % display information to keep track
 display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
@@ -106,6 +103,7 @@ elseif strcmp( model.legend, 'SOC1')
         model.fit( model, E, E_mean, BOLD_target, 'off', cross_valid);
     
 else
+    
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
         model.fit( model, E, BOLD_target, 'off', cross_valid);

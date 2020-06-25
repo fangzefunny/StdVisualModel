@@ -3,12 +3,12 @@
 clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
-optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon. value space: 'bads', 'fmincon'
+optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
-fittime              = 40;               % how many initialization. value space: Integer
+fittime              = 40;               % how manoy initialization. value space: Integer
 data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
-cross_valid   = 'one';           % choose what kind of cross validation, value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_data = 'all';          % choose some preset data
+cross_valid      = 'one';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
+choose_model = 'all';          % choose some preset data 
 
 % define model name 
 model_name = { 'contrast', 'soc', 'oriSurrond', 'normVar'};
@@ -39,7 +39,7 @@ save_address = fullfile(prevPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing
-T      = chooseData( choose_data, optimizer, fittime );
+T      = chooseData( choose_model, optimizer, fittime );
 
 %% init storages
 
