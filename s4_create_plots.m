@@ -29,7 +29,7 @@ addpath( genpath( fullfile( curPath, 'plot' )))
 %% generate save address and  choose data
 
 % save address
-figure_address = fullfile(curPath, 'figures', data_folder, target,  optimizer);
+figure_address = fullfile(curPath, 'figures_new', data_folder, target,  optimizer);
 if ~exist(figure_address, 'dir'), mkdir(figure_address); end
 pdf_address = fullfile(curPath, 'pdf', data_folder, target, optimizer);
 if ~exist(pdf_address, 'dir'), mkdir(pdf_address); end
