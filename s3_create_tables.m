@@ -4,11 +4,11 @@ clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
-fittime              = 40;               % how manoy initialization. value space: Integer
-data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
+target           = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+fittime          = 40;               % how manoy initialization. value space: Integer
+data_folder      = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid      = 'one';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_model = 'all';          % choose some preset data 
+choose_model     = 'all';          % choose some preset data 
 
 % define model name 
 model_name = { 'contrast', 'soc', 'oriSurrond', 'normVar'};
@@ -35,7 +35,7 @@ addpath( genpath( fullfile( curPath, 'plot' )))
 %% generate save address and  choose data
 
 % save address
-save_address = fullfile(prevPath, 'Data', data_folder, target,  optimizer);
+save_address = fullfile( curPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing
@@ -62,7 +62,7 @@ for roi = 1: numrois
         for dataset = 1:numdatasets
             % load value
             R_summay( idx, dataset ) = ...
-                dataloader( prevPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, optimizer);
+                dataloader( curPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, optimizer);
         end
     end
     
@@ -83,10 +83,10 @@ for roi = 1: numrois
         for dataset = 1:numdatasets
             
             % load target 
-            BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi);
+            BOLD_target = dataloader( curPath, 'BOLD_target', target, dataset, roi);
             
             % load predction 
-            BOLD_pred = dataloader( prevPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
+            BOLD_pred = dataloader( curPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
             
             % rmse 
             rmse( idx, dataset) = double(sqrt(mean((BOLD_pred- BOLD_target).^2)));
@@ -120,9 +120,9 @@ for roi = 1: numrois
             col_idx = (dataset-1) * 2 + 1;
             % load value  
             if model_idx < 6
-                param = exp(dataloader( prevPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
+                param = exp(dataloader( curPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
             else
-                param = (dataloader( prevPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
+                param = (dataloader( curPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
             end
             
             % assign value 
@@ -150,6 +150,6 @@ end
 %% show table
 
 % show R square table  
-show_table( prevPath, 'Rsquare_table', target, data_folder, optimizer); 
-show_table( prevPath, 'RMSE_table', target, data_folder, optimizer);
-show_table( prevPath, 'param_table', target, data_folder, optimizer); 
+show_table( curPath, 'Rsquare_table', target, data_folder, optimizer); 
+show_table( curPath, 'RMSE_table', target, data_folder, optimizer);
+show_table( curPath, 'param_table', target, data_folder, optimizer); 

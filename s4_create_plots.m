@@ -5,11 +5,11 @@ clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
-fittime              = 40;               % how manoy initialization. value space: Integer
-data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
+target           = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+fittime          = 40;               % how manoy initialization. value space: Integer
+data_folder      = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid      = 'one';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_model = 'all';          % choose some preset data 
+choose_model     = 'all';          % choose some preset data 
 error_bar = false;
 print_loss = true;
 
@@ -72,16 +72,16 @@ for dataset = 1:numdatasets
             model_idx = T.modelNum( idx);
             
             % load BOLD target
-            BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi );
+            BOLD_target = dataloader( curPath, 'BOLD_target', target, dataset, roi );
             len_stim = length( BOLD_target );
             
             % load errorbar 
             if error_bar
-                 BOLD_target_error = dataloader( prevPath, 'BOLD_target_error', target, dataset, roi );
+                 BOLD_target_error = dataloader( curPath, 'BOLD_target_error', target, dataset, roi );
             end
             
             % load BOLD prediction
-            BOLD_pred = dataloader( prevPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
+            BOLD_pred = dataloader( curPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
             pred_summary_all(1:len_stim, idx, dataset, roi) = BOLD_pred';
             
         end
@@ -170,7 +170,7 @@ if print_loss
                 model_idx = T.modelNum( ii);
                 
                 % load loss_log
-                loss_log = dataloader( prevPath, 'Loss_log', target, dataset, roi, data_folder , model_idx, optimizer);
+                loss_log = dataloader( curPath, 'Loss_log', target, dataset, roi, data_folder , model_idx, optimizer);
                 min_num = sum((loss_log - min(loss_log))<.05);
                 
                 % subplot dataset, roi, idx

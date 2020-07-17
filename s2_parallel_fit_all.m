@@ -23,12 +23,12 @@
 
 %% hyperparameter: each time, we only need to edit this section !! 
 
-optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target               = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
-fittime              = 40;               % how manoy initialization. value space: Integer
-data_folder    = 'noCross';  % save in which folder. value space: 'noCross', .....
+optimizer         = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
+target              = 'all';              % Two target stimuli or the whole dataset. value space: 'target', 'All'
+fittime             = 40;               % how manoy initialization. value space: Integer
+data_folder      = 'noCross';  % save in which folder. value space: 'noCross', .....
 cross_valid      = 'one';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_model = 'all';          % choose some preset data 
+choose_model  = 'all';          % choose some preset data 
 
 %% set path
 
@@ -46,7 +46,7 @@ addpath( genpath( fullfile( curPath, 'plot_tools' )))
  %% generate save address and  choose data 
 
 % save address 
-save_address = fullfile(prevPath, 'Data', data_folder, target,  optimizer);
+save_address = fullfile( curPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing 
@@ -60,9 +60,9 @@ hpc_job_number = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 if isempty(hpc_job_number), hpc_job_number = 5; end
 
 dataset          = T.dataset(hpc_job_number);
-roi                   = T.roiNum(hpc_job_number);
-model_idx   = T.modelNum(hpc_job_number);
-model           = T.modelLoader{model_idx};
+roi                  = T.roiNum(hpc_job_number);
+model_idx      = T.modelNum(hpc_job_number);
+model            = T.modelLoader{model_idx};
 
 disp(T(hpc_job_number, :));
 
@@ -71,7 +71,7 @@ display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', nu
 disp( display )
 
 % load training label
-BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi );
+BOLD_target = dataloader( curPath, 'BOLD_target', target, dataset, roi );
 
 % load the input stimuli
 switch model.model_type
@@ -80,7 +80,7 @@ switch model.model_type
     case 'space'
         which_obj = 'E_xy';
 end
-E = dataloader( prevPath, which_obj, target, dataset, roi, 'old' );
+E = dataloader( curPath, which_obj, target, dataset, roi, 'old' );
 
 if strcmp( model.legend, 'oriSurround')
     disp( 'ori_surround')
@@ -96,7 +96,7 @@ elseif strcmp( model.legend, 'SOC1')
     disp( 'soc1')
     
     % gain E_mean
-    E_mean = dataloader( prevPath, 'E_mean', target, dataset, roi );
+    E_mean = dataloader( curPath, 'E_mean', target, dataset, roi );
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
