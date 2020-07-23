@@ -1,4 +1,5 @@
 *.mat
 *.DS_Store
 Data/*
-./pdf/*
+figures_new/*
+pdf/
