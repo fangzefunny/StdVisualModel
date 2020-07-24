@@ -23,7 +23,7 @@
 
 %% hyperparameter: each time, we only need to edit this section !! 
 if ~exist('doCross', 'var'), doCross = false; end
-if ~exist('target', 'var'),  target  = 'target'; end
+if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime             = 40;        % how manoy initialization. value space: Integer
