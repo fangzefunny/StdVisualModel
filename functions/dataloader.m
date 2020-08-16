@@ -15,8 +15,12 @@ switch which_obj
     case 'BOLD_pred'
         fname = sprintf('prediction_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
         load_path = fullfile( prevPath, 'Data', data_folder, target, optimizer, fname);
-        load( load_path, 'BOLD_pred');
-        data = BOLD_pred;
+        if exist(load_path, 'file')
+            load( load_path, 'BOLD_pred');
+            data = BOLD_pred;
+        else 
+            data = [];
+        end
         
     case 'BOLD_target'
         fname = sprintf('dataset%02d.mat', dataset);

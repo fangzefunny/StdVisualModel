@@ -1,17 +1,28 @@
-%% clear the memory
-
-clear all; close all; clc
 
 %% hyperparameter: each time, we only need to edit this section !!
+if ~exist('doCross', 'var'), doCross = false; end
+if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target           = 'all';      % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime          = 40;         % how manoy initialization. value space: Integer
-data_folder      = 'noCross';  % save in which folder. value space: 'noCross', .....
-cross_valid      = 'one';      % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_model     = 'all';      % choose some preset data 
+choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
 error_bar = false;
-print_loss = true;
+
+%choose_model     = 'orientation';      % choose some preset data 
+
+
+switch doCross
+    case false
+        cross_valid  = 'one';            % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
+        data_folder  = 'noCross';       % save in which folder. value space: 'noCross', .....
+        print_loss   = true;
+
+    case true
+        cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
+        data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
+        print_loss   = false;           % we don't save all the loss plots when we cross validate
+
+end
 
 %% set path
 
@@ -29,7 +40,7 @@ addpath( genpath( fullfile( curPath, 'plot' )))
 %% generate save address and  choose data
 
 % save address
-figure_address = fullfile(curPath, 'figures_new', data_folder, target,  optimizer);
+figure_address = fullfile(curPath, 'figures', data_folder, target,  optimizer);
 if ~exist(figure_address, 'dir'), mkdir(figure_address); end
 pdf_address = fullfile(curPath, 'pdf', data_folder, target, optimizer);
 if ~exist(pdf_address, 'dir'), mkdir(pdf_address); end
@@ -82,8 +93,11 @@ for dataset = 1:numdatasets
             
             % load BOLD prediction
             BOLD_pred = dataloader( curPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
-            pred_summary_all(1:len_stim, idx, dataset, roi) = BOLD_pred';
-            
+            if ~isempty(BOLD_pred)
+                pred_summary_all(1:len_stim, idx, dataset, roi) = BOLD_pred';
+            else
+                pred_summary_all(1:len_stim, idx, dataset, roi) = NaN;
+            end
         end
         
         if strcmp( target, 'target' )

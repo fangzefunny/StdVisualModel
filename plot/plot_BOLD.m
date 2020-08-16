@@ -175,11 +175,13 @@ if strcmp( target, 'target' )==0
         bar1_error.Color = [ .8, .8, .8 ];
     end
     
-    if ~isnan( all_prediction )
         
-        % visualized the prediction: scatter
-        for which_prediction = 1:nummodels
-            model_prediction = all_prediction(: , which_prediction );
+    % visualized the prediction: scatter
+    for which_prediction = 1:nummodels
+        model_prediction = all_prediction(: , which_prediction );
+        
+        if ~isnan( model_prediction )
+            
             model_prediction = model_prediction';
             col = col_vector{which_prediction};
             for ii = 1:size(xgroups,1)
@@ -210,9 +212,9 @@ if strcmp( target, 'target' )==0
     ylim( [yvalue, vmax])
     box off
     
-    if ~isnan( all_prediction )
+    %if ~isnan( all_prediction )
         legend(legend_name(1:nummodels+1), 'Location', 'EastOutside')
-    end
+    %end
     
     hold off
     
