@@ -5,7 +5,7 @@ if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime          = 40;         % how manoy initialization. value space: Integer
-choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
+choose_model     = 'all'; % 'noOri' ;'all';      % choose some preset data  ('all' or 'noOri');
 error_bar = false;
 
 %choose_model     = 'orientation';      % choose some preset data 

@@ -1,16 +1,29 @@
-%% clear the memory
-
-clear all; close all; clc
 %% hyperparameter: each time, we only need to edit this section !!
+if ~exist('doCross', 'var'), doCross = false; end
+if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-target           = 'all';      % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime          = 40;         % how manoy initialization. value space: Integer
-data_folder      = 'noCross';  % save in which folder. value space: 'noCross', .....
-cross_valid      = 'one';      % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_model     = 'all';      % choose some preset data 
+choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
+error_bar = false;
 
-% define model name 
+%choose_model     = 'orientation';      % choose some preset data 
+
+
+switch doCross
+    case false
+        cross_valid  = 'one';            % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
+        data_folder  = 'noCross';       % save in which folder. value space: 'noCross', .....
+        print_loss   = true;
+
+    case true
+        cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
+        data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
+        print_loss   = false;           % we don't save all the loss plots when we cross validate
+
+end
+
+%% define model name 
 model_name = { 'contrast', 'soc', 'oriSurrond', 'normVar'};
 
 % define param name
@@ -139,10 +152,10 @@ for roi = 1: numrois
     
     param_table = table(param_name', parammean(:, 1) ,parammean(:, 2), parammean(:, 3), parammean(:, 4), ...
                                                                           parammean(:, 5) ,parammean(:, 6), parammean(:, 7), parammean(:, 8));
-    param_table.Properties.VariableNames = {'model', 'dataset1: mean', 'dataset1: sem', ...
-                                                                                                         'dataset2: mean', 'dataset2: sem', ...
-                                                                                                         'dataset3: mean', 'dataset3: sem', ...
-                                                                                                         'dataset4: mean', 'dataset4: sem'};
+    param_table.Properties.VariableNames = {'model', 'dataset1_mean', 'dataset1_sem', ...
+                                                                                                         'dataset2_mean', 'dataset2_sem', ...
+                                                                                                         'dataset3_mean', 'dataset3_sem', ...
+                                                                                                         'dataset4_mean', 'dataset4_sem'};
     save(fullfile(save_address , sprintf('param_table-%d_roi.mat', roi )) , 'param_table');
     
 end
