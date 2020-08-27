@@ -1,9 +1,26 @@
-function legend_list = plot_BOLD(all_prediction, BOLD_target, dataset, roi, target, error_bar  )
+function plot_test4( all_prediction, dataset, roi )
 
-if (nargin < 6), error_bar = nan; end 
-if (nargin < 5), target = 'all'; end
+    %% set path
 
-% Input 1: which datasets: dataset 1 or 2...
+    [curPath, prevPath] = stdnormRootPath();
+
+    % add path to the function
+    addpath( genpath( fullfile( curPath, 'functions' )))
+
+    % add path to the model
+    addpath( genpath( fullfile( curPath, 'models' )))
+
+    % add path to the plot tool
+    addpath( genpath( fullfile( curPath, 'plot' )))
+
+    % some important value
+    target = 'all';
+     error_bar = nan;
+
+    % load target data
+    BOLD_target = dataloader( prevPath, 'BOLD_target', target, dataset, roi );
+
+   % Input 1: which datasets: dataset 1 or 2...
 % Input 2: which roi area: 'v1' or 'v2' ...
 % input 3: the prediction of the model: a matrix: num_stim x num_models
 % Input 4: legend name:
@@ -175,19 +192,17 @@ if strcmp( target, 'target' )==0
         bar1_error.Color = [ .8, .8, .8 ];
     end
     
-        
-    % visualized the prediction: scatter
-    for which_prediction = 1:nummodels
-        model_prediction = all_prediction(: , which_prediction );
-        
-        if ~isnan( model_prediction )
-            
+    if ~isnan( all_prediction )
+        ratio = v_mean(1) / all_prediction(1)/(1/2);
+        % visualized the prediction: scatter
+        for which_prediction = 1:nummodels
+            model_prediction = all_prediction(: , which_prediction );
             model_prediction = model_prediction';
             col = col_vector{which_prediction};
             for ii = 1:size(xgroups,1)
                 lenint = ogroups( ii, 2) - ogroups( ii, 1)-1;
                 idx = xgroups(ii,1):(xgroups(ii,1) + lenint);
-                plot(idx, model_prediction(idx), '-o', 'MarkerSize', markersize,...
+                plot(idx, ratio * model_prediction(idx), '-o', 'MarkerSize', markersize,...
                     'MarkerEdgeColor', col, ...
                     'MarkerFaceColor', col,...
                     'LineWidth', plotwidth,...
@@ -212,42 +227,36 @@ if strcmp( target, 'target' )==0
     ylim( [yvalue, vmax])
     box off
     
-    %if ~isnan( all_prediction )
+    if ~isnan( all_prediction )
         legend(legend_name(1:nummodels+1), 'Location', 'EastOutside')
-    %end
+    end
     
     hold off
     
 elseif strcmp( target, 'target' )
     switch dataset
-        case { 1, 2}
-            y1 = 1:5;  y2 = 6:10; y3 = 15:18; y4 = 11:14;
-            x1 = 1:5;  x2 = 7:11;  x3 = 13:16; x4 = 18:21;
-        case { 3 , 4}
-            y1 = 17:-1:14; y2 = 13:-1:9; y3 = 5:8;  y4 = 1:4;
-            x1 = 1:4; x2 = 6:10; x3 = 12:15; x4 = 17:20;
+        case { 1 , 2 }
+            x1 = 1:5;  y1 = 1:5;
+            x2 = 7:11; y2 = 6:10;
+        case { 3 , 4, 5 }
+            x1 = 1:4; y1 = 9:-1:6;
+            x2 = 6:10; y2 = 5:-1:1;
     end
     
     legend_list = cell( 1, nummodels );
     
     b1 = bar(x1, BOLD_target(y1)); hold on
     b2 = bar(x2, BOLD_target(y2));
-    b3 = bar(x3, BOLD_target(y3));
-    b4 = bar(x4, BOLD_target(y4));
     if length(error_bar)~=1
         b1_error = errorbar( x1, BOLD_target(y1), error_bar(y1), error_bar(y1)); 
         b2_error = errorbar( x2, BOLD_target(y2), error_bar(y2), error_bar(y2)); 
-        b3_error = errorbar( x3, BOLD_target(y3), error_bar(y3), error_bar(y3));
-        b4_error = errorbar( x4, BOLD_target(y4), error_bar(y4), error_bar(y4));
     end
 
     %     set(b1,'Facecolor', [86 44 136]/255,'Edgecolor', [86 44 136]/255);% [.7, .7, .7])
     %     set(b2,'Facecolor', [66 140 203]/255,'Edgecolor', [66 140 203]/255);% [.7, .7, .7])
-    set(b1,'Facecolor', [ .6, .6, .6],'Edgecolor', [ .6, .6, .6]);% [.7, .7, .7])
+    set(b1,'Facecolor', [ .6, .6, .6],'Edgecolor', [.6, .6, .6]);% [.7, .7, .7])
+    %set(b2,'Facecolor', [ 1, 1,  1],'Edgecolor', [ 0, 0, 0]);% [.7, .7, .7])
     set(b2,'Facecolor', [ .8, .8, .8],'Edgecolor', [ .8, .8, .8]);% [.7, .7, .7])
-    set(b3,'Facecolor', [ .6, .6, .6],'Edgecolor', [ .6, .6, .6]);% [.7, .7, .7])
-    set(b4,'Facecolor', [ .8, .8, .8],'Edgecolor', [ .8, .8, .8]);% [.7, .7, .7])
-    
     hold on
     for which_prediction = 1:nummodels
         model_prediction = all_prediction(  : , which_prediction );
@@ -263,31 +272,14 @@ elseif strcmp( target, 'target' )
             'MarkerFaceColor', col,...
             'LineWidth', plotwidth,...
             'Color', col);
-        plot(x3, model_prediction(y3), '-o', 'MarkerSize', markersize,...
-            'MarkerEdgeColor', col, ...
-            'MarkerFaceColor', col,...
-            'LineWidth', plotwidth,...
-            'Color', col);
-        plot(x4, model_prediction(y4), '-o', 'MarkerSize', markersize,...
-            'MarkerEdgeColor', col, ...
-            'MarkerFaceColor', col,...
-            'LineWidth', plotwidth,...
-            'Color', col);
     end
     
     yvalue = min( 0, min( BOLD_target )) - .05;
-    interval = max(BOLD_target) * .2;
     % Label the group
-    xt = [mean(x1)+1.3, mean(x2)+1.5, mean(x3)+2.2, mean(x4)+2.7];
-    set(gca,'xtick',[mean(x1), mean(x2), mean(x3), mean(x4)+.5]);
-    set(gca,'XTickLabel',{'Patterns-','Gratings-', 'Pattens-', 'Gratings-'});
-    ytextp2 = (yvalue - interval) * ones( 1, length( xt));
-    xtb = { 'Sparity','Sparity', 'Contrast', 'Contrast'};
-    text(xt, ytextp2, xtb, 'HorizontalAlignment', 'right', 'fontsize', fontsize);
+    set(gca,'xtick',[mean(x1), mean(x2)]);
+    set(gca,'XTickLabel',{'Patterns-Sparsity','Gratings-Sparsity'});
     ylim( [yvalue, inf])
     box off
     
 end
 
-
-end
