@@ -21,6 +21,7 @@ red = [231, 76, 60]./255;
 yellow = [ 241, 196, 15]./255;
 green = [46, 204, 113]./255;
 col_vector = {dark, blue, yellow, red, green};
+curvy = [ .4, .4, .4] + .1; grating = [ .6, .6, .6] + .1; other = [ .8, .8, .8] + .1;
 legend_name = { 'BOLD', 'contrast', 'SOC', 'oriSurround', 'normVar' };
 fontsize = 9;
 linewidth = 1.2;
@@ -70,6 +71,10 @@ if strcmp( target, 'target' )==0
             stim_vector = [ 1:73];
             interval = [.05, .16];
             vmax = 1.6;
+            curvy_group = [ 1: 6];
+            grating_group = [ 7: 12];
+            int_vector = setdiff( stim_vector, curvy_group);
+            other_group = setdiff( int_vector, grating_group);
             
         case 2
             %             xgroups = [1 6; 7 12; 13 18; 19 23; 24 27; 28 31; 32 35; 36 40; ...
@@ -102,6 +107,10 @@ if strcmp( target, 'target' )==0
             stim_vector = [ 1: 73];
             interval = [ .1, .22];
             vmax = 2.4;
+            curvy_group = [ 1: 6];
+            grating_group = [ 7: 12];
+            int_vector = setdiff( stim_vector, curvy_group);
+            other_group = setdiff( int_vector, grating_group);
             
         case {3, 4, 5}
             %             xgroups = [1 9; 10 14; 15 19; 20 24; 25 35; 36 41; 42 46];
@@ -130,6 +139,10 @@ if strcmp( target, 'target' )==0
             stim_vector = [ 1:46];
             interval = [.13, .4];
             vmax = 3.4;
+            curvy_group = [ 42: 46];
+            grating_group = [ 36: 41];
+            int_vector = setdiff( stim_vector, curvy_group);
+            other_group = setdiff( int_vector, grating_group);
     end
     
     count = 0;
@@ -153,12 +166,10 @@ if strcmp( target, 'target' )==0
     v_mean = v_mean_prime;
     error_bar = error_prime;
     
-    bar1 = bar(stim_vector, v_mean);
-    hold on
     
-    set(bar1,'Facecolor', [.7, .7, .7], 'EdgeColor', [.7, .7, .7])
-    
-    % plot for legend
+     % plot for legend
+     bar( 1:2,[nan, nan],  'Facecolor', other, 'EdgeColor', other);
+     
     for which_prediction = 1:nummodels
         col = col_vector{which_prediction};
         %function plot_legend( )
@@ -175,6 +186,14 @@ if strcmp( target, 'target' )==0
         bar1_error.Color = [ .8, .8, .8 ];
     end
     
+    
+    
+    % plot the BOLD signal 
+    bar1 = bar( curvy_group, v_mean( curvy_group), 'Facecolor', curvy, 'EdgeColor', curvy);
+    bar2 = bar( grating_group, v_mean( grating_group), 'Facecolor', grating, 'EdgeColor', grating);
+    bar3 = bar( other_group, v_mean( other_group), 'Facecolor', other, 'EdgeColor', other);
+   
+    hold on    
         
     % visualized the prediction: scatter
     for which_prediction = 1:nummodels
@@ -243,10 +262,15 @@ elseif strcmp( target, 'target' )
 
     %     set(b1,'Facecolor', [86 44 136]/255,'Edgecolor', [86 44 136]/255);% [.7, .7, .7])
     %     set(b2,'Facecolor', [66 140 203]/255,'Edgecolor', [66 140 203]/255);% [.7, .7, .7])
-    set(b1,'Facecolor', [ .6, .6, .6],'Edgecolor', [ .6, .6, .6]);% [.7, .7, .7])
-    set(b2,'Facecolor', [ .8, .8, .8],'Edgecolor', [ .8, .8, .8]);% [.7, .7, .7])
-    set(b3,'Facecolor', [ .6, .6, .6],'Edgecolor', [ .6, .6, .6]);% [.7, .7, .7])
-    set(b4,'Facecolor', [ .8, .8, .8],'Edgecolor', [ .8, .8, .8]);% [.7, .7, .7])
+%         set(b1,'Facecolor', [ .6, .6, .6],'Edgecolor', [ .6, .6, .6]);% [.7, .7, .7])
+%         set(b2,'Facecolor', [ .8, .8, .8],'Edgecolor', [ .8, .8, .8]);% [.7, .7, .7])
+%         set(b3,'Facecolor', [ .6, .6, .6],'Edgecolor', [ .6, .6, .6]);% [.7, .7, .7])
+%         set(b4,'Facecolor', [ .8, .8, .8],'Edgecolor', [ .8, .8, .8]);% [.7, .7, .7])
+    
+        set(b1,'Facecolor', curvy,'Edgecolor', curvy);% [.7, .7, .7])
+        set(b2,'Facecolor', grating,'Edgecolor', grating);% [.7, .7, .7])
+        set(b3,'Facecolor', curvy,'Edgecolor', curvy);% [.7, .7, .7])
+        set(b4,'Facecolor', grating,'Edgecolor', grating);% [.7, .7, .7])
     
     hold on
     for which_prediction = 1:nummodels
