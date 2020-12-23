@@ -1,14 +1,15 @@
 
 %% hyperparameter: each time, we only need to edit this section !!
 if ~exist('doCross', 'var'), doCross = false; end
-if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
+if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
+if ~exist('doModel', 'var'), doModel = true; end
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime          = 40;         % how manoy initialization. value space: Integer
-choose_model     = 'all'; % 'noOri' ;'all';      % choose some preset data  ('all' or 'noOri');
+%choose_model     = 'noVar'; % 'noOri' ;'all';      % choose some preset data  ('all' or 'noOri');
 error_bar = false;
 
-%choose_model     = 'orientation';      % choose some preset data 
+choose_model     = 'figure4';      % choose some preset data
 
 
 switch doCross
@@ -16,13 +17,14 @@ switch doCross
         cross_valid  = 'one';            % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'noCross';       % save in which folder. value space: 'noCross', .....
         print_loss   = true;
-
+        
     case true
         cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
         print_loss   = false;           % we don't save all the loss plots when we cross validate
-
+        
 end
+print_loss = false
 
 %% set path
 
@@ -64,7 +66,7 @@ Rsqu_summary_all = NaN(nummodels,numdatasets, numrois);
 
 if strcmp( target, 'target' )
     figure;set(gcf, 'Position', [200 100 1400 960])
-    sgtitle( 'Fitted Result: Target stimuli' )
+    %sgtitle( 'Fitted Result: Target stimuli' )
     subplot( numdatasets, numrois+1, numdatasets+1)
     %legend( { 'BOLD', 'contrast', 'normStd', 'normVar'});
     
@@ -86,9 +88,9 @@ for dataset = 1:numdatasets
             BOLD_target = dataloader( curPath, 'BOLD_target', target, dataset, roi );
             len_stim = length( BOLD_target );
             
-            % load errorbar 
+            % load errorbar
             if error_bar
-                 BOLD_target_error = dataloader( curPath, 'BOLD_target_error', target, dataset, roi );
+                BOLD_target_error = dataloader( curPath, 'BOLD_target_error', target, dataset, roi );
             end
             
             % load BOLD prediction
@@ -105,11 +107,17 @@ for dataset = 1:numdatasets
             % subplot dataset, roi, idx
             idx = (dataset-1)*(numrois+1) + roi;
             subplot( numdatasets, numrois+1, idx)
-            if error_bar 
-                plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target, BOLD_target_error );
+            if doModel
+                if error_bar
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target, BOLD_target_error );
+                else
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target );
+                end
             else
-                plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target );
+                nan_prediction = NaN( size( pred_summary_all(1:len_stim, :, dataset, roi)));
+                plot_BOLD( nan_prediction, BOLD_target, dataset, roi, target)
             end
+            
             show_title = sprintf( 'Dataset%d-V%d', dataset, roi );
             title( show_title )
             if idx ==numrois
@@ -120,11 +128,17 @@ for dataset = 1:numdatasets
         else
             % subplot nroi, 1, roi
             subplot( numrois, 1, roi )
-            if error_bar
-                plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target, BOLD_target_error )
+            if doModel
+                if error_bar
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target, BOLD_target_error )
+                else
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target )
+                end
             else
-                plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target )
+                nan_prediction = NaN( size( pred_summary_all(1:len_stim, :, dataset, roi)));
+                plot_BOLD( nan_prediction, BOLD_target, dataset, roi)
             end
+            
             show_title = sprintf( 'Dataset%d-V%d', dataset, roi );
             title( show_title )
         end
@@ -191,7 +205,7 @@ if print_loss
                 idx = (roi-1)*nummodels + ii;
                 subplot( numrois, nummodels, idx)
                 histogram( loss_log, 'BinWidth', 0.05 )
-                xlim( [0,1]) 
+                xlim( [0,1])
                 show_title = sprintf( 'Dataset%d-V%d-M%d\n-min-%d', dataset, roi, model_idx, min_num );
                 title( show_title )
                 

@@ -26,6 +26,22 @@ model5  = oriSurroundModel( optimizer, fittime);
 model6 = SOCModel2( optimizer, fittime);
 
 switch quick_choice
+    case {'figure1'}
+        models = {model1};
+        model_idx = [1];
+        datasets = [1];
+    case {'figure2'}
+        models = {model4, model5};
+        model_idx = [4, 5];
+        datasets = [1];
+    case {'figure3'}
+        models = {model3};
+        model_idx = [3];
+        datasets = [1];
+    case {'figure4'}
+        models = {model1, model3};
+        model_idx = [1, 3];
+        datasets = [1];
     case {'con'}
         models = {model1};
         model_idx = [1];
@@ -44,9 +60,12 @@ switch quick_choice
     case 'oriSurround'
         models = {model5};
         model_idx = [ 5];
-    case 'con'
-        model = { model1};
-        model_idx = 1;
+    case 'noVar'
+        models = {model1, model4, model5};
+        model_idx = [1, 4, 5];
+    case 'no_model'
+        models = {};
+        model_idx = NaN;
 end
 
 

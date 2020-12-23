@@ -81,7 +81,7 @@ for roi = 1: numrois
     
     r2_table = table(model_name', R_summay(:, 1) ,R_summay(:, 2), R_summay(:, 3), R_summay(:, 4));
     r2_table.Properties.VariableNames = {'model', 'dataset1', 'dataset2', 'dataset3', 'dataset4' };
-    save(fullfile(save_address , sprintf('Rsqaure_table-%d_roi.mat', roi )) , 'r2_table');
+    save(fullfile(save_address , sprintf('Rsquare_table-%d_roi.mat', roi )) , 'r2_table');
     
 end
 

@@ -15,10 +15,10 @@ addpath( genpath( fullfile( curPath, 'plot_tools' )))
 %% download the data
 
 % get fmri data
-url= 'https://osf.io/xv8m2/download';
-pth = fullfile(prevPath, 'Data.zip');
-fname = websave(pth, url);
-unzip( fname, prevPath);
+% url= 'https://osf.io/xv8m2/download';
+% pth = fullfile(prevPath, 'Data.zip');
+% fname = websave(pth, url);
+% unzip( fname, prevPath);
 
 %% calculate E
 

@@ -20,7 +20,7 @@ blue = [52, 152, 219]./255;
 red = [231, 76, 60]./255;
 yellow = [ 241, 196, 15]./255;
 green = [46, 204, 113]./255;
-col_vector = {dark, blue, yellow, red, green};
+col_vector = {dark, red, green}; %dark, blue, yellow, red, green
 curvy = [ .4, .4, .4] + .1; grating = [ .6, .6, .6] + .1; other = [ .8, .8, .8] + .1;
 legend_name = { 'BOLD', 'contrast', 'SOC', 'oriSurround', 'normVar' };
 fontsize = 9;
@@ -49,8 +49,8 @@ if strcmp( target, 'target' )==0
             %                 'Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'};
             ogroups = [1 6; 7 12; 13 18; 19 25; 26 29; 30 33; 34 37; 38 42; ...
                 43 47; 48 52; 53 57; 58 62];
-            xgroups = [1 6; 7 12; 13 18; 19 25; 26 31; 32 37; 38 43; 44 49; ...
-                50 55; 56 61; 62 67; 68 73];
+            xgroups = [1 6; 7 12; 13 18; 19 25; 26 30; 31 35; 36 40; 41 46; ...
+                47 52; 53 58; 59 64; 65 70];
             groupnames1 = {'Patterns-', 'Gratings-',...
                 '  NoiseBars-', 'Waves-', ...
                 'Grating-', ' NoiseBar-', 'Waves-', ...
@@ -71,8 +71,8 @@ if strcmp( target, 'target' )==0
             stim_vector = [ 1:73];
             interval = [.05, .16];
             vmax = 1.6;
-            curvy_group = [ 1: 6];
-            grating_group = [ 7: 12];
+            curvy_group = [ 1: 6, 65: 70];
+            grating_group = [ 7: 12, 47: 52];
             int_vector = setdiff( stim_vector, curvy_group);
             other_group = setdiff( int_vector, grating_group);
             
@@ -186,15 +186,13 @@ if strcmp( target, 'target' )==0
         bar1_error.Color = [ .8, .8, .8 ];
     end
     
-    
-    
     % plot the BOLD signal 
     bar1 = bar( curvy_group, v_mean( curvy_group), 'Facecolor', curvy, 'EdgeColor', curvy);
     bar2 = bar( grating_group, v_mean( grating_group), 'Facecolor', grating, 'EdgeColor', grating);
-    bar3 = bar( other_group, v_mean( other_group), 'Facecolor', other, 'EdgeColor', other);
+    bar3 = bar( other_group, v_mean( other_group), 'Facecolor', other + .05, 'EdgeColor', other - .2);
    
     hold on    
-        
+       
     % visualized the prediction: scatter
     for which_prediction = 1:nummodels
         model_prediction = all_prediction(: , which_prediction );

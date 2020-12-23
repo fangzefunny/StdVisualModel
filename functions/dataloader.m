@@ -159,7 +159,7 @@ switch which_obj
         fname = sprintf('stimuli-dataset0%1d', dataset);
         path=fullfile(prevPath, 'Data', 'Stimuli', fname);
         load(path, 'stimuli');
-        data = double(stimuli)./255 - .5;
+        data = double(stimuli);
         
 end
 
