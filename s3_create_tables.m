@@ -48,7 +48,7 @@ addpath( genpath( fullfile( curPath, 'plot' )))
 %% generate save address and  choose data
 
 % save address
-save_address = fullfile( curPath, 'Data', data_folder, target,  optimizer);
+save_address = fullfile( curPath, 'Tables', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing
@@ -62,7 +62,6 @@ model_vector = [ 1, 4, 5, 3];
 numrois     = length(unique(T.roiNum));
 numdatasets = length(unique(T.dataset));
 numstimuli = 50;
-numparams = 3;
 
 %% create Rsquare tables: 3 (roi) x ( model x dataset )
 
@@ -81,7 +80,7 @@ for roi = 1: numrois
     
     r2_table = table(model_name', R_summay(:, 1) ,R_summay(:, 2), R_summay(:, 3), R_summay(:, 4));
     r2_table.Properties.VariableNames = {'model', 'dataset1', 'dataset2', 'dataset3', 'dataset4' };
-    save(fullfile(save_address , sprintf('Rsquare_table-%d_roi.mat', roi )) , 'r2_table');
+    writetable( r2_table, fullfile(save_address , sprintf('Rsquare_table-%d_roi.csv', roi )));
     
 end
 
@@ -109,7 +108,7 @@ for roi = 1: numrois
     
     rmse_table = table(model_name', rmse(:, 1), rmse(:, 2), rmse(:, 3), rmse(:, 4));
     rmse_table.Properties.VariableNames = {'model', 'dataset1', 'dataset2', 'dataset3', 'dataset4' };
-    save(fullfile(save_address , sprintf('rmse_table-%d_roi.mat', roi )) , 'rmse_table');
+    writetable( rmse_table, fullfile(save_address , sprintf('rmse_table-%d_roi.csv', roi )));
     
 end
 
@@ -156,8 +155,7 @@ for roi = 1: numrois
                                                                                                          'dataset2_mean', 'dataset2_sem', ...
                                                                                                          'dataset3_mean', 'dataset3_sem', ...
                                                                                                          'dataset4_mean', 'dataset4_sem'};
-    save(fullfile(save_address , sprintf('param_table-%d_roi.mat', roi )) , 'param_table');
-    
+    writetable( param_table, fullfile(save_address , sprintf('param_table-%d_roi.csv', roi )));
 end
 
 %% show table
