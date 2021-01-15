@@ -160,7 +160,7 @@ end
 
 %% show table
 
-% show R square table  
-show_table( curPath, 'Rsquare_table', target, data_folder, optimizer); 
-show_table( curPath, 'RMSE_table', target, data_folder, optimizer);
-show_table( curPath, 'param_table', target, data_folder, optimizer); 
+% % show R square table  
+% show_table( curPath, 'Rsquare_table', target, data_folder, optimizer); 
+% show_table( curPath, 'RMSE_table', target, data_folder, optimizer);
+% show_table( curPath, 'param_table', target, data_folder, optimizer); 
