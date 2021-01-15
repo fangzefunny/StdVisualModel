@@ -41,28 +41,20 @@ switch quick_choice
         model_idx = [3];
         datasets = [1];
     case {'con'}
-        models = {model1};
         model_idx = [1];
     case {'all', 'All' }
-        models   = { model1, model4, model5, model3};
         model_idx = [ 1, 4, 5, 3];
     case 'orientation'
-        models   = {model1,  model3};% , 'normPower'};
         model_idx = [ 1, 3];
     case 'noOri'
-        models   = { model1, model3, model4};
         model_idx = [ 1, 3, 4];
     case {'SOC', 'soc'}
-        models   = { model4};
         model_idx = [ 4];
     case 'oriSurround'
-        models = {model5};
         model_idx = [ 5];
     case 'noVar'
-        models = {model1, model4, model5};
         model_idx = [1, 4, 5];
     case 'no_model'
-        models = {};
         model_idx = NaN;
 end
 
