@@ -10,7 +10,7 @@ switch which_obj
     
     case 'Rsquare_table'
         for roi = 1:3
-            fname = sprintf('Rsqaure_table-%d_roi.mat',roi );
+            fname = sprintf('Rsquare_table-%d_roi.mat',roi );
             load_path = fullfile( prevPath, 'Data', data_folder, target, optimizer, fname);
             load( load_path, 'r2_table');
             roi_name = sprintf('-------------------------------------V%d------------------------------', roi);
