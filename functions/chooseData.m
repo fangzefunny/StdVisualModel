@@ -14,33 +14,31 @@ addpath( genpath( fullfile( currPath, 'models' )))
 datasets = [1, 2, 3, 4];
 roi_idx = [1, 2, 3 ];
 ROIs     = {'V1', 'V2', 'V3'};
-% datasets = [1];
-% roi_idx = [1];
-% ROIs     = {'V1'};
 
-model1 = contrastModel( optimizer, fittime);
-%model2 = normStdModel( optimizer, fittime);
-model3 = normVarModel( optimizer, fittime);
-model4 = SOCModel( optimizer, fittime);
-model5  = oriSurroundModel( optimizer, fittime);
-model6 = SOCModel2( optimizer, fittime);
+
+
+
+models(1) = contrastModel( optimizer, fittime);
+%models(2) = normStdModel( optimizer, fittime);
+models(3) = normVarModel( optimizer, fittime);
+models(4) = SOCModel( optimizer, fittime);
+models(5)  = oriSurroundModel( optimizer, fittime);
+models(6) = SOCModel2( optimizer, fittime);
+
 
 switch quick_choice
     case {'figure1'}
-        models = {model1};
         model_idx = [1];
         datasets = [1];
     case {'figure2'}
-        models = {model4, model5};
         model_idx = [4, 5];
         datasets = [1];
     case {'figure3'}
-        models = {model3};
         model_idx = [3];
         datasets = [1];
     case {'figure4'}
-        models = {model1, model3};
-        model_idx = [1, 3];
+       % models = {model1, model3};
+        model_idx = [3];
         datasets = [1];
     case {'con'}
         models = {model1};
@@ -69,7 +67,7 @@ switch quick_choice
 end
 
 
-n = length(datasets) * length(ROIs) * length(models);
+n = length(datasets) * length(ROIs) * length(model_idx);
 
 dataset     = NaN(n,1);
 roiNum      = NaN(n,1);
@@ -80,7 +78,7 @@ modelLoader   = cell(n,1);
 idx = 0;
 for d = 1:length(datasets)
     for r = 1:length(ROIs)
-        for m = 1:length(models)
+        for m = 1:length(model_idx)
              
             idx = idx+1;
         
@@ -88,7 +86,7 @@ for d = 1:length(datasets)
             roiNum(idx)      = roi_idx(r);
             roiName(idx)     = ROIs(r);
             modelNum(idx)    = model_idx(m);
-            modelLoader(idx)   = models(m);
+            modelLoader{idx} = models(model_idx(m));
 
         end
     end

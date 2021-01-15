@@ -1,6 +1,6 @@
 
 %% hyperparameter: each time, we only need to edit this section !!
-if ~exist('doCross', 'var'), doCross = false; end
+if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
 if ~exist('doModel', 'var'), doModel = true; end
 
@@ -24,7 +24,6 @@ switch doCross
         print_loss   = false;           % we don't save all the loss plots when we cross validate
         
 end
-print_loss = false
 
 %% set path
 
@@ -53,25 +52,21 @@ T      = chooseData( choose_model, optimizer, fittime );
 
 %% plot prediction
 
-% obtain some features of the storages
+% Obtain some features of the storages
 nummodels   = length(unique(T.modelNum));
 numrois     = length(unique(T.roiNum));
 numdatasets = length(unique(T.dataset));
 numstimuli = 50;
 numparams = 3;
 
-% storages
+% Initialize variables 
 pred_summary_all = NaN(numstimuli,nummodels,numdatasets, numrois);
 Rsqu_summary_all = NaN(nummodels,numdatasets, numrois);
+data_summary_all = NaN(numstimuli,1,numdatasets, numrois);
 
-if strcmp( target, 'target' )
-    figure;set(gcf, 'Position', [200 100 1400 960])
-    %sgtitle( 'Fitted Result: Target stimuli' )
-    subplot( numdatasets, numrois+1, numdatasets+1)
-    %legend( { 'BOLD', 'contrast', 'normStd', 'normVar'});
-    
-end
 
+
+% Loop through datasets and load model predictions and data
 for dataset = 1:numdatasets
     
     if strcmp( target, 'target' )==0
@@ -85,13 +80,12 @@ for dataset = 1:numdatasets
             model_idx = T.modelNum( idx);
             
             % load BOLD target
-            BOLD_target = dataloader( curPath, 'BOLD_target', target, dataset, roi );
-            len_stim = length( BOLD_target );
+            BOLD_data = dataloader( curPath, 'BOLD_target', target, dataset, roi );
+            len_stim = length( BOLD_data );
+            data_summary_all(1:len_stim, 1, dataset, roi) = BOLD_data';
             
             % load errorbar
-            if error_bar
-                BOLD_target_error = dataloader( curPath, 'BOLD_target_error', target, dataset, roi );
-            end
+            BOLD_data_error = dataloader( curPath, 'BOLD_target_error', target, dataset, roi );
             
             % load BOLD prediction
             BOLD_pred = dataloader( curPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
@@ -101,6 +95,50 @@ for dataset = 1:numdatasets
                 pred_summary_all(1:len_stim, idx, dataset, roi) = NaN;
             end
         end
+                
+        
+    end
+    
+  
+    
+end
+
+%% Make plots 
+
+% Intialize a figure
+if strcmp( target, 'target' )
+    figure;set(gcf, 'Position', [200 100 1400 960])
+    %sgtitle( 'Fitted Result: Target stimuli' )
+    subplot( numdatasets, numrois+1, numdatasets+1)
+    %legend( { 'BOLD', 'contrast', 'normStd', 'normVar'});
+    
+end
+
+% Loop through datasets and make plots
+for dataset = 1:numdatasets
+    
+    if strcmp( target, 'target' )==0
+        figure;set(gcf, 'Position', [200 100 1100 960])
+    end
+    
+    
+    for roi = 1:numrois
+        for idx = 1:nummodels
+            
+            model_idx = T.modelNum( idx);
+                                   
+        end
+
+        BOLD_data = data_summary_all(1:len_stim, 1, dataset, roi)';
+        
+        if strcmp( target, 'target' ) ==0
+            % define filename and save the file
+            fname= sprintf(  '/BOLD_fit-dataset%d-%s', dataset, target);
+            if error_bar, fname = sprintf('%s-error', fname); end
+            savefig(fullfile(figure_address, fname));
+            print(fullfile(pdf_address, fname),'-dpng');
+            
+        end
         
         if strcmp( target, 'target' )
             
@@ -109,13 +147,13 @@ for dataset = 1:numdatasets
             subplot( numdatasets, numrois+1, idx)
             if doModel
                 if error_bar
-                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target, BOLD_target_error );
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, BOLD_data_error );
                 else
-                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target );
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target );
                 end
             else
                 nan_prediction = NaN( size( pred_summary_all(1:len_stim, :, dataset, roi)));
-                plot_BOLD( nan_prediction, BOLD_target, dataset, roi, target)
+                plot_BOLD( nan_prediction, BOLD_data, dataset, roi, target)
             end
             
             show_title = sprintf( 'Dataset%d-V%d', dataset, roi );
@@ -130,13 +168,13 @@ for dataset = 1:numdatasets
             subplot( numrois, 1, roi )
             if doModel
                 if error_bar
-                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target, BOLD_target_error )
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, BOLD_data_error )
                 else
-                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_target, dataset, roi, target )
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target )
                 end
             else
                 nan_prediction = NaN( size( pred_summary_all(1:len_stim, :, dataset, roi)));
-                plot_BOLD( nan_prediction, BOLD_target, dataset, roi)
+                plot_BOLD( nan_prediction, BOLD_data, dataset, roi)
             end
             
             show_title = sprintf( 'Dataset%d-V%d', dataset, roi );
@@ -144,43 +182,9 @@ for dataset = 1:numdatasets
         end
         
     end
-    
-    if strcmp( target, 'target' ) ==0
-        % define filename and save the file
-        if error_bar
-            filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s-error', dataset, target) );
-            savefig(filename)
-            %print
-            filename = fullfile( pdf_address, sprintf( '/BOLD_fit-dataset%d-%s-error', dataset, target) );
-            print(filename,'-dpng')
-        else
-            filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, target) );
-            savefig(filename)
-            %print
-            filename = fullfile( pdf_address, sprintf( '/BOLD_fit-dataset%d-%s', dataset, target) );
-            print(filename,'-dpng')
-        end
-    end
-    
 end
 
-if strcmp( target, 'target' )
-    if error_bar
-        % define filename and save the file
-        filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s-error', dataset, target) );
-        savefig(filename)
-        %print
-        filename = fullfile( pdf_address, sprintf(  '/BOLD_fit-dataset%d-%s-error', dataset, target) );
-        print(filename,'-dpng')
-    else
-        % define filename and save the file
-        filename = fullfile( figure_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, target) );
-        savefig(filename)
-        %print
-        filename = fullfile( pdf_address, sprintf(  '/BOLD_fit-dataset%d-%s', dataset, target) );
-        print(filename,'-dpng')
-    end
-end
+
 
 %% plot loss histogram
 
