@@ -28,17 +28,17 @@ switch which_obj
         load(load_path, 'v_mean');
         data = v_mean(roi, : ); %matrix: num_roi x num_stim --> vector: num_stimuli 
         if strcmp(target,  'target')
-                    switch dataset
-                        case {1}
-                            stim_idx = [1:10, 35:38, 47:50];
-                            data = data(stim_idx);
-                        case{2}
-                            stim_idx = [1:10, 33:36, 45:48];
-                            data = data(stim_idx);
-                        case{3, 4}
-                            stim_idx = [9:12, 26, 28:39];
-                            data = data(stim_idx);
-                    end
+            switch dataset
+                case {1}
+                    stim_idx = [1:10, 35:38, 47:50];
+                    data = data(stim_idx);
+                case{2}
+                    stim_idx = [1:10, 33:36, 45:48];
+                    data = data(stim_idx);
+                case{3, 4}
+                    stim_idx = [9:12, 26, 28:39];
+                    data = data(stim_idx);
+            end
         end
         
     case 'BOLD_target_error' 

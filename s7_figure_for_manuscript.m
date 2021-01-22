@@ -18,9 +18,15 @@ pattern_cl = [ .6, .6, .6];
 x_pattern = 1:5;
 x_grating = 7:11;
 
+% set the figure size
+% the figure size is design to have 1.5 col width
+set( gcf, 'unit', 'centimeters', 'position', [10, 5, 8.5, 16]);
+set( gca, 'FontSize', 9) 
+
+
 for roi = 1:3
     
-    subplot( 1, 3, roi)
+    subplot( 3, 1, roi)
     
     BOLD_target = dataloader( curPath, 'BOLD_target', 'target', 1, roi );
     BOLD_target_error = dataloader( curPath, 'BOLD_target_error', 'target', 1, roi);
@@ -52,11 +58,15 @@ for roi = 1:3
      
     show_title = sprintf( 'V%d', roi );
     set(gca,'XTick', []);
-    title( show_title)
     ylim( [ 0, 1.5])
     box off
     
 end
+
+%% figure 2a 
+
+
+
 
 %% figure 2
 

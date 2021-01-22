@@ -68,6 +68,11 @@ data_summary_all = NaN(numstimuli,1,numdatasets, numrois);
 % Loop through datasets and load model predictions and data
 for dataset = 1:numdatasets
     
+    if strcmp( target, 'target' )==0
+        figure;set(gcf, 'Position', [200 100 1100 960])
+    end
+    
+    
     for roi = 1:numrois
         for idx = 1:nummodels
             
@@ -109,13 +114,21 @@ end
 for dataset = 1:numdatasets
     
     if strcmp( target, 'target' )==0
-        figure;
+        % figure size: figure is design to fit in 2 col (about 16cm wdith)
+        fig_width = 16;
+        fig_height = 10;
+        pos = [10, 5, 10+fig_width, 10+fig_height];
+        
+        set( gcf, 'unit', 'centimeters', 'position', pos);
+        set( gca, 'FontSize', 9) 
     end
     
     
     for roi = 1:numrois
         for idx = 1:nummodels
-            model_idx = T.modelNum( idx);      
+            
+            model_idx = T.modelNum( idx);
+                                   
         end
 
         BOLD_data = data_summary_all(1:len_stim, 1, dataset, roi)';
@@ -126,6 +139,7 @@ for dataset = 1:numdatasets
             if error_bar, fname = sprintf('%s-error', fname); end
             savefig(fullfile(figure_address, fname));
             print(fullfile(pdf_address, fname),'-dpng');
+            
         end
         
         if strcmp( target, 'target' )

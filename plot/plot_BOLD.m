@@ -23,7 +23,7 @@ green = [46, 204, 113]./255;
 col_vector = {dark, red, green}; %dark, blue, yellow, red, green
 curvy = [ .4, .4, .4] + .1; grating = [ .6, .6, .6] + .1; other = [ .8, .8, .8] + .1;
 legend_name = { 'BOLD', 'contrast', 'SOC', 'oriSurround', 'normVar' };
-fontsize = 9;
+fontsize = 12;
 linewidth = 1.2;
 plotwidth = 1.5;
 markersize = 4.5;

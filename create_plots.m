@@ -1,17 +1,14 @@
 
-%% hyperparameter: each time, we only need to edit this section !!
-
-if ~exist('doCross', 'var'), doCross = true; end
-if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
-if ~exist('doModel', 'var'), doModel = true; end
+function [] = creat_plots( )
+fig= 'figure2'
+doCross = true;
+target = 'target';
+doModel = true; 
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime          = 40;         % how manoy initialization. value space: Integer
-%choose_model     = 'noVar'; % 'noOri' ;'all';      % choose some preset data  ('all' or 'noOri');
 error_bar = false;
-
-choose_model     = 'figure2';      % choose some preset data
-
+choose_model     = fig;      % choose some preset data
 
 switch doCross
     case false
@@ -23,7 +20,6 @@ switch doCross
         cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
         print_loss   = false;           % we don't save all the loss plots when we cross validate
-        
 end
 
 %% set path
@@ -51,7 +47,7 @@ if ~exist(pdf_address, 'dir'), mkdir(pdf_address); end
 % choose data as if we are doing parallel computing
 T      = chooseData( choose_model, optimizer, fittime );
 
-%% plot prediction
+%% Load data into a matrix 
 
 % Obtain some features of the storages
 nummodels   = length(unique(T.modelNum));
@@ -99,19 +95,26 @@ end
 
 % Intialize a figure
 if strcmp( target, 'target' )
-    figure;set(gcf, 'Position', [200 100 1400 960])
-    %sgtitle( 'Fitted Result: Target stimuli' )
+    % figure size: figure is design to fit in 2 col (about 16cm wdith)
+    fig_width = 20;
+    fig_height = 3.5 * numdatasets;
+    pos = [10, 5, 2*fig_width, 2*fig_height];
+    set( gcf, 'unit', 'centimeters', 'position', pos);
     subplot( numdatasets, numrois+1, numdatasets+1)
-    %legend( { 'BOLD', 'contrast', 'normStd', 'normVar'});
 end
 
 % Loop through datasets and make plots
 for dataset = 1:numdatasets
     
     if strcmp( target, 'target' )==0
+        % figure size: figure is design to fit in 2 col (about 16cm wdith)
+        fig_width = 16;
+        fig_height = 10;
+        pos = [10, 5, 10+fig_width, 10+fig_height];
+        set( gcf, 'unit', 'centimeters', 'position', pos);
+        set( gca, 'FontSize', 9) 
         figure;
     end
-    
     
     for roi = 1:numrois
         for idx = 1:nummodels
@@ -119,15 +122,7 @@ for dataset = 1:numdatasets
         end
 
         BOLD_data = data_summary_all(1:len_stim, 1, dataset, roi)';
-        
-        if strcmp( target, 'target' ) ==0
-            % define filename and save the file
-            fname= sprintf(  '/BOLD_fit-dataset%d-%s', dataset, target);
-            if error_bar, fname = sprintf('%s-error', fname); end
-            savefig(fullfile(figure_address, fname));
-            print(fullfile(pdf_address, fname),'-dpng');
-        end
-        
+          
         if strcmp( target, 'target' )
             
             % subplot dataset, roi, idx
@@ -172,46 +167,4 @@ for dataset = 1:numdatasets
     end
 end
 
-
-
-%% plot loss histogram
-
-if print_loss
-    
-    for dataset = 1:numdatasets
-        
-        % initate a figure for each dataset
-        figure;set(gcf,'PaperType','a3')
-        set(gca,'xtick',[])
-        
-        for roi = 1:numrois
-            for ii = 1:nummodels
-                
-                model_idx = T.modelNum( ii);
-                
-                % load loss_log
-                loss_log = dataloader( curPath, 'Loss_log', target, dataset, roi, data_folder , model_idx, optimizer);
-                min_num = sum((loss_log - min(loss_log))<.05);
-                
-                % subplot dataset, roi, idx
-                idx = (roi-1)*nummodels + ii;
-                subplot( numrois, nummodels, idx)
-                histogram( loss_log, 'BinWidth', 0.05 )
-                xlim( [0,1])
-                show_title = sprintf( 'Dataset%d-V%d-M%d\n-min-%d', dataset, roi, model_idx, min_num );
-                title( show_title )
-                
-            end
-            
-            
-        end
-        
-        % define filename and save the file
-        filename = fullfile( figure_address, sprintf(  '/loss_log-dataset%d-%s', dataset, target) );
-        savefig(filename)
-        %print
-        filename = fullfile( pdf_address, sprintf(  '/loss_log-dataset%d-%s', dataset, target) );
-        print(filename,'-dpng')
-        
-    end
-end
+end 
