@@ -6,10 +6,6 @@ function T = chooseData(  quick_choice, optimizer, fittime )
 % 'orientation',
 % 'space' 
 
-% add path to the model
-[currPath, prevPath] = stdnormRootPath();
-addpath( genpath( fullfile( currPath, 'models' )))
-
 % dataset is [which_dataset (1-4) | which_roi (V1-V3)];
 datasets = [1, 2, 3, 4];
 roi_idx = [1, 2, 3 ];

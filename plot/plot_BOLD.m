@@ -32,7 +32,7 @@ set (gca, 'FontSize', fontsize, 'LineWidth', linewidth); hold on;
 nummodels = size( all_prediction ,2);
 
 % Load the fit target: fMRI data voxel mean
-if strcmp( target, 'target' )==0
+if ~strcmp( target, 'target' )
     % load data
     v_mean = BOLD_target; %matrix: num_roi x num_stim
     
@@ -255,7 +255,8 @@ elseif strcmp( target, 'target' )
         b1_error = errorbar( x1, BOLD_target(y1), error_bar(y1), error_bar(y1)); 
         b2_error = errorbar( x2, BOLD_target(y2), error_bar(y2), error_bar(y2)); 
         b3_error = errorbar( x3, BOLD_target(y3), error_bar(y3), error_bar(y3));
-        b4_error = errorbar( x4, BOLD_target(y4), error_bar(y4), error_bar(y4));
+        b4_error = errorbar( x4, BOLD_target(y4), error_bar(y4), error_bar(y4));        
+        
     end
 
     %     set(b1,'Facecolor', [86 44 136]/255,'Edgecolor', [86 44 136]/255);% [.7, .7, .7])
@@ -269,6 +270,12 @@ elseif strcmp( target, 'target' )
         set(b2,'Facecolor', grating,'Edgecolor', grating);% [.7, .7, .7])
         set(b3,'Facecolor', curvy,'Edgecolor', curvy);% [.7, .7, .7])
         set(b4,'Facecolor', grating,'Edgecolor', grating);% [.7, .7, .7])
+        
+        set(b1_error,'LineStyle', 'none','Color', .2*[1 1 1]);% [.7, .7, .7])
+        set(b2_error,'LineStyle', 'none','Color', .2*[1 1 1]);% [.7, .7, .7])
+        set(b3_error,'LineStyle', 'none','Color', .2*[1 1 1]);% [.7, .7, .7])
+        set(b4_error,'LineStyle', 'none','Color', .2*[1 1 1]);% [.7, .7, .7])
+                    
     
     hold on
     for which_prediction = 1:nummodels
