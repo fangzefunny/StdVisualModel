@@ -1,5 +1,5 @@
 %% hyperparameter: each time, we only need to edit this section !!
-if ~exist('doCross', 'var'), doCross = false; end
+if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
@@ -159,8 +159,8 @@ for roi = 1: numrois
 end
 
 %% show table
-
-% % show R square table  
-% show_table( curPath, 'Rsquare_table', target, data_folder, optimizer); 
-% show_table( curPath, 'RMSE_table', target, data_folder, optimizer);
-% show_table( curPath, 'param_table', target, data_folder, optimizer); 
+% 
+ % show R square table  
+ show_table( curPath, 'Rsqaure_table', target, data_folder, optimizer); 
+ show_table( curPath, 'RMSE_table', target, data_folder, optimizer);
+ show_table( curPath, 'param_table', target, data_folder, optimizer); 

@@ -39,6 +39,10 @@ addpath( genpath( fullfile( curPath, 'models' )))
 % add path to the plot tool
 addpath( genpath( fullfile( curPath, 'plot' )))
 
+roi = 1;
+E_ori = dataloader( curPath, 'E_ori', target, dataset, roi, data_folder, [], optimizer);
+
+disp(1)
 %% generate save address and  choose data
 
 % save address

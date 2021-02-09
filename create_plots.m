@@ -1,6 +1,5 @@
 
-function [] = creat_plots( )
-fig= 'figure2'
+function [] = creat_plots( fig)
 doCross = true;
 target = 'target';
 doModel = true; 
