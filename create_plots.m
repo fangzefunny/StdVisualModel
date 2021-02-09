@@ -1,12 +1,13 @@
 
-function [] = creat_plots( fig)
+function [] = create_plots( )
+fig= 'figure2'
 doCross = true;
 target = 'target';
 doModel = true; 
 
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime          = 40;         % how manoy initialization. value space: Integer
-error_bar = false;
+error_bar        = true;
 choose_model     = fig;      % choose some preset data
 
 switch doCross
@@ -21,27 +22,12 @@ switch doCross
         print_loss   = false;           % we don't save all the loss plots when we cross validate
 end
 
-%% set path
-
-[curPath, prevPath] = stdnormRootPath();
-
-% add path to the function
-addpath( genpath( fullfile( curPath, 'functions' )))
-
-% add path to the model
-addpath( genpath( fullfile( curPath, 'models' )))
-
-% add path to the plot tool
-addpath( genpath( fullfile( curPath, 'plot' )))
 
 %% generate save address and  choose data
 
 % save address
-figure_address = fullfile(curPath, 'figures', data_folder, target,  optimizer);
+figure_address = fullfile(stdnormRootPath, 'figures', data_folder, target,  optimizer);
 if ~exist(figure_address, 'dir'), mkdir(figure_address); end
-pdf_address = fullfile(curPath, 'pdf', data_folder, target, optimizer);
-if ~exist(pdf_address, 'dir'), mkdir(pdf_address); end
-
 
 % choose data as if we are doing parallel computing
 T      = chooseData( choose_model, optimizer, fittime );
@@ -69,15 +55,15 @@ for dataset = 1:numdatasets
             model_idx = T.modelNum( idx);
             
             % load BOLD target
-            BOLD_data = dataloader( curPath, 'BOLD_target', target, dataset, roi );
+            BOLD_data = dataloader( stdnormRootPath, 'BOLD_target', target, dataset, roi );
             len_stim = length( BOLD_data );
             data_summary_all(1:len_stim, 1, dataset, roi) = BOLD_data';
             
             % load errorbar
-            BOLD_data_error = dataloader( curPath, 'BOLD_target_error', target, dataset, roi );
+            BOLD_data_error = dataloader( stdnormRootPath, 'BOLD_target_error', target, dataset, roi );
             
             % load BOLD prediction
-            BOLD_pred = dataloader( curPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
+            BOLD_pred = dataloader( stdnormRootPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
             if ~isempty(BOLD_pred)
                 pred_summary_all(1:len_stim, idx, dataset, roi) = BOLD_pred';
             else
