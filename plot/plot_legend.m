@@ -1,14 +1,16 @@
-function plot_legend( all_prediction )
+function plot_legend( all_prediction, model_ind )
 
 nummodels = size( all_prediction ,2);
-
+model_ind = model_ind + 1;
 dark = [52, 73, 94]./255;
 blue = [52, 152, 219]./255;
 red = [231, 76, 60]./255;
 yellow = [ 241, 196, 15]./255;
 green = [46, 204, 113]./255;
-col_vector = {dark, red, green};%dark, blue, yellow, red, green
-legend_name = {  'contrast', 'soc', 'oriSurround', 'normVar' };
+col_vector = {'w', dark, green, red, blue, yellow};
+col_vector = col_vector(model_ind);
+legend_name = { 'BOLD', 'contrast', 'std', 'normVar','SOC', 'oriSurround', };
+legend_name = legend_name(model_ind);
 fontsize = 15;
 plotwidth = 1.5;
 markersize = 4.5;
@@ -25,5 +27,5 @@ plot( 1:2,[nan, nan], '-o', 'MarkerSize', markersize,...
 end
 
 
-legend(legend_name(1:nummodels), 'Location', 'West', 'FontSize', fontsize )
+legend(legend_name(1:nummodels), 'Location', 'East', 'FontSize', fontsize )
 axis( 'off' )

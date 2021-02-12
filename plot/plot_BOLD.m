@@ -1,7 +1,6 @@
-function legend_list = plot_BOLD(all_prediction, BOLD_target, dataset, roi, target, error_bar  )
+function legend_list = plot_BOLD(all_prediction, BOLD_target, dataset, roi, target, model_ind, error_bar)
 
-if (nargin < 6), error_bar = nan; end 
-if (nargin < 5), target = 'all'; end
+if (nargin < 7), error_bar = nan; end 
 
 % Input 1: which datasets: dataset 1 or 2...
 % Input 2: which roi area: 'v1' or 'v2' ...
@@ -20,9 +19,11 @@ blue = [52, 152, 219]./255;
 red = [231, 76, 60]./255;
 yellow = [ 241, 196, 15]./255;
 green = [46, 204, 113]./255;
-col_vector = {dark, red, green}; %dark, blue, yellow, red, green
+col_vector = {dark, green, red, blue, yellow};
+col_vector = col_vector(model_ind);
 curvy = [ .4, .4, .4] + .1; grating = [ .6, .6, .6] + .1; other = [ .8, .8, .8] + .1;
 legend_name = { 'BOLD', 'contrast', 'SOC', 'oriSurround', 'normVar' };
+legend_name = legend_name(model_ind);
 fontsize = 12;
 linewidth = 1.2;
 plotwidth = 1.5;
@@ -230,7 +231,7 @@ if ~strcmp( target, 'target' )
     box off
     
     %if ~isnan( all_prediction )
-        legend(legend_name(1:nummodels+1), 'Location', 'EastOutside')
+       %legend(legend_name(1:nummodels+1), 'Location', 'EastOutside')
     %end
     
     hold off
@@ -258,24 +259,18 @@ elseif strcmp( target, 'target' )
         b4_error = errorbar( x4, BOLD_target(y4), error_bar(y4), error_bar(y4));        
         
     end
-
-    %     set(b1,'Facecolor', [86 44 136]/255,'Edgecolor', [86 44 136]/255);% [.7, .7, .7])
-    %     set(b2,'Facecolor', [66 140 203]/255,'Edgecolor', [66 140 203]/255);% [.7, .7, .7])
-%         set(b1,'Facecolor', [ .6, .6, .6],'Edgecolor', [ .6, .6, .6]);% [.7, .7, .7])
-%         set(b2,'Facecolor', [ .8, .8, .8],'Edgecolor', [ .8, .8, .8]);% [.7, .7, .7])
-%         set(b3,'Facecolor', [ .6, .6, .6],'Edgecolor', [ .6, .6, .6]);% [.7, .7, .7])
-%         set(b4,'Facecolor', [ .8, .8, .8],'Edgecolor', [ .8, .8, .8]);% [.7, .7, .7])
-    
+   
         set(b1,'Facecolor', curvy,'Edgecolor', curvy);% [.7, .7, .7])
         set(b2,'Facecolor', grating,'Edgecolor', grating);% [.7, .7, .7])
         set(b3,'Facecolor', curvy,'Edgecolor', curvy);% [.7, .7, .7])
         set(b4,'Facecolor', grating,'Edgecolor', grating);% [.7, .7, .7])
         
+    if length(error_bar)~=1
         set(b1_error,'LineStyle', 'none','Color', .2*[1 1 1]);% [.7, .7, .7])
         set(b2_error,'LineStyle', 'none','Color', .2*[1 1 1]);% [.7, .7, .7])
         set(b3_error,'LineStyle', 'none','Color', .2*[1 1 1]);% [.7, .7, .7])
         set(b4_error,'LineStyle', 'none','Color', .2*[1 1 1]);% [.7, .7, .7])
-                    
+    end             
     
     hold on
     for which_prediction = 1:nummodels

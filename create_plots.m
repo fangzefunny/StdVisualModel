@@ -1,49 +1,55 @@
 
-function [] = create_plots( )
-fig= 'figure2'
-doCross = true;
-target = 'target';
-doModel = true; 
+function [] = create_plots(fig)
 
+% What should I do to add the path
+addpath( genpath( fullfile( stdnormRootPath, 'functions' )))
+addpath( genpath( fullfile( stdnormRootPath, 'models' )))
+addpath( genpath( fullfile( stdnormRootPath, 'plot' )))
+
+%%%%%%%%%%%%%%%%%
+%  Hyperparams  %
+%%%%%%%%%%%%%%%%%
+
+% Set up hyperparameters
+doModel          = true;
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-fittime          = 40;         % how manoy initialization. value space: Integer
-error_bar        = true;
-choose_model     = fig;      % choose some preset data
+error_bar        = false;
+data_folder      = 'Cross';  % save in which folder. value space: 'noCross', .....
+smallfig         = true;
 
-switch doCross
-    case false
-        cross_valid  = 'one';            % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-        data_folder  = 'noCross';       % save in which folder. value space: 'noCross', .....
-        print_loss   = true;
+switch fig
+    case {'figure1'}
+        target   = 'target';
+        error_bar = true;
+        doModel  = false;
         
-    case true
-        cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-        data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
-        print_loss   = false;           % we don't save all the loss plots when we cross validate
+    case {'figure2', 'figure3', 'figure5'}
+        target   = 'target';
+        
+    case {'figure6', 'figure7'}
+        target   = 'all';
+        smallfig = false;
 end
 
-
-%% generate save address and  choose data
-
-% save address
-figure_address = fullfile(stdnormRootPath, 'figures', data_folder, target,  optimizer);
+% Generate save address and  choose data
+figure_address = fullfile(stdnormRootPath, 'figures', data_folder, target, optimizer);
 if ~exist(figure_address, 'dir'), mkdir(figure_address); end
 
-% choose data as if we are doing parallel computing
-T      = chooseData( choose_model, optimizer, fittime );
+% Choose data as if we are doing parallel computing
+T = chooseData( fig, optimizer, 40 );
+model_ind = sort(unique(T.modelNum))';
 
-%% Load data into a matrix 
 
-% Obtain some features of the storages
+%%%%%%%%%%%%%%%
+%  Load Data  %
+%%%%%%%%%%%%%%%
+
+% Init the data storages
 nummodels   = length(unique(T.modelNum));
 numrois     = length(unique(T.roiNum));
 numdatasets = length(unique(T.dataset));
 numstimuli = 50;
-numparams = 3;
-
-% Initialize variables 
 pred_summary_all = NaN(numstimuli,nummodels,numdatasets, numrois);
-Rsqu_summary_all = NaN(nummodels,numdatasets, numrois);
 data_summary_all = NaN(numstimuli,1,numdatasets, numrois);
 
 % Loop through datasets and load model predictions and data
@@ -70,86 +76,91 @@ for dataset = 1:numdatasets
                 pred_summary_all(1:len_stim, idx, dataset, roi) = NaN;
             end
         end
-                
-        
     end
-    
 end
 
-%% Make plots 
+%%%%%%%%%%%%%%%%
+%  Make plots  %
+%%%%%%%%%%%%%%%%
 
-% Intialize a figure
-if strcmp( target, 'target' )
-    % figure size: figure is design to fit in 2 col (about 16cm wdith)
+if smallfig
+    
+    % Make 3 mini figures in one row 3 columns
+    
+    % Intialize a figure
     fig_width = 20;
     fig_height = 3.5 * numdatasets;
     pos = [10, 5, 2*fig_width, 2*fig_height];
     set( gcf, 'unit', 'centimeters', 'position', pos);
     subplot( numdatasets, numrois+1, numdatasets+1)
-end
-
-% Loop through datasets and make plots
-for dataset = 1:numdatasets
     
-    if strcmp( target, 'target' )==0
-        % figure size: figure is design to fit in 2 col (about 16cm wdith)
-        fig_width = 16;
-        fig_height = 10;
-        pos = [10, 5, 10+fig_width, 10+fig_height];
-        set( gcf, 'unit', 'centimeters', 'position', pos);
-        set( gca, 'FontSize', 9) 
-        figure;
-    end
-    
-    for roi = 1:numrois
-        for idx = 1:nummodels
-            model_idx = T.modelNum( idx);      
-        end
-
-        BOLD_data = data_summary_all(1:len_stim, 1, dataset, roi)';
-          
-        if strcmp( target, 'target' )
+    % Loop through datasets and make plots
+    for dataset = 1:numdatasets
+        for roi = 1:numrois
+            
+            BOLD_data = data_summary_all(1:len_stim, 1, dataset, roi)';
             
             % subplot dataset, roi, idx
             idx = (dataset-1)*(numrois+1) + roi;
             subplot( numdatasets, numrois+1, idx)
             if doModel
                 if error_bar
-                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, BOLD_data_error );
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, model_ind, BOLD_data_error );
                 else
-                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target );
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, model_ind );
                 end
             else
                 nan_prediction = NaN( size( pred_summary_all(1:len_stim, :, dataset, roi)));
-                plot_BOLD( nan_prediction, BOLD_data, dataset, roi, target)
+                plot_BOLD( nan_prediction, BOLD_data, dataset, roi, target, model_ind, BOLD_data_error);
             end
             
-            show_title = sprintf( 'Dataset%d-V%d', dataset, roi );
+            show_title = sprintf( 'V%d', roi);
             title( show_title )
             if idx ==numrois
                 subplot( numdatasets, numrois+1, idx+1)
-                plot_legend( pred_summary_all(1:len_stim, :, dataset, roi))
+                plot_legend( pred_summary_all(1:len_stim, :, dataset, roi), model_ind)
             end
+        end
+    end
+    
+else
+    % Make 3 mini figures in 3 rows
+    
+    % init a figure
+    fig_width  = 17;
+    fig_height = 17;
+    pos = [10, 5, 2*fig_width, 2*fig_height];
+    set( gcf, 'unit', 'centimeters', 'position', pos);
+    
+    
+    % Loop through datasets and make plots
+    for dataset = 1:numdatasets
+        for roi = 1:numrois
             
-        else
-            % subplot nroi, 1, roi
-            subplot( numrois, 1, roi )
+            BOLD_data = data_summary_all(1:len_stim, 1, dataset, roi)';
+            
+            % subplot dataset, roi, idx
+            subplot( numrois+1, 1, roi)
             if doModel
                 if error_bar
-                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, BOLD_data_error )
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, model_ind, BOLD_data_error )
                 else
-                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target )
+                    plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, model_ind )
                 end
             else
                 nan_prediction = NaN( size( pred_summary_all(1:len_stim, :, dataset, roi)));
-                plot_BOLD( nan_prediction, BOLD_data, dataset, roi)
+                plot_BOLD( nan_prediction, BOLD_data, dataset, roi, target, model_ind, BOLD_data_error)
             end
             
-            show_title = sprintf( 'Dataset%d-V%d', dataset, roi );
+            show_title = sprintf( 'V%d', roi);
             title( show_title )
         end
-        
+        if doModel
+            subplot( numrois+1, 1, roi+1)
+            plot_legend( pred_summary_all(1:len_stim, :, dataset, roi), model_ind)
+        end
     end
 end
 
-end 
+end
+

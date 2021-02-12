@@ -11,16 +11,12 @@ datasets = [1, 2, 3, 4];
 roi_idx = [1, 2, 3 ];
 ROIs     = {'V1', 'V2', 'V3'};
 
-
-
-
 models(1) = contrastModel( optimizer, fittime);
 %models(2) = normStdModel( optimizer, fittime);
 models(3) = normVarModel( optimizer, fittime);
 models(4) = SOCModel( optimizer, fittime);
 models(5)  = oriSurroundModel( optimizer, fittime);
 models(6) = SOCModel2( optimizer, fittime);
-
 
 switch quick_choice
     case {'figure1'}
@@ -32,10 +28,16 @@ switch quick_choice
     case {'figure3'}
         model_idx = [4, 5];
         datasets = [1];
-    case {'figure4'}
+    case {'figure5'}
        % models = {model1, model3};
         model_idx = [3];
         datasets = [1];
+    case {'figure6'}
+        model_idx = [3];
+        datasets  = [1];
+    case {'figure7'}
+        model_idx = [1, 3];
+        datasets  = [1];
     case {'con'}
         model_idx = [1];
     case {'all', 'All' }
