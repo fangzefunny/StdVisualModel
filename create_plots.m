@@ -23,7 +23,6 @@ switch fig
                
     case {'figure6', 'figure6.1', 'figure6.2', 'figure6.3', 'figure7'}
         target   = 'all';
-        smallfig = false;
 end
 
 % Generate save address and  choose data
@@ -92,8 +91,10 @@ if strcmp( target, 'target')
     
     % Loop through datasets and make plots
     for dataset = 1:numdatasets
+        
+        % for each each ori area 
         for roi = 1:numrois
-            
+            % get the data for plots 
             BOLD_data = data_summary_all(1:len_stim, 1, dataset, roi)';
             
             % subplot dataset, roi, idx
@@ -110,8 +111,11 @@ if strcmp( target, 'target')
                 plot_BOLD( nan_prediction, BOLD_data, dataset, roi, target, model_ind, BOLD_data_error);
             end
             
+            % display title 
             show_title = sprintf( 'V%d', roi);
             title( show_title )
+            
+            % add legend to specify the model's predictions 
             if idx ==numrois
                 subplot( numdatasets, numrois+1, idx+1)
                 plot_legend( pred_summary_all(1:len_stim, :, dataset, roi), model_ind)
@@ -131,12 +135,15 @@ else
     
     % Loop through datasets and make plots
     for dataset = 1:numdatasets
+        
+        % for each each ori area 
         for roi = 1:numrois
-            
+            % get the data for plots 
             BOLD_data = data_summary_all(1:len_stim, 1, dataset, roi)';
-            
             % subplot dataset, roi, idx
             subplot( numrois+1, 1, roi)
+            
+            % if we add model prediction 
             if doModel
                 if error_bar
                     plot_BOLD( pred_summary_all(1:len_stim, :, dataset, roi), BOLD_data, dataset, roi, target, model_ind, BOLD_data_error )
@@ -148,9 +155,12 @@ else
                 plot_BOLD( nan_prediction, BOLD_data, dataset, roi, target, model_ind, BOLD_data_error)
             end
             
+            % display title 
             show_title = sprintf( 'V%d', roi);
             title( show_title )
         end
+        
+        % add legend to specify the model's predictions 
         if doModel
             subplot( numrois+1, 1, roi+1)
             plot_legend( pred_summary_all(1:len_stim, :, dataset, roi), model_ind)

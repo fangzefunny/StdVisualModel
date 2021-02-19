@@ -15,7 +15,7 @@ models(1) = contrastModel( optimizer, fittime);
 %models(2) = normStdModel( optimizer, fittime);
 models(3) = normVarModel( optimizer, fittime);
 models(4) = SOCModel( optimizer, fittime);
-models(5)  = oriSurroundModel( optimizer, fittime);
+models(5) = oriSurroundModel( optimizer, fittime);
 models(6) = SOCModel2( optimizer, fittime);
 
 switch quick_choice
