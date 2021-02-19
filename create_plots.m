@@ -1,7 +1,7 @@
 
 function [] = create_plots(fig)
 
-% What should I do to add the path
+% impor packages 
 addpath( genpath( fullfile( stdnormRootPath, 'functions' )))
 addpath( genpath( fullfile( stdnormRootPath, 'models' )))
 addpath( genpath( fullfile( stdnormRootPath, 'plot' )))
@@ -15,17 +15,12 @@ doModel          = true;
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 error_bar        = false;
 data_folder      = 'Cross';  % save in which folder. value space: 'noCross', .....
-smallfig         = true;
-
+target           = 'target';
 switch fig
     case {'figure1'}
-        target   = 'target';
         error_bar = true;
         doModel  = false;
-        
-    case {'figure2', 'figure3', 'figure5'}
-        target   = 'target';
-        
+               
     case {'figure6', 'figure6.1', 'figure6.2', 'figure6.3', 'figure7'}
         target   = 'all';
         smallfig = false;
@@ -83,9 +78,10 @@ end
 %  Make plots  %
 %%%%%%%%%%%%%%%%
 
-if smallfig
+if strcmp( target, 'target')
     
-    % Make 3 mini figures in one row 3 columns
+    %%%%%%%%%%%%%%% Fig. for target data set  %%%%%%%%%%%%%%%%
+    
     
     % Intialize a figure
     fig_width = 20;
@@ -124,7 +120,7 @@ if smallfig
     end
     
 else
-    % Make 3 mini figures in 3 rows
+    %%%%%%%%%%%%%%% Fig. for whole data set  %%%%%%%%%%%%%%%%
     
     % init a figure
     fig_width  = 17;
