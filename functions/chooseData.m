@@ -43,7 +43,7 @@ switch quick_choice
         datasets  = [3];
     case {'figure6.3'}
         model_idx = [3];
-        datasets  = [];
+        datasets  = [4];
     case {'figure7'}
         model_idx = [1, 3];
         datasets  = [1];
