@@ -26,7 +26,7 @@ switch fig
     case {'figure2', 'figure3', 'figure5'}
         target   = 'target';
         
-    case {'figure6', 'figure7'}
+    case {'figure6', 'figure6.1', 'figure6.2', 'figure6.3', 'figure7'}
         target   = 'all';
         smallfig = false;
 end
