@@ -13,14 +13,12 @@ addpath( genpath( fullfile( stdnormRootPath, 'plot' )))
 % Set up hyperparameters
 doModel          = true;
 optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-error_bar        = false;
+error_bar        = true;
 data_folder      = 'Cross';  % save in which folder. value space: 'noCross', .....
 target           = 'target';
 switch fig
     case {'figure1'}
-        error_bar = true;
         doModel  = false;
-               
     case {'figure6', 'figure6.1', 'figure6.2', 'figure6.3', 'figure7'}
         target   = 'all';
 end
@@ -86,7 +84,7 @@ if strcmp( target, 'target')
     fig_width = 20;
     fig_height = 3.5 * numdatasets;
     pos = [10, 5, 2*fig_width, 2*fig_height];
-    set( gcf, 'unit', 'centimeters', 'position', pos);
+    set( gcf, 'unit', 'centimeters', 'position', pos, 'color', 'w');
     subplot( numdatasets, numrois+1, numdatasets+1)
     
     % Loop through datasets and make plots
@@ -130,7 +128,7 @@ else
     fig_width  = 17;
     fig_height = 17;
     pos = [10, 5, 2*fig_width, 2*fig_height];
-    set( gcf, 'unit', 'centimeters', 'position', pos);
+    set( gcf, 'unit', 'centimeters', 'position', pos, 'color', 'w');
     
     
     % Loop through datasets and make plots
