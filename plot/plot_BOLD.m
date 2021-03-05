@@ -108,8 +108,8 @@ if ~strcmp( target, 'target' )
             stim_vector = [ 1: 73];
             interval = [ .1, .22];
             vmax = 2.4;
-            curvy_group = [ 1: 6];
-            grating_group = [ 7: 12];
+            curvy_group = [ 1: 6, 68: 73];
+            grating_group = [ 7: 12, 50: 55];
             int_vector = setdiff( stim_vector, curvy_group);
             other_group = setdiff( int_vector, grating_group);
             
@@ -140,8 +140,8 @@ if ~strcmp( target, 'target' )
             stim_vector = [ 1:46];
             interval = [.13, .4];
             vmax = 3.4;
-            curvy_group = [ 42: 46];
-            grating_group = [ 36: 41];
+            curvy_group = [ 30, 32:34, 42: 46];
+            grating_group = [ 10:14, 36: 41 ];
             int_vector = setdiff( stim_vector, curvy_group);
             other_group = setdiff( int_vector, grating_group);
     end
@@ -215,18 +215,18 @@ if ~strcmp( target, 'target' )
     end
     
     yvalue = min( 0, min( v_mean )) ;
-    % Label the group
-    set( gca, 'xtick', xgroups(:,1));
-    set( gca, 'XTickLabel', groupnames1);
-    xt = get( gca, 'xtick' );
-    xtb = get( gca, 'XTickLabel' );
-    xtb2 = groupnames2;
-    xtextp = xt+3;
-    ytextp=(yvalue - interval(1))*ones(1,length(xt));
-    ytextp2 = (yvalue - interval(2)) * ones( 1, length( xt));
-    text(xtextp, ytextp, xtb, 'HorizontalAlignment', 'right', 'fontsize', fontsize);
-    text(xtextp, ytextp2, xtb2, 'HorizontalAlignment', 'right', 'fontsize', fontsize);
-    set(gca, 'xticklabel', '')
+%     % Label the group
+%     set( gca, 'xtick', ''));
+     set( gca, 'XTickLabel', '');
+%     xt = get( gca, 'xtick' );
+%     xtb = get( gca, 'XTickLabel' );
+%     xtb2 = groupnames2;
+%     xtextp = xt+3;
+%     ytextp=(yvalue - interval(1))*ones(1,length(xt));
+%     ytextp2 = (yvalue - interval(2)) * ones( 1, length( xt));
+%     text(xtextp, ytextp, xtb, 'HorizontalAlignment', 'right', 'fontsize', fontsize);
+%     text(xtextp, ytextp2, xtb2, 'HorizontalAlignment', 'right', 'fontsize', fontsize);
+%     set(gca, 'xticklabel', '')
     ylim( [yvalue, vmax])
     box off
     
@@ -299,15 +299,15 @@ elseif strcmp( target, 'target' )
             'Color', col);
     end
     
-    yvalue = min( 0, min( BOLD_target )) - .05;
-    interval = max(BOLD_target) * .2;
-    % Label the group
-    xt = [mean(x1)+1.3, mean(x2)+1.5, mean(x3)+2.2, mean(x4)+2.7];
-    set(gca,'xtick',[mean(x1), mean(x2), mean(x3), mean(x4)+.5]);
-    set(gca,'XTickLabel',{'Patterns-','Gratings-', 'Pattens-', 'Gratings-'});
-    ytextp2 = (yvalue - interval) * ones( 1, length( xt));
-    xtb = { 'Density','Density', 'Contrast', 'Contrast'};
-    text(xt, ytextp2, xtb, 'HorizontalAlignment', 'right', 'fontsize', fontsize);
+     yvalue = min( 0, min( BOLD_target )) - .05;
+%     interval = max(BOLD_target) * .2;
+%     % Label the group
+%     xt = [mean(x1)+1.3, mean(x2)+1.5, mean(x3)+2.2, mean(x4)+2.7];
+%     set(gca,'xtick',[mean(x1), mean(x2), mean(x3), mean(x4)+.5]);
+%     set(gca,'XTickLabel',{'Patterns-','Gratings-', 'Pattens-', 'Gratings-'});
+%     ytextp2 = (yvalue - interval) * ones( 1, length( xt));
+%     xtb = { 'Density','Density', 'Contrast', 'Contrast'};
+%     text(xt, ytextp2, xtb, 'HorizontalAlignment', 'right', 'fontsize', fontsize);
     ylim( [yvalue, inf])
     box off
     
