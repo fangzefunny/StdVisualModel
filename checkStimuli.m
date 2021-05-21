@@ -7,66 +7,28 @@ t=tiledlayout(3,5);
 load stimuli-dataset01.mat;figure(1)
 for ii=1:5
     nexttile
-    imshow(stimuli(:,:,1,ii)+0.5); axis on
+    imshow(stimuli(:,:,1,ii)+0.5); 
 end
 
 load stimuli-dataset02.mat;
 for ii=1:5
     nexttile
-    imshow(stimuli(1:150,1:150,1,ii)+0.5); axis on
+    imshow(stimuli(1:150,1:150,1,ii)+0.5); 
 end
 load stimuli-dataset03.mat;
 
-idx = [39 30 38 37 36];
-%idx = 22:2:30;
-for ii=1:5
-    thisim = idx(ii);
+idx = 36:39; % 30
+for ii=idx
+    thisim = ii;
     nexttile
-    imshow(stimuli(1:150,1:150,1,thisim)+0.5); axis on
+    imshow(stimuli(1:150,1:150,1,thisim)+0.5); 
 end
 
-t.TileSpacing = 'compact';
-
-
-
-%% Note that SOC paper had one extra curves/density image that we did not use:
-load ~/Downloads/socmodel/stimuli.mat;
-figure(9), clf; t=tiledlayout(1,5);
-idx = [ 184 29+56 183 182 181];
-for ii = idx
-    nexttile();
-    imshow(.5+images{ii}(:,:,1));
-    
-end
-
-%% check densities
-figure(2)
-
-load stimuli-dataset01.mat;
-for ii=1:5
-    subplot(3,5,ii);
-    plot(stimuli(80,:,1,ii)+0.5); 
-    axis([0 150 .2 .8])
-end
-
-load stimuli-dataset02.mat;
-for ii=1:5
-    subplot(3,5,ii+5);
-    plot(stimuli(80,1:150,1,ii)+0.5); 
-    axis([0 150 .2 .8])
-end
-
-load stimuli-dataset03.mat;
-for ii=1:4
-    subplot(3,5,ii+10);
-    plot(stimuli(80,1:150,1,(5-ii)+35)+0.5); 
-    axis([0 150 .2 .8])
-end
-
+t.TileSpacing = 'none';
 
 %% check densities
 load stimuli-dataset01.mat;
-figure(3); clf
+figure(2); clf
 
 [fsx, fsy] = meshgrid((-75:74)/12.5);  
 fs = sqrt(fsx.^2+fsy.^2);
@@ -116,7 +78,7 @@ for ii=1:4
 end
 
 %%
-figure(5), clf
+figure(3), clf
 
 [fsx, fsy] = meshgrid((-75:74)/12.5);  
 fs = sqrt(fsx.^2+fsy.^2);
@@ -140,9 +102,75 @@ for ii = 1:3
     subplot(3,2,2*ii);
     B = fftshift(A);
     scatter(fs(:), B(:), '.'); axis([0 8 0 12]); grid on; hold on;
-%     [x, idx] = sort(fs(:));
-%     y = B(idx);
-%     y = smooth(x,y, 500, 'lowess');
-%     plot(x, y, '-')
-%     axis([0 8 0 12]);
+
+end
+
+
+
+%% Note that SOC paper had one extra curves/density image that we did not use:
+load stimuli_kay.mat;
+figure(9), clf; t=tiledlayout(1,5);
+idx = [ 184 29+56 183 182 181];
+for ii = idx
+    nexttile();
+    imshow(.5+images{ii}(:,:,1));
+    
+end
+
+
+%% Compare STRIPES (density) to STRIPES (contrast)
+load stimuli_kay.mat;
+
+load stimuli-dataset03.mat;
+figure(1), 
+
+% grating density (150 x 150 images)
+
+subplot(2,6,1);
+imagesc(squeeze(stimuli(:,:,1,1))+0.5, [0 1]); axis image; colormap gray;
+subplot(2,6,7);
+plot(stimuli(:,75,1,1)); ylim([-.4 .3])
+
+for ii = 1:5
+    subplot(2,6,1+ii);
+    imagesc(squeeze(stimuli(:,:,1,30+ii))+0.5, [0 1]); axis image; colormap gray;
+    
+    subplot(2,6,7+ii);
+    plot(stimuli(:,75,1,30+ii)); ylim([-.4 .3])
+end
+
+
+
+figure(2)
+
+% density for full resolution images
+subplot(2,6,1);
+imagesc(images{139}(:,:,1), [0 255]); axis image; colormap gray;
+subplot(2,6,7);
+plot(images{139}(:,300,1));ylim([0 255])
+
+for ii = 1:5
+    subplot(2,6,1+ii);
+    imagesc(images{175+ii}(:,:,1), [0 255]); axis image; colormap gray;
+    
+    subplot(2,6,7+ii);
+    plot(images{175+ii}(:,300,1));ylim([0 255])
+end
+
+
+figure(4)
+scatter(images{139}(:,300,1), images{176}(:,300,1))
+
+
+% contrast for dataset 1
+figure(5) ; clf
+load stimuli-dataset01.mat;
+stims = [35 36 8 37 38];
+for ii = 1:length(stims)
+    idx = stims(ii);
+    subplot(2,length(stims)+1,ii+1);
+    imagesc(squeeze(stimuli(:,:,1,idx))+0.5, [0 1]); axis image; colormap gray;
+    
+    subplot(2,6,length(stims)+2+ii);
+    plot(stimuli(:,75,1,idx)); ylim([-.4 .3])
 end
