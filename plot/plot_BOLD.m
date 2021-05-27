@@ -8,12 +8,7 @@ if (nargin < 7), error_bar = nan; end
 % Input 4: legend name:
 % Input 5: This is prepared for arbitrary input: like two class
 
-% print useful information
-%disp(dataset);
-%disp(legend_name);
-
-% some hyper parameters:
-% colors for each model, we may want to change this in the future
+% some hyperparameters;
 dark = [52, 73, 94]./255;
 blue = [52, 152, 219]./255;
 red = [231, 76, 60]./255;
@@ -30,139 +25,52 @@ plotwidth = 1.5;
 markersize = 4.5;
 set (gca, 'FontSize', fontsize, 'LineWidth', linewidth); hold on;
 
-nummodels = size( all_prediction ,2);
+num_models = size( all_prediction ,2);
+num_stim = size( all_prediction, 1);
 
 % Load the fit target: fMRI data voxel mean
 if ~strcmp( target, 'target' )
     % load data
-    v_mean = BOLD_target; %matrix: num_roi x num_stim
-    
-    % obtain some useful parameters from the data
-    
-    switch dataset
-        case 1
-            %             xgroups = [1 6; 7 12; 13 18; 19 25; 26 29; 30 33; 34 37; 38 42; ...
-            %                 43 47; 48 52; 53 57; 58 62];
-            %             groupnames = {'Patterns-Sparsity','Gratings-Sparsity',...
-            %                 'NoiseBars-Sparsity','Waves-Sparisity',...
-            %                 'Grating-Orientation','Noisebar-Orientation',...
-            %                 'Waves-Orientation','Grating-cross','Grating-Contrast',...
-            %                 'Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'};
-            ogroups = [1 6; 7 12; 13 18; 19 25; 26 29; 30 33; 34 37; 38 42; ...
-                43 47; 48 52; 53 57; 58 62];
-            xgroups = [1 6; 7 12; 13 18; 19 25; 26 30; 31 35; 36 40; 41 46; ...
-                47 52; 53 58; 59 64; 65 70];
-            groupnames1 = {'Patterns-', 'Gratings-',...
-                '  NoiseBars-', 'Waves-', ...
-                'Grating-', ' NoiseBar-', 'Waves-', ...
-                'Grating-','Grating-','  NoiseBar-', ...
-                'Wave-', 'Pattern-'};
-            groupnames2 = {'Density','Density',...
-                'Density','Density',...
-                ' Orientation',' Orientation',...
-                '   Orientation','Cross','Contrast',...
-                'Contrast','Contrast','Contrast'};
-            all_prediction_prime  = zeros( size(all_prediction, 2), 73)';
-            v_mean_prime = nan( 1, 73 );
-            if ~isnan(error_bar)
-                error_prime = nan( 1, 73);
-            else
-                error_prime = nan;
-            end
-            stim_vector = [ 1:73];
-            interval = [.05, .16];
-            vmax = 1.6;
-            curvy_group = [ 1: 6, 65: 70];
-            grating_group = [ 7: 12, 47: 52];
-            int_vector = setdiff( stim_vector, curvy_group);
-            other_group = setdiff( int_vector, grating_group);
-            
-        case 2
-            %             xgroups = [1 6; 7 12; 13 18; 19 23; 24 27; 28 31; 32 35; 36 40; ...
-            %                 41 45; 46 50; 51 55; 56 60];
-            %             groupnames = {'Patterns-Sparsity','Gratings-Sparsity',...
-            %                 'NoiseBars-Sparsity','Waves-Sparisity',...
-            %                 'Gratings-Orientation','Noisebars-Orientation',...
-            %                 'Wave-Orientation','Grating-cross','Grating-Contrast',...
-            %                 'Noisebar-Contrast','Wave-Contrast','Pattern-Contrast'};
-            
-            ogroups = [1 6; 7 12; 13 18; 19 23; 24 27; 28 31; 32 35; 36 40; ...
-                41 45; 46 50; 51 55; 56 60];
-            xgroups = [1 6; 7 12; 13 18; 19 25; 26 31; 32 37; 38 43; 44 49; ...
-                50 55; 56 61; 62 67; 68 73];
-            groupnames1 = {'Patterns-','Gratings-', 'NoiseBars-','Waves-', ...
-                'Gratings-','Noisebars-', 'Wave-', ...
-                'Grating-', ...
-                'Grating-', 'Noisebar-','Wave-','Pattern-'};
-            groupnames2 = { 'Density', 'Density', 'Density', 'Density', ...
-                'Orientation', 'Orientation', 'Orientation', ...
-                'Cross', ...
-                'Contrast', 'Contrast', 'Contrast', 'Contrast'};
-            all_prediction_prime  = nan( size(all_prediction, 2), 73)';
-            v_mean_prime = nan( 1, 73);
-            if ~isnan(error_bar)
-                error_prime = nan( 1, 73);
-            else
-                error_prime = nan;
-            end
-            stim_vector = [ 1: 73];
-            interval = [ .1, .22];
-            vmax = 2.4;
-            curvy_group = [ 1: 6, 68: 73];
-            grating_group = [ 7: 12, 50: 55];
-            int_vector = setdiff( stim_vector, curvy_group);
-            other_group = setdiff( int_vector, grating_group);
-            
-        case {3, 4, 5}
-            %             xgroups = [1 9; 10 14; 15 19; 20 24; 25 35; 36 41; 42 46];
-            %             groupnames = {'Gratings-Orientation','Gratings-Contrast',...
-            %                 'Chess-Contrast','Dust-Contrast','Patterns-Contrast', ...
-            %                 'Gratings-Sparsity(-)','Patterns-Sparsity(-)'};
-            
-            ogroups = [1 9; 10 14; 15 19; 20 24; 25 35; 36 41; 42 46];
-            xgroups = [1 9; 10 14; 15 19; 20 24; 25 35; 36 41; 42 46];
-            groupnames1 = {'Gratings-', ...
-                'Gratings-','Chess-','Dust-', ...
-                'Patterns-', ...
-                'Gratings-','Patterns-'};
-            groupnames2 = {'Orientation', ...
-                'Contrast','Contrast','Contrast', ...
-                'Contrast', ...
-                'Density(-)','Density(-)'};
-            
-            all_prediction_prime  = nan( size(all_prediction, 2), 46)';
-            v_mean_prime = nan( 1, 46 );
-            if ~isnan(error_bar)
-                error_prime = nan( 1, 46);
-            else
-                error_prime = nan;
-            end
-            stim_vector = [ 1:46];
-            interval = [.13, .4];
-            vmax = 3.4;
-            curvy_group = [ 30, 32:34, 42: 46];
-            grating_group = [ 10:14, 36: 41 ];
-            int_vector = setdiff( stim_vector, curvy_group);
-            other_group = setdiff( int_vector, grating_group);
-    end
-    
-    count = 0;
-    for i = 1:size( xgroups, 1)
-        count = count + 1;
-        raw_start_idx = ogroups( i, 1);
-        raw_end_idx = ogroups( i, 2);
-        start_idx = xgroups(i, 1);
-        end_idx = start_idx + raw_end_idx - raw_start_idx;
-        all_prediction_prime( start_idx : end_idx-1, :) = all_prediction( raw_start_idx-count+1: raw_end_idx-count, :);
-        all_prediction_prime( end_idx:xgroups( i, 2), :) = 0;
-        v_mean_prime( 1, start_idx : end_idx-1) = v_mean(1, raw_start_idx-count+1:raw_end_idx-count);
-        v_mean_prime( end_idx:xgroups( i, 2) ) = nan;
-        if ~isnan( error_bar)
-            error_prime( 1, start_idx : end_idx -1) = error_bar(1, raw_start_idx-count+1:raw_end_idx-count);
-            error_prime( end_idx:xgroups( i, 2) ) = nan;
+    BOLD = BOLD_target; %matrix: num_roi x num_stim
+    % data stimuli label 
+    % read the table for index information
+    T = readtable( fullfile(stdnormRootPath, 'Tables/tableS2.csv'));
+    % get the ind given specific dataset: question how to do exist
+    ind = find(strcmp(T.Dataset,sprintf('DS%d',dataset)));
+    N = length(ind);
+    plt_N = num_stim + N - 1;
+
+    % create array of the image according to the table
+    pred_groups = nan(plt_N, num_models);
+    curve_groups = [];
+    grating_groups = [];
+    pat_groups  = cell(plt_N, 1);
+    var_groups  = cell(plt_N, 1);
+    counter = 1;
+    for i = 1:N
+        % cell2mat 
+        stim_ind = str2num( T.Number{i});
+        ns = length(stim_ind);
+        new_ind = counter:counter+ns-1;
+        pred_groups(counter:counter+ns-1, :) = all_prediction(stim_num, :);
+        pat = T.Patten{i};
+        if strcmp( pat, 'CURVES')
+            curve_groups = [ curve_groups, new_ind]; 
+        elseif strcmp( pat, 'GRATINGS')
+            grating_groups = [ grating_groups, new_ind];
         end
+        pat_groups{i} = pat;
+        var_groups{i} = T.Variation{i};
+        counter = counter + ns; 
     end
-    
+    other_group = setdiff( 1:plt_N, curvy_group);
+    other_group = setdiff( other_group, grating_group);
+  
+    %interval = [.05, .16];
+    vmax = 1.6;
+    count = 0;
+ 
+   
     all_prediction = all_prediction_prime;
     v_mean = v_mean_prime;
     error_bar = error_prime;

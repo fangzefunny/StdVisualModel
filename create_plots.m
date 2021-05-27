@@ -35,7 +35,7 @@ if strcmp(fig, 'figure1.1')
     
 elseif strcmp( fig, 'figureS1')
         
-     stim = dataloader( stdnormRootPath, 'stimuli', 'All', 1, 1 );
+     stim = dataloader( stdnormRootPath, 'stimuli', 'All', 4, 1 );
      figure;
      set( gcf, 'color', 'w');
      for ii = 1:size(stim, 4)

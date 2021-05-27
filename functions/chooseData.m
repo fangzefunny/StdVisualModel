@@ -26,7 +26,10 @@ switch quick_choice
         model_idx = [1];
         datasets = [1];
     case {'figure3'}
-        model_idx = [4, 5];
+        model_idx = [4];
+        datasets = [1];
+    case {'figure4'}
+        model_idx = [5];
         datasets = [1];
     case {'figure5'}
        % models = {model1, model3};
@@ -39,8 +42,8 @@ switch quick_choice
         model_idx = [1, 3];
         datasets  = [1];
     case {'figureS2'}
-        model_idx = [3];
-        datasets  = [2, 3, 4];
+        model_idx = [ 3];
+        datasets  = [1, 2, 3, 4];
     case {'figureS3'}
         model_idx = [3];
         datasets  = [2];
