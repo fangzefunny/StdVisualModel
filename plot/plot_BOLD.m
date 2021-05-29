@@ -36,12 +36,13 @@ if ~strcmp( target, 'target' )
     % read the table for index information
     T = readtable( fullfile(stdnormRootPath, 'Tables/tableS2.csv'));
     % get the ind given specific dataset: question how to do exist
-    ind = find(strcmp(T.Dataset,sprintf('DS%d',dataset)));
+    ind = find(contains(T.Dataset,sprintf('DS%d',dataset)));
     N = length(ind);
     plt_N = num_stim + N - 1;
 
     % create array of the image according to the table
-    pred_groups = nan(plt_N, num_models);
+    preds = nan(plt_N, num_models);
+    targets = nan(plt_N, 1);
     curve_groups = [];
     grating_groups = [];
     pat_groups  = cell(plt_N, 1);
@@ -52,7 +53,8 @@ if ~strcmp( target, 'target' )
         stim_ind = str2num( T.Number{i});
         ns = length(stim_ind);
         new_ind = counter:counter+ns-1;
-        pred_groups(counter:counter+ns-1, :) = all_prediction(stim_num, :);
+        preds(counter:counter+ns-1, :) = all_prediction(stim_num, :);
+        targets(counter:counter+ns-1, :) = 
         pat = T.Patten{i};
         if strcmp( pat, 'CURVES')
             curve_groups = [ curve_groups, new_ind]; 
@@ -63,6 +65,7 @@ if ~strcmp( target, 'target' )
         var_groups{i} = T.Variation{i};
         counter = counter + ns; 
     end
+    % get the other group, this is for visualization
     other_group = setdiff( 1:plt_N, curvy_group);
     other_group = setdiff( other_group, grating_group);
   
