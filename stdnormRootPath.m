@@ -12,4 +12,3 @@ function rootPath=stdnormRootPath()
 rootPath=which('stdnormRootPath');
 rootPath=fileparts(rootPath);
 
-return

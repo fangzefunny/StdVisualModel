@@ -1,7 +1,25 @@
 function [] = viewStimuli( data_set, pattern, variation)
+    %{
+        View stimuli indexed by dataset pattern, variation
+
+        1. Input data set, pattern and variation to view the stimuli
+        and the corresponding wave amplitude. 
+        e.g. viewStimuli( 1, 'CURVES', 'density')
+            Note data set should be a int, 
+                 pattern should be a uppercase string,
+                 vairation should be a lowercase string.
+        
+        2. If only data set is input: it displays all stimuli families 
+        in the selected data set. 
+        e.g. viewStimuli(1)
+        
+        3. If nothing is passed through the function: it displays all stimuli
+        and all dataset
+        e.g. viewStimuli()
+    %}
 
     % load the table 
-    fname = 'SupplememtaryTable2.csv';
+    fname = 'tables/SupplememtaryTable2.csv';
     opts = detectImportOptions(fname);
     %opts = setvartype(opts,'Number','uint8');
     imcontrast = @(x) round(1000*(max(x(:))-min(x(:))))/10;
