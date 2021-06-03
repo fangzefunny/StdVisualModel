@@ -40,12 +40,17 @@ function [] = viewStimuli( data_set, pattern, variation)
                 T.Variation{thisrow}));
             for col = 1:numstim(r)
                 nexttile;            
-                imshow(0.5+squeeze(stimuli(:,:,1, T.Number{thisrow}(col))));            
+                imshow(0.5+squeeze(stimuli(:,:,1, T.Number{thisrow}(col)))); 
+                sim_size = size( stimuli, 1);         
             end
             for col = 1:numstim(r)
                 nexttile;            
                 thisim = squeeze(stimuli(:,:,1,T.Number{thisrow}(col)));
-                plot(thisim(:,75)); ylim([-0.5 .5]);
+                if ds == 2
+                    plot(thisim( floor(sim_size/2),:)); ylim([-0.5 .5]);
+                else
+                    plot(thisim(:, floor(sim_size/2))); ylim([-0.5 .5]);
+                end
                 title(sprintf('%3.2f Contrast', imcontrast(thisim)));
             end
         end
