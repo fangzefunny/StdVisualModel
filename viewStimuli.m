@@ -1,35 +1,52 @@
-fname = 'SupplememtaryTable2.csv';
-opts = detectImportOptions(fname);
-%opts = setvartype(opts,'Number','uint8');
-imcontrast = @(x) round(1000*(max(x(:))-min(x(:))))/10;
-T = readtable(fname, opts);
-T.Number = cellfun(@(x) str2num(x), T.Number, 'UniformOutput', false);
-%%
-% loop over 3 datasets (datasets 3 and 4 use the same stimuli)
-for ds = 3
-    load(sprintf('stimuli-dataset%02d', ds), 'stimuli');
-    rows = find(contains(T.Dataset, sprintf('DS%d',ds)));
-    n = length(rows);
-    numstim = cellfun(@length, T.Number(rows));
-    %c = max(numstim);
-    
-    for r = 1:n
-        thisrow = rows(r);
-        figure(ds*100+r); clf; 
-        t=tiledlayout(2, numstim(r)); 
-        t.TileSpacing =  'none';
-        set(gcf, 'NumberTitle', 'off', ...
-            'Name', sprintf('Dataset %d, %s (%s)', ds, upper(T.Pattern{thisrow}), ...
-            T.Variation{thisrow}));
-        for col = 1:numstim(r)
-            nexttile;            
-            imshow(0.5+squeeze(stimuli(:,:,1, T.Number{thisrow}(col))));            
+function [] = viewStimuli( data_set, pattern, variation)
+
+    % load the table 
+    fname = 'SupplememtaryTable2.csv';
+    opts = detectImportOptions(fname);
+    %opts = setvartype(opts,'Number','uint8');
+    imcontrast = @(x) round(1000*(max(x(:))-min(x(:))))/10;
+    T = readtable(fname, opts);
+    T.Number = cellfun(@(x) str2num(x), T.Number, 'UniformOutput', false);
+
+    % select the rows, 
+    if (nargin<1)
+        select_datasets = 1:3;
+    else
+        select_datasets = data_set;
+    end
+
+    % loop over 3 datasets (datasets 3 and 4 use the same stimuli)
+    for ds = select_datasets
+        load(sprintf('Data/Stimuli/stimuli-dataset%02d', ds), 'stimuli');
+        rows = find(contains(T.Dataset, sprintf('DS%d',ds)));
+        n = length(rows);
+        numstim = cellfun(@length, T.Number(rows));
+        %c = max(numstim);
+        if (nargin<2)
+            select_rows = 1:n; 
+        else
+            pat_rows = find(contains(T.Pattern(rows), pattern));
+            var_rows = find(contains(T.Variation(rows), variation));
+            select_rows = intersect( pat_rows, var_rows);
         end
-        for col = 1:numstim(r)
-            nexttile;            
-            thisim = squeeze(stimuli(:,:,1,T.Number{thisrow}(col)));
-            plot(thisim(:,75)); ylim([-0.5 .5]);
-            title(sprintf('%3.2f Contrast', imcontrast(thisim)));
+
+        for r = select_rows
+            thisrow = rows(r);
+            figure(ds*100+r); clf; 
+            t=tiledlayout(2, numstim(r)); 
+            t.TileSpacing =  'none';
+            set(gcf, 'NumberTitle', 'off', ...
+                'Name', sprintf('Dataset %d, %s (%s)', ds, upper(T.Pattern{thisrow}), ...
+                T.Variation{thisrow}));
+            for col = 1:numstim(r)
+                nexttile;            
+                imshow(0.5+squeeze(stimuli(:,:,1, T.Number{thisrow}(col))));            
+            end
+            for col = 1:numstim(r)
+                nexttile;            
+                thisim = squeeze(stimuli(:,:,1,T.Number{thisrow}(col)));
+                plot(thisim(:,75)); ylim([-0.5 .5]);
+                title(sprintf('%3.2f Contrast', imcontrast(thisim)));
+            end
         end
     end
-end
