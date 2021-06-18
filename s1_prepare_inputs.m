@@ -1,28 +1,14 @@
-
-%% set path
-
-[curPath, prevPath] = stdnormRootPath();
-
-% add path to the function
-addpath( genpath( fullfile( curPath, 'functions' )))
-
-% add path to the model
-addpath( genpath( fullfile( curPath, 'models' )))
-
-% add path to the plot tool
-addpath( genpath( fullfile( curPath, 'plot_tools' )))
-
 %% download the data
 
 % get fmri data
-% url= 'https://osf.io/xv8m2/download';
-% pth = fullfile(prevPath, 'Data.zip');
-% fname = websave(pth, url);
-% unzip( fname, prevPath);
+url= 'https://osf.io/xv8m2/download';
+pth = fullfile(stdnormRootPath, 'Data', 'Data.zip');
+fname = websave(pth, url);
+unzip( fname);
 
 %% calculate E
 
-save_address = fullfile(prevPath, 'Data', 'E');
+save_address = fullfile(stdnormRootPath, 'Data', 'E');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 for which_data = 1:4 % 4 data sets
@@ -31,7 +17,7 @@ for which_data = 1:4 % 4 data sets
     
     % Load the stimuli
     fname = sprintf('stimuli-dataset%02d.mat', which_data);
-    path=fullfile(prevPath, 'Data', 'Stimuli', fname);
+    path=fullfile(stdnormRootPath, 'Data', 'Stimuli', fname);
     load(path, 'stimuli')
     labelVec = 1:size(stimuli, 4);
        
