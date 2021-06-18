@@ -5,13 +5,13 @@ classdef contrastModel
         optimizer               
         fittime        
         num_param           = 2
-        param_name         = ['g'; 'n']
-        param                      = []
-        param_bound       = [ 0, 100; 0,   1  ]
-        param_pbound    = [ 1,  10;  .1, .5 ]
-        model_type           = 'orientation'
-        legend                     = 'contrast'
-        loss_log                   = []
+        param_name          = ['g'; 'n']
+        param               = []
+        param_bound         = [ 0, 100; 0,   1  ]
+        param_pbound        = [ 1,  10;  .1, .5 ]
+        model_type          = 'orientation'
+        legend              = 'contrast'
+        loss_log            = []
     end
     
     methods
