@@ -4,14 +4,14 @@ classdef contrastModel
     properties 
         optimizer               
         fittime        
-        num_param           = 2
-        param_name         = ['g'; 'n']
-        param                      = []
-        param_bound       = [ 0, 100; 0,   1  ]
-        param_pbound    = [ 1,  10;  .1, .5 ]
-        model_type           = 'orientation'
-        legend                     = 'contrast'
-        loss_log                   = []
+        num_param    = 2
+        param_name   = ['g'; 'n']
+        param        = []
+        param_bound  = [ 0, 100; 0,   1  ]
+        param_pbound = [ 1,  10;  .1, .5 ]
+        model_type   = 'orientation'
+        legend       = 'CE'
+        loss_log     = []
     end
     
     methods
@@ -67,6 +67,36 @@ classdef contrastModel
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';
    
+        end
+
+        % foward model to generate an image 
+        function x_hat = reconstruct(model, E_xy, param)
+
+            % set param
+            g = exp(param(1));
+            n = exp(param(2));
+            
+            % d: ori x exp x stim
+            d = squeeze(mean(E_xy,3));
+            
+            % sum over orientation, s: exp x stim 
+            x_hat = g .* d.^n;
+
+        end
+
+        function err = recon_err( model, x, E, params)
+
+            x_hat = model.reconstruct( model, E, params);
+            mean(x(:))
+            nX = size(E,1);
+            nS = size(E,5);
+            %pad the stimuli
+            pad_x = zeros(nX, nX, 9, nS);
+            nP = (nX - size(x,1))/2;
+            pad_x( nP+1:nX-nP, nP+1:nX-nP, :, :) = x( :, :, :, :);
+            err2 = (pad_x - x_hat).^2;
+            err  = mean( err2(1:3));
+
         end
             
         % predict the BOLD response: y_hat = f(x)

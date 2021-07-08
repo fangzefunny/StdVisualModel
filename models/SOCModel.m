@@ -2,9 +2,7 @@ classdef SOCModel < contrastModel
     
     % The basic properties of the class
     properties 
-        
         receptive_weight = false
-       
     end
     
     methods
@@ -27,15 +25,15 @@ classdef SOCModel < contrastModel
                 error('Wrong Possible Bound')
             end
             
-            model.param_bound    = param_bound;
+            model.param_bound  = param_bound;
             model.param_pbound = param_pbound; 
-            model.fittime                   = fittime;
-            model.optimizer             = optimizer; 
-            model.num_param        = param_num ;
-            model.param_name      = [ 'c'; 'g'; 'n' ];
-            model.legend                  = 'SOC'; 
-            model.model_type        = 'space';
-            model.param                   = [];
+            model.fittime      = fittime;
+            model.optimizer    = optimizer; 
+            model.num_param    = param_num ;
+            model.param_name   = [ 'c'; 'g'; 'n' ];
+            model.legend       = 'SOC'; 
+            model.model_type   = 'space';
+            model.param        = [];
             model.receptive_weight = false; 
         end
                        
@@ -106,6 +104,40 @@ classdef SOCModel < contrastModel
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));
            
+        end
+        
+        % foward model to generate an image 
+        function x_hat = reconstruct(model, E, param )
+
+            if model.receptive_weight ==false
+                height = size(E, 1) ;
+                model = model.disk_weight(model, height);
+            end
+             
+            c = exp(param(1));
+            g = exp(param(2));
+            n = exp(param(3));
+            
+            % x x y x ori x exp x stim --> x x y x exp x stim
+            E = squeeze( mean( E, 3));
+            
+            % d: x x y x exp x stim
+            E_mean = mean( mean(E, 1), 2);
+            v = (E - c * E_mean).^2; 
+            d = bsxfun(@times, v, model.receptive_weight);
+                
+            % sum over orientation, s: exp x stim 
+            x_hat = g .* d.^n;
+
+        end
+
+        function err = recon_error( model, x, param)
+
+
+            x_hat = model.reconstruct( x, param);
+            err2 = (x - x_hat).^2;
+            err  = mean( err2(:));
+
         end
             
         % predict the BOLD response: y_hat = f(x)

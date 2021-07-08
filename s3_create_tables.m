@@ -2,12 +2,9 @@
 if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 
-optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime          = 40;         % how manoy initialization. value space: Integer
 choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
-error_bar = false;
-
-%choose_model     = 'orientation';      % choose some preset data 
+error_bar        = false;
 
 
 switch doCross
@@ -32,27 +29,16 @@ param_name =  { 'contrastModel: g', 'contrastModel: n',  ...
                                     'oriSurroundModel: w', 'oriSurroundModel: g', 'oriSurroundModel: n',...
                                     'normVarModel: w', 'normVarModel: g', 'normVarModel: n'};
 
-%% set path
-
-[curPath, prevPath] = stdnormRootPath();
-
 % add path to the function
-addpath( genpath( fullfile( curPath, 'functions' )))
-
-% add path to the model
-addpath( genpath( fullfile( curPath, 'models' )))
-
-% add path to the plot tool
-addpath( genpath( fullfile( curPath, 'plot' )))
 
 %% generate save address and  choose data
 
 % save address
-save_address = fullfile( curPath, 'Tables', data_folder, target,  optimizer);
+save_address = fullfile( stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing
-T      = chooseData( choose_model, optimizer, fittime );
+T      = chooseData( choose_model, 'fmincon', fittime );
 
 %% init storages
 
@@ -74,12 +60,12 @@ for roi = 1: numrois
         for dataset = 1:numdatasets
             % load value
             R_summay( idx, dataset ) = ...
-                dataloader( curPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, optimizer);
+                dataloader( stdnormRootPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, 'fmincon');
         end
     end
     
     r2_table = table(model_name', R_summay(:, 1) ,R_summay(:, 2), R_summay(:, 3), R_summay(:, 4));
-    r2_table.Properties.VariableNames = {'model', 'dataset1', 'dataset2', 'dataset3', 'dataset4' };
+    r2_table.Properties.VariableNames = {'model', 'DS1', 'DS2', 'DS3', 'DS4' };
     writetable( r2_table, fullfile(save_address , sprintf('Rsquare_table-%d_roi.csv', roi )));
     
 end
@@ -95,10 +81,10 @@ for roi = 1: numrois
         for dataset = 1:numdatasets
             
             % load target 
-            BOLD_target = dataloader( curPath, 'BOLD_target', target, dataset, roi);
+            BOLD_target = dataloader( stdnormRootPath, 'BOLD_target', target, dataset, roi);
             
             % load predction 
-            BOLD_pred = dataloader( curPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
+            BOLD_pred = dataloader( stdnormRootPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, 'fmincon');
             
             % rmse 
             rmse( idx, dataset) = double(sqrt(mean((BOLD_pred- BOLD_target).^2)));
@@ -107,8 +93,8 @@ for roi = 1: numrois
     end
     
     rmse_table = table(model_name', rmse(:, 1), rmse(:, 2), rmse(:, 3), rmse(:, 4));
-    rmse_table.Properties.VariableNames = {'model', 'dataset1', 'dataset2', 'dataset3', 'dataset4' };
-    writetable( rmse_table, fullfile(save_address , sprintf('rmse_table-%d_roi.csv', roi )));
+    rmse_table.Properties.VariableNames = {'model', 'DS1', 'DS2', 'DS3', 'DS4' };
+    writetable( rmse_table, fullfile(save_address, sprintf('rmse_table-%d_roi.csv', roi )));
     
 end
 
@@ -132,9 +118,9 @@ for roi = 1: numrois
             col_idx = (dataset-1) * 2 + 1;
             % load value  
             if model_idx < 6
-                param = exp(dataloader( curPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
+                param = exp(dataloader( stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
             else
-                param = (dataloader( curPath, 'param', target, dataset, roi, data_folder, model_idx, optimizer));
+                param = (dataloader( stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
             end
             
             % assign value 
@@ -161,6 +147,6 @@ end
 %% show table
 % 
  % show R square table  
- show_table( curPath, 'Rsqaure_table', target, data_folder, optimizer); 
- show_table( curPath, 'RMSE_table', target, data_folder, optimizer);
- show_table( curPath, 'param_table', target, data_folder, optimizer); 
+ show_table( stdnormRootPath, 'Rsqaure_table', target, data_folder, 'fmincon'); 
+ show_table( stdnormRootPath, 'RMSE_table', target, data_folder, 'fmincon');
+ show_table( stdnormRootPath, 'param_table', target, data_folder, 'fmincon'); 

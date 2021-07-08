@@ -2,9 +2,7 @@ classdef oriSurroundModel < contrastModel
     
     % The basic properties of the class
     properties 
-        
         receptive_weight = false
-       
     end
     
     methods
@@ -27,15 +25,15 @@ classdef oriSurroundModel < contrastModel
                 error('Wrong Possible Bound')
             end
             
-            model.param_bound    = param_bound;
+            model.param_bound  = param_bound;
             model.param_pbound = param_pbound; 
-            model.fittime                   = fittime;
-            model.optimizer             = optimizer; 
-            model.num_param        = param_num ;
-            model.param_name      = [ 'w'; 'g'; 'n' ];
-            model.legend                  = 'oriSurround'; 
-            model.model_type        = 'space';
-            model.param                   = [];
+            model.fittime      = fittime;
+            model.optimizer    = optimizer; 
+            model.num_param    = param_num ;
+            model.param_name   = [ 'w'; 'g'; 'n' ];
+            model.legend       = 'oriSurround'; 
+            model.model_type   = 'space';
+            model.param        = [];
             model.receptive_weight = false; 
         end
                        
@@ -103,6 +101,31 @@ classdef oriSurroundModel < contrastModel
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));
            
+        end
+
+        % foward model to generate an image 
+        function x_hat = reconstruct(model, E, weight_E, param )
+
+            if model.receptive_weight ==false
+                height = size(E, 1) ;
+                model = model.disk_weight(model, height);
+            end
+             
+            w = exp(param(1));
+            g = exp(param(2));
+            n = exp(param(3));
+            
+            % calculate weight of E 
+            %weight_E = model.cal_weight_E( model, E);
+            
+            % x x y x ori x exp x stim --> x x y x exp x stim
+            d_theta = E ./ ( 1 + w * weight_E); %E :3d
+            v = squeeze( mean( d_theta, 3));
+            d = bsxfun(@times, v, model.receptive_weight); 
+                
+            % sum over orientation, s: exp x stim 
+            x_hat = g .* d.^n;
+
         end
             
          % predict the BOLD response: y_hat = f(x)

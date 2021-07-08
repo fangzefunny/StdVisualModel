@@ -2,7 +2,7 @@ classdef normVarModel < contrastModel
     
     % The basic properties of the class
     properties 
-       
+
     end
     
     methods
@@ -28,7 +28,7 @@ classdef normVarModel < contrastModel
             model.param_bound  = param_bound;
             model.param_pbound = param_pbound; 
             model.fittime      = fittime;
-            model.optimizer = optimizer; 
+            model.optimizer    = optimizer; 
             model.num_param    = param_num ;
             model.param_name   = [ 'w'; 'g'; 'n' ];
             model.legend       = 'normVar'; 
@@ -70,6 +70,29 @@ classdef normVarModel < contrastModel
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';
            
+        end
+
+        % foward model to generate an image 
+        function x_hat = reconstruct(model, x, param)
+
+            w = exp(param(1));
+            g = exp(param(2));
+            n = exp(param(3));
+            
+            % d: ori x exp x stim
+            d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 
+            d = squeeze(mean(d, 3));
+                
+            % sum over orientation, s: exp x stim 
+            x_hat = g .* d.^n;
+
+        end
+
+        function err = recon_err( model, x, E, params)
+
+            % call subclass
+            err = recon_err@contrastModel( model, x, E, params);
+
         end
             
         % predict the BOLD response: y_hat = f(x)

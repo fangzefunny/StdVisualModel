@@ -8,7 +8,7 @@ function T = chooseData(  quick_choice, optimizer, fittime )
 
 % dataset is [which_dataset (1-4) | which_roi (V1-V3)];
 datasets = [1, 2, 3, 4];
-roi_idx = [1, 2, 3 ];
+roi_idx  = [1, 2, 3 ];
 ROIs     = {'V1', 'V2', 'V3'};
 
 models(1) = contrastModel( optimizer, fittime);
@@ -16,7 +16,6 @@ models(1) = contrastModel( optimizer, fittime);
 models(3) = normVarModel( optimizer, fittime);
 models(4) = SOCModel( optimizer, fittime);
 models(5) = oriSurroundModel( optimizer, fittime);
-models(6) = SOCModel2( optimizer, fittime);
 
 switch quick_choice
     case {'figure1'}

@@ -19,7 +19,7 @@ function [] = viewStimuli( data_set, pattern, variation)
     %}
 
     % load the table 
-    fname = 'tables/SupplememtaryTable2.csv';
+    fname = 'Tables/SupplememtaryTable3.csv';
     opts = detectImportOptions(fname);
     %opts = setvartype(opts,'Number','uint8');
     imcontrast = @(x) round(1000*(max(x(:))-min(x(:))))/10;
