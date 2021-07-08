@@ -12,7 +12,6 @@ roi_idx  = [1, 2, 3 ];
 ROIs     = {'V1', 'V2', 'V3'};
 
 models(1) = contrastModel( optimizer, fittime);
-%models(2) = normStdModel( optimizer, fittime);
 models(3) = normVarModel( optimizer, fittime);
 models(4) = SOCModel( optimizer, fittime);
 models(5) = oriSurroundModel( optimizer, fittime);

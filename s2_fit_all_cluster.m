@@ -38,25 +38,12 @@ switch doCross
         data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
 end
 
-
-    
-%% set path
-
-[curPath, prevPath] = stdnormRootPath();
-
-% add path to the function
-addpath( genpath( fullfile( curPath, 'functions' )))
-
-% add path to the model
-addpath( genpath( fullfile( curPath, 'models' )))
-
-% add path to the plot tool
-addpath( genpath( fullfile( curPath, 'plot_tools' )))
+add_path()
 
  %% generate save address and  choose data 
 
 % save address 
-save_address = fullfile( curPath, 'Data', data_folder, target,  optimizer);
+save_address = fullfile( stdnormRootPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing 
@@ -81,7 +68,7 @@ display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', nu
 disp( display )
 
 % load training label
-BOLD_target = dataloader( curPath, 'BOLD_target', target, dataset, roi );
+BOLD_target = dataloader( stdnormRootPath, 'BOLD_target', target, dataset, roi );
 
 % load the input stimuli
 switch model.model_type
@@ -90,13 +77,13 @@ switch model.model_type
     case 'space'
         which_obj = 'E_xy';
 end
-E = dataloader( curPath, which_obj, target, dataset, roi, 'old' );
+E = dataloader( stdnormRootPath, which_obj, target, dataset, roi, 'old' );
 
 if strcmp( model.legend, 'oriSurround')
     disp( 'ori_surround')
     
     % gain weight E
-    weight_E = dataloader( prevPath, 'weight_E', target, dataset, roi );
+    weight_E = dataloader( stdnormRootPath 'weight_E', target, dataset, roi );
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
@@ -106,7 +93,7 @@ elseif strcmp( model.legend, 'SOC1')
     disp( 'soc1')
     
     % gain E_mean
-    E_mean = dataloader( curPath, 'E_mean', target, dataset, roi );
+    E_mean = dataloader( stdnormRootPath, 'E_mean', target, dataset, roi );
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...

@@ -6,7 +6,6 @@ fittime          = 40;         % how manoy initialization. value space: Integer
 choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
 error_bar        = false;
 
-
 switch doCross
     case false
         cross_valid  = 'one';            % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
