@@ -9,7 +9,7 @@ add_path()
 target       = 'all';  % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime      = 40;     % how manoy initialization. value space: Integer
 cross_valid  = 'one';  % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-choose_model = 'all';  % choose some preset data 
+choose_model = 'soc';  % choose some preset data 
 
 % save address 
 % choose fold according to the cross validation method
@@ -90,9 +90,9 @@ for job = 1: len
     % save data
     save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'params');
     save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'BOLD_pred');
-    save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'Rsquare');
+    save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'Rsquare');
     if strcmp( cross_valid, 'one')
-        save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'loss_log');
+        save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'loss_log');
     end
     
 end

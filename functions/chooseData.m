@@ -11,10 +11,11 @@ datasets = [1, 2, 3, 4];
 roi_idx  = [1, 2, 3 ];
 ROIs     = {'V1', 'V2', 'V3'};
 
-models(1) = contrastModel( optimizer, fittime);
-models(3) = normVarModel( optimizer, fittime);
-models(4) = SOCModel( optimizer, fittime);
-models(5) = oriSurroundModel( optimizer, fittime);
+models = cell( 4, 1);
+models{1} = contrastModel( optimizer, fittime);
+models{3} = normVarModel( optimizer, fittime);
+models{4} = SOCModel( optimizer, fittime);
+models{5} = oriSurroundModel( optimizer, fittime);
 
 switch quick_choice
     case {'figure1'}
@@ -89,7 +90,7 @@ for d = 1:length(datasets)
             roiNum(idx)      = roi_idx(r);
             roiName(idx)     = ROIs(r);
             modelNum(idx)    = model_idx(m);
-            modelLoader{idx} = models(model_idx(m));
+            modelLoader{idx} = models{model_idx(m)};
 
         end
     end

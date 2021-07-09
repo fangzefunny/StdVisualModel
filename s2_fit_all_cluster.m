@@ -22,12 +22,12 @@
 % EOF
 
 %% hyperparameter: each time, we only need to edit this section !! 
-if ~exist('doCross', 'var'), doCross = false; end
-if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
+if ~exist('doCross', 'var'), doCross = true; end
+if ~exist('target', 'var'),  target  = 'All'; end % 'target' or 'All';
 
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-fittime             = 40;        % how manoy initialization. value space: Integer
-choose_model        = 'all';     % choose some preset data 
+fittime             = 40;        % how many initialization. value space: Integer
+choose_model        = 'soc';     % choose some preset data 
 
 switch doCross
     case false
@@ -40,7 +40,7 @@ end
 
 add_path()
 
- %% generate save address and  choose data 
+%% generate save address and  choose data 
 
 % save address 
 save_address = fullfile( stdnormRootPath, 'Data', data_folder, target,  optimizer);
@@ -61,8 +61,6 @@ roi       = T.roiNum(hpc_job_number);
 model_idx = T.modelNum(hpc_job_number);
 model     = T.modelLoader{hpc_job_number};
 
-disp(T(hpc_job_number, :));
-
 % display information to keep track
 display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
 disp( display )
@@ -81,26 +79,25 @@ E = dataloader( stdnormRootPath, which_obj, target, dataset, roi, 'old' );
 
 if strcmp( model.legend, 'oriSurround')
     disp( 'ori_surround')
-    
+
     % gain weight E
-    weight_E = dataloader( stdnormRootPath 'weight_E', target, dataset, roi );
+    weight_E = dataloader( stdnormRootPath, 'weight_E', target, dataset, roi );
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, weight_E, BOLD_target, 'off', cross_valid);
+        model.fit( model, E, weight_E, BOLD_target, 'off' , cross_valid);
     
 elseif strcmp( model.legend, 'SOC1')
     disp( 'soc1')
     
-    % gain E_mean
+     % gain E_mean
     E_mean = dataloader( stdnormRootPath, 'E_mean', target, dataset, roi );
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
         model.fit( model, E, E_mean, BOLD_target, 'off', cross_valid);
     
-else
-    
+else 
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
         model.fit( model, E, BOLD_target, 'off', cross_valid);
@@ -113,13 +110,10 @@ end
 % save data
 save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'params');
 save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'BOLD_pred');
-save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'Rsquare');
+save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'Rsquare');
 if strcmp( cross_valid, 'one')
-    save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',   dataset, roi, model_idx )) , 'loss_log');
+    save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'loss_log');
 end
-
-
-
 
 
 

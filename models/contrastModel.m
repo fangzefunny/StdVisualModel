@@ -33,7 +33,7 @@ classdef contrastModel
             model.param_bound  = param_bound;
             model.param_pbound = param_pbound; 
             model.fittime      = fittime;
-            model.optimizer = optimizer; 
+            model.optimizer    = optimizer; 
         end
            
     end
