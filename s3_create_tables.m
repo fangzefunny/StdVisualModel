@@ -1,6 +1,6 @@
 %% hyperparameter: each time, we only need to edit this section !!
-if ~exist('doCross', 'var'), doCross = true; end
-if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
+if ~exist('doCross', 'var'), doCross = false; end
+if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
 
 % add path
 add_path()
