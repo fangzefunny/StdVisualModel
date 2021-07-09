@@ -122,6 +122,7 @@ for i = 1:nrows
              'Color', col);
     end
 end
+xticklabels([])
 ylim( [y_min, y_max])
 box off
 hold off
