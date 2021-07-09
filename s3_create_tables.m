@@ -2,6 +2,9 @@
 if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 
+% add path
+add_path()
+
 fittime          = 40;         % how manoy initialization. value space: Integer
 choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
 error_bar        = false;
@@ -28,16 +31,12 @@ param_name =  { 'contrastModel: g', 'contrastModel: n',  ...
                                     'oriSurroundModel: w', 'oriSurroundModel: g', 'oriSurroundModel: n',...
                                     'normVarModel: w', 'normVarModel: g', 'normVarModel: n'};
 
-% add path to the function
-
-%% generate save address and  choose data
-
 % save address
 save_address = fullfile( stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing
-T      = chooseData( choose_model, 'fmincon', fittime );
+T  = chooseData( choose_model, 'fmincon', fittime );
 
 %% init storages
 
@@ -99,7 +98,6 @@ end
 
 %%  create param tables: 3 (roi) x ( modelx param x dataset )
 
-
 numparams = length(param_name);
 
 % storages
@@ -143,9 +141,3 @@ for roi = 1: numrois
     writetable( param_table, fullfile(save_address , sprintf('param_table-%d_roi.csv', roi )));
 end
 
-%% show table
-% 
- % show R square table  
- show_table( stdnormRootPath, 'Rsqaure_table', target, data_folder, 'fmincon'); 
- show_table( stdnormRootPath, 'RMSE_table', target, data_folder, 'fmincon');
- show_table( stdnormRootPath, 'param_table', target, data_folder, 'fmincon'); 

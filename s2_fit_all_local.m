@@ -1,6 +1,8 @@
 %% clear the memory
 close all; 
 clc; 
+
+% add path to other folders
 add_path()
 
 %% hyperparameter: each time, we only need to edit this section !! 

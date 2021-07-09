@@ -1,11 +1,8 @@
 
-function [] = create_plots(fig)
+function [] = s4_visualize(fig)
 
 % import packages
-addpath( genpath( fullfile( stdnormRootPath, 'functions' )))
-addpath( genpath( fullfile( stdnormRootPath, 'models' )))
-addpath( genpath( fullfile( stdnormRootPath, 'plot' )))
-
+add_path()
 
 if strcmp(fig, 'figure1.1')
     
@@ -45,11 +42,6 @@ elseif strcmp( fig, 'figureS1')
 
 else
     
-    
-    %%%%%%%%%%%%%%%%%
-    %  Hyperparams  %
-    %%%%%%%%%%%%%%%%%
-    
     % Set up hyperparameters
     doModel          = true;
     optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
@@ -73,11 +65,8 @@ else
     T = chooseData( fig, optimizer, 40 );
     model_ind = sort(unique(T.modelNum))';
     
-    
-    %%%%%%%%%%%%%%%
-    %  Load Data  %
-    %%%%%%%%%%%%%%%
-    
+    %% Load data 
+
     % Init the data storages
     all_datasets = unique(T.dataset);
     nummodels   = length(unique(T.modelNum));
@@ -92,42 +81,41 @@ else
     % Loop through datasets and load model predictions and data
     for data_idx = 1:numdatasets
         
+        % select data set 
         dataset = all_datasets(data_idx);
         
         for roi = 1:numrois
             for idx = 1:nummodels
                 
+                % select model 
                 model_idx = T.modelNum( idx);
                 
                 % load BOLD target
-                BOLD_data = dataloader( stdnormRootPath, 'BOLD_target', target, dataset, roi );
+                BOLD_data = dataloader( stdnormRootPath, 'BOLD_target', 'all', dataset, roi );
                 len_stim = length( BOLD_data);
                 num_stimuli( data_idx) = len_stim;
                 data_summary_all(1:len_stim, 1, data_idx, roi) = BOLD_data';
                 
                 % load errorbar
-                BOLD_data_error = dataloader( stdnormRootPath, 'BOLD_target_error', target, dataset, roi );
-                err_summary_all(1:len_stim, 1, data_idx, roi) = BOLD_data_error';
-                
+                if error_bar
+                    BOLD_data_error = dataloader( stdnormRootPath, 'BOLD_target_error', 'all', dataset, roi );
+                    err_summary_all(1:len_stim, 1, data_idx, roi) = BOLD_data_error';
+                end
+
                 % load BOLD prediction
-                BOLD_pred = dataloader( stdnormRootPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
-                if ~isempty(BOLD_pred)
+                if doModel
+                    BOLD_pred = dataloader( stdnormRootPath, 'BOLD_pred', 'all', dataset, roi, data_folder, model_idx, optimizer);
                     pred_summary_all(1:len_stim, idx, data_idx, roi) = BOLD_pred';
-                else
-                    pred_summary_all(1:len_stim, idx, data_idx, roi) = NaN;
                 end
             end
         end
     end
     
-    %%%%%%%%%%%%%%%%
-    %  Make plots  %
-    %%%%%%%%%%%%%%%%
+    %% Make figures
     
     if strcmp( target, 'target')
         
         %%%%%%%%%%%%%%% Fig. for target data set  %%%%%%%%%%%%%%%%
-        
         
         % Intialize a figure
         fig_width = 20;
@@ -148,32 +136,25 @@ else
                 % get the data for plots
                 BOLD_data = data_summary_all(1:len_stim, 1, data_idx, roi)';
                 % get the error bar for plots
-                BOLD_data_error = err_summary_all(1:len_stim, 1, data_idx, roi)';
+                BOLD_err = err_summary_all(1:len_stim, 1, data_idx, roi)';
                 % get the model prediction
-                BOLD_pred = pred_summary_all(1:len_stim, :, data_idx, roi);
+                BOLD_preds = pred_summary_all(1:len_stim, :, data_idx, roi)';
                 
                 % subplot dataset, roi, idx
                 idx = (data_idx-1)*(numrois+1) + roi;
                 subplot( numdatasets, numrois+1, idx)
-                if doModel
-                    if error_bar
-                        plot_BOLD( BOLD_pred, BOLD_data, dataset, roi, target, model_ind, BOLD_data_error );
-                    else
-                        plot_BOLD( BOLD_pred, BOLD_data, dataset, roi, target, model_ind );
-                    end
-                else
-                    nan_prediction = NaN( size( pred_summary_all(1:len_stim, :, data_idx, roi)));
-                    plot_BOLD( nan_prediction, BOLD_data, dataset, roi, target, model_ind, BOLD_data_error);
-                end
-                
+                plot_BOLD( BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target);
+
                 % display title
                 show_title = sprintf( 'V%d', roi);
                 title( show_title )
                 
                 % add legend to specify the model's predictions
-                if idx ==numrois
-                    subplot( numdatasets, numrois+1, idx+1)
-                    plot_legend( pred_summary_all(1:len_stim, :, data_idx, roi), model_ind)
+                if doModel
+                    if idx ==numrois
+                        subplot( numdatasets, numrois+1, idx+1)
+                        plot_legend( BOLD_preds, model_ind)
+                    end
                 end
             end
         end
@@ -195,23 +176,21 @@ else
             
             % for each each ori area
             for roi = 1:numrois
+
+                % get the total length of the data
+                len_stim  = num_stimuli( data_idx);
                 % get the data for plots
                 BOLD_data = data_summary_all(1:len_stim, 1, data_idx, roi)';
-                len_stim  = num_stimuli( data_idx);
+                % get the error bar for plots
+                BOLD_err = err_summary_all(1:len_stim, 1, data_idx, roi)';
+                % get the model prediction
+                BOLD_preds = pred_summary_all(1:len_stim, :, data_idx, roi)';
+                
                 % subplot dataset, roi, idx
                 subplot( numrois+1, 1, roi)
                 
                 % if we add model prediction
-                if doModel
-                    if error_bar
-                        plot_BOLD( pred_summary_all(1:len_stim, :, data_idx, roi), BOLD_data, dataset, roi, target, model_ind, BOLD_data_error )
-                    else
-                        plot_BOLD( pred_summary_all(1:len_stim, :, data_idx, roi), BOLD_data, dataset, roi, target, model_ind )
-                    end
-                else
-                    nan_prediction = NaN( size( pred_summary_all(1:len_stim, :, data_idx, roi)));
-                    plot_BOLD( nan_prediction, BOLD_data, dataset, roi, target, model_ind, BOLD_data_error)
-                end
+                plot_BOLD( BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target)
                 
                 % display title
                 show_title = sprintf( 'V%d', roi);
@@ -221,7 +200,7 @@ else
             % add legend to specify the model's predictions
             if doModel
                 subplot( numrois+1, 1, roi+1)
-                plot_legend( pred_summary_all(1:len_stim, :, data_idx, roi), model_ind)
+                plot_legend( BOLD_preds, model_ind)
             end
         end
     end
