@@ -217,6 +217,7 @@ classdef contrastModel
 
                     % cross_valid  
                     for knock_idx = stim_vector
+                        fprintf('Fitting fold %d \n', knock_idx)
 
                         % train vector and train data
                         keep_idx = setdiff( stim_vector, knock_idx );

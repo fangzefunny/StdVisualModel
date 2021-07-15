@@ -35,7 +35,7 @@ len = size( T, 1 );
 
 hpc_job_number = str2double(getenv('SLURM_ARRAY_TASK_ID'));
 
-if isempty(hpc_job_number), hpc_job_number = 5; end
+if isnan(hpc_job_number), hpc_job_number = 5; end
 
 dataset   = T.dataset(hpc_job_number);
 roi       = T.roiNum(hpc_job_number);
