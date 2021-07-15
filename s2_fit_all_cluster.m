@@ -1,26 +1,7 @@
 %% Set up the dataset and the models we are going to test
 %
-% % For running on HPC, execute
-%       sbatch  run.sh
-% % where run.sh is an executable file containing the following text
-%
-% #! /bin/bash
-% #SBATCH --job-name=StdModel
-% #SBATCH -a 1-48 # these numbers are read in to SLURM_ARRAY_TASK_ID
-% #SBATCH --nodes=1
-% #SBATCH --cpus-per-task=4
-% #SBATCH --mem=16g
-% #SBATCH --time=08:00:00
-% #SBATCH --output=/scratch/jaw288/StdVisualModel/Data/HPC/out_%x-%a.txt
-% #SBATCH --error=/scratch/jaw288/StdVisualModel/Data/HPC/error_%x-%a.txt
-%
-% module load matlab/2019b
-%
-% matlab <<EOF
-% addpath(genpath('~/toolboxes'));
-% s2_parallel_fit_all
-% EOF
-
+% For running on HPC, execute
+%       sbatch  hpc_solve_models.sh
 %% hyperparameter: each time, we only need to edit this section !! 
 if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'All'; end % 'target' or 'All';
