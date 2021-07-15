@@ -15,6 +15,6 @@ module load matlab/2021a
 matlab <<EOF
 
 addpath(genpath('~/toolboxes/StdVisualModel'));
-s1_prepare_inputs
 s2_fit_all_cluster
 EOF
+
