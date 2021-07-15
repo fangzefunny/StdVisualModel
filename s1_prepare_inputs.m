@@ -1,11 +1,8 @@
-% add path to all folders
-add_path()
-
 % download the fmri data
 url= 'https://osf.io/xv8m2/download';
 pth = fullfile(stdnormRootPath, 'Data', 'Data.zip');
 fname = websave(pth, url);
-unzip( fname);
+unzip( fname, fullfile(stdnormRootPath, 'Data'));
 
 % calculate E
 save_address = fullfile(stdnormRootPath, 'Data', 'E');
