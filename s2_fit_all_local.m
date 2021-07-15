@@ -8,7 +8,7 @@ add_path()
 %% hyperparameter: each time, we only need to edit this section !! 
 target       = 'all';  % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime      = 40;     % how manoy initialization. value space: Integer
-cross_valid  = 'one';  % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
+cross_valid  = 'cross_valid';  % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
 choose_model = 'soc';  % choose some preset data 
 
 % save address 
