@@ -5,10 +5,12 @@
 %% hyperparameter: each time, we only need to edit this section !! 
 if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'All'; end % 'target' or 'All';
+if ~exist('start_idx', 'var'), start_idx = 1; end % what fold in the cross validation to start
 
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime             = 40;        % how many initialization. value space: Integer
 choose_model        = 'soc';     % choose some preset data 
+verbose             = 'final'; 
 
 switch doCross
     case false
@@ -18,8 +20,6 @@ switch doCross
         cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
 end
-
-add_path()
 
 %% generate save address and  choose data 
 
@@ -41,6 +41,13 @@ dataset   = T.dataset(hpc_job_number);
 roi       = T.roiNum(hpc_job_number);
 model_idx = T.modelNum(hpc_job_number);
 model     = T.modelLoader{hpc_job_number};
+
+% set the save info 
+save_info.dir = fullfile( save_address, 'temp');
+save_info.roi = roi;
+save_info.model_idx = model_idx;
+save_info.dataset = dataset;
+save_info.start_idx = start_idx;
 
 % display information to keep track
 display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
@@ -66,22 +73,12 @@ if strcmp( model.legend, 'oriSurround')
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, weight_E, BOLD_target, 'off' , cross_valid);
-    
-elseif strcmp( model.legend, 'SOC1')
-    disp( 'soc1')
-    
-     % gain E_mean
-    E_mean = dataloader( stdnormRootPath, 'E_mean', target, dataset, roi );
-    
-    % fit the data without cross validation: knock-1-out, don't show the fit
-    [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, E_mean, BOLD_target, 'off', cross_valid);
+        model.fit( model, E, weight_E, BOLD_target, verbose , cross_valid);
     
 else 
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, BOLD_target, 'off', cross_valid);
+        model.fit( model, E, BOLD_target, verbose, cross_valid);
 end
 
 if strcmp( cross_valid, 'one')

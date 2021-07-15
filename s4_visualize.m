@@ -1,9 +1,6 @@
 
 function [] = s4_visualize(fig)
 
-% import packages
-add_path()
-
 if strcmp(fig, 'figure1.1')
     
     open('figures/Figure2E_fitSOCbbpower.fig');

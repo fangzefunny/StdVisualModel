@@ -2,9 +2,6 @@
 if ~exist('doCross', 'var'), doCross = false; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
 
-% add path
-add_path()
-
 fittime          = 40;         % how manoy initialization. value space: Integer
 choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
 error_bar        = false;

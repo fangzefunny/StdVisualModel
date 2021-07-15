@@ -2,9 +2,6 @@
 close all; 
 clc; 
 
-% add path to other folders
-add_path()
-
 %% hyperparameter: each time, we only need to edit this section !! 
 target       = 'all';  % Two target stimuli or the whole dataset. value space: 'target', 'All'
 fittime      = 40;     % how manoy initialization. value space: Integer
@@ -67,20 +64,10 @@ for job = 1: len
         [BOLD_pred, params, Rsquare, model] = ...
             model.fit( model, E, weight_E, BOLD_target, 'off' , cross_valid);
         
-    elseif strcmp( model.legend, 'SOC1')
-        disp( 'soc1')
-        
-         % gain E_mean
-        E_mean = dataloader( stdnormRootPath, 'E_mean', target, dataset, roi );
-        
-        % fit the data without cross validation: knock-1-out, don't show the fit
-        [BOLD_pred, params, Rsquare, model] = ...
-            model.fit( model, E, E_mean, BOLD_target, 'off', cross_valid);
-        
     else 
         % fit the data without cross validation: knock-1-out, don't show the fit
         [BOLD_pred, params, Rsquare, model] = ...
-            model.fit( model, E, BOLD_target, 'off', cross_valid);
+            model.fit( model, E, BOLD_target, 'off', cross_valid, save_info);
     end
     
     if strcmp( cross_valid, 'one')
