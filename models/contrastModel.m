@@ -167,6 +167,7 @@ classdef contrastModel
                         [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], [], [], [], opts);
                 end
                 
+                fprintf('   fit: %d, loss: %.4f \n', ii, sse(ii)) 
             end
             
             % find the lowest sse
@@ -174,6 +175,7 @@ classdef contrastModel
             trial = find( sse == loss );
             param = x( trial(1), : ); 
             loss_history = sse;
+            
             
         end
         
@@ -217,7 +219,7 @@ classdef contrastModel
 
                     % cross_valid  
                     for knock_idx = stim_vector
-                        fprintf('Fitting fold %d \n', knock_idx)
+                        fprintf('fold %d \n', knock_idx)
 
                         % train vector and train data
                         keep_idx = setdiff( stim_vector, knock_idx );
@@ -240,7 +242,7 @@ classdef contrastModel
                     end 
                     
                     % evaluate performance of the algorithm on test data
-                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
+                    Rsquare = model.metric( BOLD_pred, BOLD_target);
                     
                     % bootstrap to get the param
                     params_boot = mean( params, 1 );

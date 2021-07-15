@@ -10,7 +10,7 @@ if ~exist('start_idx', 'var'), start_idx = 1; end % what fold in the cross valid
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime             = 40;        % how many initialization. value space: Integer
 choose_model        = 'soc';     % choose some preset data 
-verbose             = 'final'; 
+verbose             = 'off'; 
 
 switch doCross
     case false
@@ -43,7 +43,9 @@ model_idx = T.modelNum(hpc_job_number);
 model     = T.modelLoader{hpc_job_number};
 
 % set the save info 
-save_info.dir = fullfile( save_address, 'temp');
+save_temp = fullfile( save_address, 'temp');
+if ~exist(save_temp, 'dir'), mkdir(save_temp); end
+save_info.dir = save_temp;
 save_info.roi = roi;
 save_info.model_idx = model_idx;
 save_info.dataset = dataset;
@@ -78,7 +80,7 @@ if strcmp( model.legend, 'oriSurround')
 else 
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, BOLD_target, verbose, cross_valid);
+        model.fit( model, E, BOLD_target, verbose, cross_valid, save_info);
 end
 
 if strcmp( cross_valid, 'one')

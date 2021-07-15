@@ -182,7 +182,7 @@ classdef SOCModel < contrastModel
         end
         
         % fit and cross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, BOLD_target, verbose, cross_valid )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, BOLD_target, verbose, cross_valid, save_info)
             
            if (nargin < 5), cross_valid = 'one'; end
             
@@ -210,13 +210,22 @@ classdef SOCModel < contrastModel
                     stim_vector = 1 : size( E_xy, last_idx);
     
                     % storages
-                    BOLD_pred = nan( 1, stim_dim);
-                    params    = nan( model.num_param, stim_dim);
+                    % storage, try to load the saved history, if any
+                    if save_info.start_idx == 1
+                        params    = nan( model.num_param, stim_dim);
+                        BOLD_pred = nan( 1, stim_dim);
+                    else
+                        load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'params');
+                        load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d_fold-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'BOLD_pred');
+                    end
                     losses    = nan( 1, stim_dim);
                     loss_histories = nan( model.fittime, stim_dim);
 
                     % cross_valid  
                     for knock_idx = stim_vector
+                        fprintf('fold %d \n', knock_idx)
 
                         % train vector and train data
                         keep_idx = setdiff( stim_vector, knock_idx);
@@ -227,12 +236,15 @@ classdef SOCModel < contrastModel
                         % fit the training data 
                         [ loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
                         params( :, knock_idx) = param;
-                        losses( knock_idx) = loss;
-                        loss_histories( :, knock_idx) = loss_history;
                         
                         % use the fitted parameter to predict test data 
                         BOLD_pred( knock_idx ) = model.forward(model, E_test, param );
                         
+                        % save files for each cross validated fold
+                        save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx, knock_idx)) , 'params');
+                        save(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d_fold-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx, knock_idx)) , 'BOLD_pred');
                     end 
                     
                     % evaluate performance of the algorithm on test data
