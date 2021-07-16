@@ -13,8 +13,8 @@ classdef SOCModel < contrastModel
             model = model@contrastModel();
             
             % the parameters here are log params
-            if (nargin < 4), param_pbound  = [    .5, 1;  0, 2; .1,.5 ]; end
-            if (nargin < 3), param_bound   = [ -1e10, 0; -6, 4; -6, 2]; end
+            if (nargin < 4), param_pbound  = log([    .5, 1;  eps,  2; .1,.5 ]); end
+            if (nargin < 3), param_bound   = log([     eps, 1;  eps, 50;  eps, 1 ]); end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -84,6 +84,8 @@ classdef SOCModel < contrastModel
             c = exp(param(1));
             g = exp(param(2));
             n = exp(param(3));
+            
+            fprintf('c:%5.4f\tg:%5.4f\tn:%5.4f\n',c,g,n);
             
             % x x y x ori x exp x stim --> x x y x exp x stim
             E = squeeze( mean( E, 3));

@@ -4,9 +4,11 @@ clc;
 
 %% hyperparameter: each time, we only need to edit this section !! 
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-fittime             = 40;        % how many initialization. value space: Integer
+fittime             = 1;         % how many initialization. value space: Integer
 choose_model        = 'soc';     % choose some preset data 
-verbose             = 'off'; 
+verbose             = 'final'; %'off'; 
+doCross             = false;
+target              = 'all';
 
 switch doCross
     case false
@@ -42,7 +44,7 @@ for job_number = 1: len
     save_info.roi = roi;
     save_info.model_idx = model_idx;
     save_info.dataset = dataset;
-    save_info.start_idx = start_idx;
+    %save_info.start_idx = start_idx;
 
     % display information to keep track
     display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
