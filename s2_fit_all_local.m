@@ -1,12 +1,9 @@
-%% clear the memory
-close all; 
-clc; 
-
 %% hyperparameter: each time, we only need to edit this section !! 
+
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-fittime             = 1;         % how many initialization. value space: Integer
+fittime             = 40;         % how many initialization. value space: Integer
 choose_model        = 'soc';     % choose some preset data 
-verbose             = 'final'; %'off'; 
+verbose             = 'off'; %'off'; 
 doCross             = false;
 target              = 'all';
 

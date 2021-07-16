@@ -13,8 +13,8 @@ classdef SOCModel < contrastModel
             model = model@contrastModel();
             
             % the parameters here are log params
-            if (nargin < 4), param_pbound  = log([    .5, 1;  eps,  2; .1,.5 ]); end
-            if (nargin < 3), param_bound   = log([     eps, 1;  eps, 50;  eps, 1 ]); end
+            if (nargin < 4), param_pbound  = log([  .5, 1;  1e-2, 2;   .1,.5 ]); end
+            if (nargin < 3), param_bound   = log([ eps, 1;  eps, 50;  eps, 1 ]); end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -85,7 +85,7 @@ classdef SOCModel < contrastModel
             g = exp(param(2));
             n = exp(param(3));
             
-            fprintf('c:%5.4f\tg:%5.4f\tn:%5.4f\n',c,g,n);
+            %fprintf('c:%5.4f\tg:%5.4f\tn:%5.4f\n',c,g,n);
             
             % x x y x ori x exp x stim --> x x y x exp x stim
             E = squeeze( mean( E, 3));
@@ -217,10 +217,10 @@ classdef SOCModel < contrastModel
                         params    = nan( model.num_param, stim_dim);
                         BOLD_pred = nan( 1, stim_dim);
                     else
-                        load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'params');
-                        load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'BOLD_pred');
+                        load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
+                        load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end
                     losses    = nan( 1, stim_dim);
                     loss_histories = nan( model.fittime, stim_dim);
@@ -243,10 +243,10 @@ classdef SOCModel < contrastModel
                         BOLD_pred( knock_idx ) = model.forward(model, E_test, param );
                         
                         % save files for each cross validated fold
-                        save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, knock_idx)) , 'params');
-                        save(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, knock_idx)) , 'BOLD_pred');
+                        save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
+                        save(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end 
                     
                     % evaluate performance of the algorithm on test data

@@ -150,7 +150,7 @@ classdef contrastModel
             pub = model.param_pbound( :, 2 );
             
             % init param
-            x0_set = ( lb + ( ub - lb ) .* rand( model.num_param, model.fittime ) )';
+            x0_set = ( plb + ( pub - plb ) .* rand( model.num_param, model.fittime ) )';
             
             % storage
             x   = NaN( model.fittime, model.num_param );
@@ -164,10 +164,11 @@ classdef contrastModel
                     case 'bads'
                         [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], [], [], [], opts);
+                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
-                fprintf('   fit: %d, loss: %.4f \n', ii, sse(ii)) 
+                fprintf('   fit: %d, loss: %.4f \n   params:', ii, sse(ii)) 
+                disp(exp(x(ii,:)))
             end
             
             % find the lowest sse
@@ -211,10 +212,10 @@ classdef contrastModel
                         params    = nan( model.num_param, size( E_ori, stim_dim ) );
                         BOLD_pred = nan( 1, size( E_ori, stim_dim ) );
                     else
-                        load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'params');
-                        load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'BOLD_pred');
+                        load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
+                        load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end
 
                     % cross_valid  
@@ -235,10 +236,10 @@ classdef contrastModel
                         BOLD_pred( knock_idx ) = model.forward(model, E_test, param);
 
                         % save files for each cross validated fold
-                        save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, knock_idx)) , 'params');
-                        save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, knock_idx)) , 'BOLD_pred');
+                        save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
+                        save(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end 
                     
                     % evaluate performance of the algorithm on test data
