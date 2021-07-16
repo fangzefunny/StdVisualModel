@@ -8,7 +8,7 @@ if ~exist('target', 'var'),  target  = 'All'; end % 'target' or 'All';
 if ~exist('start_idx', 'var'), start_idx = 1; end % what fold in the cross validation to start
 
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-fittime             = 40;        % how many initialization. value space: Integer
+fittime             = 1;        % how many initialization. value space: Integer
 choose_model        = 'soc';     % choose some preset data 
 verbose             = 'off'; 
 

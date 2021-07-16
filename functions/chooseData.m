@@ -18,6 +18,7 @@ models{4} = SOCModel( optimizer, fittime);
 models{5} = oriSurroundModel( optimizer, fittime);
 
 switch quick_choice
+    % for figures
     case {'figure1'}
         model_idx = [1];
         datasets = [1];
@@ -43,15 +44,52 @@ switch quick_choice
     case {'figureS2'}
         model_idx = [ 3];
         datasets  = [1, 2, 3, 4];
-    case {'figureS3'}
+    case {'figureS3a'}
         model_idx = [3];
         datasets  = [2];
-    case {'figureS4'}
+    case {'figureS3b'}
         model_idx = [3];
         datasets  = [3];
-    case {'figureS5'}
+    case {'figureS3c'}
         model_idx = [3];
         datasets  = [4];
+    case {'figureS4a'}
+        model_idx = [1];
+        datasets  = [1];
+    case {'figureS4b'}
+        model_idx = [1];
+        datasets  = [2];
+    case {'figureS4c'}
+        model_idx = [1];
+        datasets  = [3];
+    case {'figureS4d'}
+        model_idx = [1];
+        datasets  = [4];
+    case {'figureS5a'}
+        model_idx = [4];
+        datasets  = [1];
+    case {'figureS5b'}
+        model_idx = [4];
+        datasets  = [2];
+    case {'figureS5c'}
+        model_idx = [4];
+        datasets  = [3];
+    case {'figureS5d'}
+        model_idx = [4];
+        datasets  = [4];
+    case {'figureS6a'}
+        model_idx = [5];
+        datasets  = [1];
+    case {'figureS6b'}
+        model_idx = [5];
+        datasets  = [2];
+    case {'figureS6c'}
+        model_idx = [5];
+        datasets  = [3];
+    case {'figureS6d'}
+        model_idx = [5];
+        datasets  = [4];
+    % for others
     case {'con'}
         model_idx = [1];
     case {'all', 'All' }

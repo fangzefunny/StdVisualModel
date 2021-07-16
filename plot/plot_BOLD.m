@@ -81,9 +81,9 @@ for i = 1:nrows
     y_err( 1:length(idx)) = BOLD_err(idx);
     y_hat = NaN(n_models,nx);
     y_hat( :, 1:length(idx)) = BOLD_preds( :, idx);
-    if strcmp(T.Pattern{i}, 'CURVES')
+    if (i < 5) && strcmp(T.Pattern{i}, 'CURVES')
         bar_color = curvy;
-    elseif strcmp(T.Pattern{i}, 'GRATINGS')
+    elseif (i < 5) && strcmp(T.Pattern{i}, 'GRATINGS')
         bar_color = grating;
     else
         bar_color = other;
