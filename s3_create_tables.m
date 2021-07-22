@@ -2,7 +2,7 @@
 if ~exist('doCross', 'var'), doCross = false; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
 
-fittime          = 40;         % how manoy initialization. value space: Integer
+fittime          = [];         % how manoy initialization. value space: Integer
 choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
 error_bar        = false;
 
@@ -61,7 +61,7 @@ for roi = 1: numrois
     
     r2_table = table(model_name', R_summay(:, 1) ,R_summay(:, 2), R_summay(:, 3), R_summay(:, 4));
     r2_table.Properties.VariableNames = {'model', 'DS1', 'DS2', 'DS3', 'DS4' };
-    writetable( r2_table, fullfile(save_address , sprintf('Rsquare_table-%d_roi.csv', roi )));
+    writetable( r2_table, fullfile(save_address , sprintf('Rsquare_table_roi-%d.csv', roi )));
     
 end
 
@@ -89,7 +89,7 @@ for roi = 1: numrois
     
     rmse_table = table(model_name', rmse(:, 1), rmse(:, 2), rmse(:, 3), rmse(:, 4));
     rmse_table.Properties.VariableNames = {'model', 'DS1', 'DS2', 'DS3', 'DS4' };
-    writetable( rmse_table, fullfile(save_address, sprintf('rmse_table-%d_roi.csv', roi )));
+    writetable( rmse_table, fullfile(save_address, sprintf('rmse_table_roi-%d.csv', roi )));
     
 end
 
@@ -135,6 +135,6 @@ for roi = 1: numrois
                                                                                                          'dataset2_mean', 'dataset2_sem', ...
                                                                                                          'dataset3_mean', 'dataset3_sem', ...
                                                                                                          'dataset4_mean', 'dataset4_sem'};
-    writetable( param_table, fullfile(save_address , sprintf('param_table-%d_roi.csv', roi )));
+    writetable( param_table, fullfile(save_address , sprintf('param_table-roi-%d.csv', roi )));
 end
 

@@ -35,7 +35,7 @@ len = size( T, 1 );
 
 hpc_job_number = str2double(getenv('SLURM_ARRAY_TASK_ID'));
 
-if isnan(hpc_job_number), hpc_job_number = 1; end
+if isnan(hpc_job_number), hpc_job_number = 39; end
 
 dataset   = T.dataset(hpc_job_number);
 roi       = T.roiNum(hpc_job_number);
@@ -75,7 +75,7 @@ if strcmp( model.legend, 'oriSurround')
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, weight_E, BOLD_target, verbose , cross_valid);
+        model.fit( model, E, weight_E, BOLD_target, verbose , cross_valid, save_info);
     
 else 
     % fit the data without cross validation: knock-1-out, don't show the fit
