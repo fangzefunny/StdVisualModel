@@ -104,6 +104,8 @@ switch quick_choice
         model_idx = [ 5];
     case 'noVar'
         model_idx = [1, 4, 5];
+    case 'NOVA'
+        model_idx = [3];
     case 'no_model'
         model_idx = NaN;
 end

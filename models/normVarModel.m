@@ -136,12 +136,12 @@ classdef normVarModel < contrastModel
         end
         
         % fcross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid, save_info )
             
             if (nargin < 5), cross_valid = 'one'; end
            
             % call subclass
-            [BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid );
+            [BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid, save_info );
             
         end
             
