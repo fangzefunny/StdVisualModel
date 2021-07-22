@@ -3,7 +3,7 @@
 % For running on HPC, execute
 %       sbatch  hpc_solve_models.sh
 %% hyperparameter: each time, we only need to edit this section !! 
-if ~exist('doCross', 'var'), doCross = false; end
+if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 if ~exist('start_idx', 'var'), start_idx = 1; end % what fold in the cross validation to start
 if ~exist('choose_model', 'var'), choose_model = 'all'; end
@@ -35,7 +35,7 @@ len = size( T, 1 );
 
 hpc_job_number = str2double(getenv('SLURM_ARRAY_TASK_ID'));
 
-if isnan(hpc_job_number), hpc_job_number = 1; end
+if isnan(hpc_job_number), hpc_job_number = 39; end
 
 dataset   = T.dataset(hpc_job_number);
 roi       = T.roiNum(hpc_job_number);
@@ -75,7 +75,7 @@ if strcmp( model.legend, 'oriSurround')
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, weight_E, BOLD_target, verbose , cross_valid);
+        model.fit( model, E, weight_E, BOLD_target, verbose , cross_valid, save_info);
     
 else 
     % fit the data without cross validation: knock-1-out, don't show the fit
