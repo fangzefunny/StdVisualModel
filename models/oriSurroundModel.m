@@ -233,8 +233,7 @@ classdef oriSurroundModel < contrastModel
                     % achieve stim vector
                     last_idx = length( size( E_xy));
                     stim_dim = size( E_xy, last_idx); 
-                    stim_vector = 1 : size( E_xy, last_idx);
-    
+                    stim_vector = save_info.start_idx:size(E_xy, last_idx);
                     % storages
                     % storages
                     % storage, try to load the saved history, if any
