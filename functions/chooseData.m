@@ -41,8 +41,17 @@ switch quick_choice
     case {'figure7'}
         model_idx = [1, 3];
         datasets  = [1];
-    case {'figureS2'}
+    case {'figureS2a'}
         model_idx = [ 3];
+        datasets  = [1, 2, 3, 4];
+    case {'figureS2b'}
+        model_idx = [ 1];
+        datasets  = [1, 2, 3, 4];
+    case {'figureS2c'}
+        model_idx = [ 4];
+        datasets  = [1, 2, 3, 4];
+    case {'figureS2d'}
+        model_idx = [ 5];
         datasets  = [1, 2, 3, 4];
     case {'figureS3a'}
         model_idx = [3];
