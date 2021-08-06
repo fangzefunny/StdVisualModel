@@ -199,6 +199,8 @@ classdef contrastModel
                     Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
                     model  = model.fixparameters( model, param );
                     
+                    model.loss_log = loss_histories;
+                    
                 case 'cross_valid'
                  
                     % achieve stim vector
@@ -250,7 +252,7 @@ classdef contrastModel
                     model  = model.fixparameters( model, params_boot );
             end
             
-            model.loss_log = loss_histories;
+            
                       
         end
                 

@@ -242,6 +242,7 @@ classdef oriSurroundModel < contrastModel
                         params    = nan( model.num_param, stim_dim);
                         BOLD_pred = nan( 1, stim_dim);
                     else
+                        stim_vector = save_info.start_idx : size( E_xy, last_idx);
                         load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
                                         save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'params');
                         load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d_fold-%d.mat',...

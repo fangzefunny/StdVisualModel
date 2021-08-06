@@ -1,6 +1,7 @@
 *.mat
 *.DS_Store
 Data/*
+Tables/*
 figures/*
 note/*
 Temp/*
