@@ -190,7 +190,7 @@ classdef contrastModel
                 case 'one'
                     
                     % optimize to find the best 
-                    [loss, param, loss_history] = model.optim( model, E_ori, BOLD_target, verbose );
+                    [~, param, loss_history] = model.optim( model, E_ori, BOLD_target, verbose );
                     params = param;
                     loss_histories = loss_history;
                   
@@ -231,7 +231,7 @@ classdef contrastModel
                         E_test   = E_ori( :, :, knock_idx );
                       
                         % fit the training data 
-                        [loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
+                        [~, param] = model.optim( model, E_train, target_train, verbose );
                         params( :, knock_idx ) = param;
                         
                         % predict test data 
@@ -251,7 +251,6 @@ classdef contrastModel
                     params_boot = mean( params, 1 );
                     model  = model.fixparameters( model, params_boot );
             end
-            
             
                       
         end
