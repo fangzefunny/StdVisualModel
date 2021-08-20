@@ -1,7 +1,11 @@
 
 function [] = s4_visualize(fig)
-
-if strcmp(fig, 'figure1.1')
+% A function used to generate figures in the paper.
+% Replace the fig with any figure index (as str) you see in the paper.
+% Please do not include space in the str. 
+% for example, to obtain figure 1, fig = 'figure1'
+   
+if strcmp(fig, 'figure2.1')
     
     open('figures/Figure2E_fitSOCbbpower.fig');
     subplot(8,1,1);
@@ -37,7 +41,7 @@ elseif strcmp( fig, 'figureS1')
          imshow( stim( :, :, 1, ii), []);
      end
 
-elseif strcmp( fig, 'figure7')
+elseif strcmp( fig, 'figure8')
 
     % get the plot color
     curvy = [ .4, .4, .4] + .1; 
@@ -83,9 +87,6 @@ elseif strcmp( fig, 'figure7')
         box off 
     end
     
-
-
-
 else
     
     % Set up hyperparameters
@@ -96,10 +97,10 @@ else
     target           = 'target';
     switch fig
         
-        case {'figure1'}
+        case {'figure2'}
             doModel  = false;
         case {
-                'figure6'  ,... 
+                'figure7'  ,... 
                 'figureS3a', 'figureS3b', 'figureS3c',...
                 'figureS4a', 'figureS4b', 'figureS4c', 'figureS4d',...
                 'figureS5a', 'figureS5b', 'figureS5c', 'figureS5d',...
