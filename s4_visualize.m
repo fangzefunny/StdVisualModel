@@ -37,6 +37,55 @@ elseif strcmp( fig, 'figureS1')
          imshow( stim( :, :, 1, ii), []);
      end
 
+elseif strcmp( fig, 'figure7')
+
+    % get the plot color
+    curvy = [ .4, .4, .4] + .1; 
+    grating = [ .6, .6, .6] + .1; 
+    ep = 5;
+    s  = 4;
+    w = 100;
+
+    % get stimuli
+    stim_ind = [ 8, 3, 35, 47];
+    colors   = { grating, curvy, grating, curvy};
+    stim = dataloader( stdnormRootPath, 'stimuli', 'all', 1, 1);
+    E_ori = dataloader( stdnormRootPath, 'E_ori', 'all', 1, 1);
+    stim = squeeze(stim( :, :, ep, stim_ind));
+    E_ori = s * squeeze(E_ori( :, ep, stim_ind));
+    
+    for i = 1:length(stim_ind)
+        % visualize the raw stimuli
+        x = E_ori( : , i);
+        d = x ./ (1 + w * var(x) );
+        subplot( 4, 3, (i-1)*3 + 1)
+        imshow( stim( :, :, i), [-.25, .25]);
+        axis off 
+        % visualize E_ori^2 
+        subplot( 4, 3, (i-1)*3 + 2)
+        bar( x, 'FaceColor', colors{i},...
+                        'EdgeColor', colors{i});
+        set(gca,'xtick',[])
+        ylim( [ 0, .3])
+        sum_txt = sprintf( 'sum=%.2f', sum(x));
+        text( .1, .28, sum_txt)
+        var_txt = sprintf( 'var=%.4f', var(x));
+        text( .1, .25, var_txt)
+        box off 
+        % visualize d 
+        subplot( 4, 3, (i-1)*3 + 3)
+        bar( d, 'FaceColor', colors{i},...
+                       'EdgeColor', colors{i});
+        set(gca,'xtick',[])
+        ylim( [ 0, .3])
+        sum_txt = sprintf( 'sum=%.2f', sum(d));
+        text( .1, .28, sum_txt)
+        box off 
+    end
+    
+
+
+
 else
     
     % Set up hyperparameters
@@ -50,7 +99,7 @@ else
         case {'figure1'}
             doModel  = false;
         case {
-                'figure6', 'figure7',... 
+                'figure6'  ,... 
                 'figureS3a', 'figureS3b', 'figureS3c',...
                 'figureS4a', 'figureS4b', 'figureS4c', 'figureS4d',...
                 'figureS5a', 'figureS5b', 'figureS5c', 'figureS5d',...
