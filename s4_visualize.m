@@ -59,7 +59,7 @@ elseif strcmp( fig, 'figure7')
         x = E_ori( : , i);
         d = x ./ (1 + w * var(x) );
         subplot( 4, 3, (i-1)*3 + 1)
-        imshow( stim( :, :, i), [-.25, .25]);
+        imshow( stim( :, :, i), [-.1, .1]);
         axis off 
         % visualize E_ori^2 
         subplot( 4, 3, (i-1)*3 + 2)
