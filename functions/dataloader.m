@@ -117,10 +117,10 @@ switch which_obj
                     end
         end
         
-    case 'weight_E'
-        fname = sprintf('weight_E_%02d.mat', dataset);
-        path = fullfile(prevPath, 'Data', 'E', fname );
-        load( path, 'weight_E');
+    case 'Z'
+        fname = sprintf('Z_%02d.mat', dataset);
+        path = fullfile(prevPath, 'Data', 'Z', fname );
+        load( path, 'Z');
         data  = weight_E;
         if strcmp(target,  'target')
                     switch dataset

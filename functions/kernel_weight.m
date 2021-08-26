@@ -43,5 +43,9 @@ for theta = thetas
     G(:,:,idx) = exp(- ( y2(:,:,idx).^2./(2*sigma_p^2) + x2(:,:,idx).^2./(2*sigma_g^2)));
     
     Gauss(:,:,:,theta_prime) = G(:,:,:) / sum( G(:) );
+
 end
-Gauss1 = 8.*Gauss./sum(Gauss(:));
+Gauss = Gauss ./ sum(Gauss(:));
+Gauss1 = Gauss;
+Gauss1( :, :, 1:4, 1:4) = Gauss( :, :, 5:8, 5:8);
+Gauss1( :, :, 5:8, 5:8) = Gauss( :, :, 1:4, 1:4);

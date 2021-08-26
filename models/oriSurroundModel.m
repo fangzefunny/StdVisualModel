@@ -73,7 +73,7 @@ classdef oriSurroundModel < contrastModel
        end
         
        % function: f()
-        function y_hat = forward(model, E, weight_E, param )
+        function y_hat = forward(model, E, Z, param )
             
             if model.receptive_weight ==false
                 height = size(E, 1) ;
@@ -88,7 +88,7 @@ classdef oriSurroundModel < contrastModel
             %weight_E = model.cal_weight_E( model, E);
             
             % x x y x ori x exp x stim --> x x y x exp x stim
-            d_theta = E ./ ( 1 + w * weight_E); %E :3d
+            d_theta = E ./ ( 1 + w * Z); %E :3d
             v = squeeze( mean( d_theta, 3));
             d = bsxfun(@times, v, model.receptive_weight);
                         
@@ -104,7 +104,7 @@ classdef oriSurroundModel < contrastModel
         end
 
         % foward model to generate an image 
-        function x_hat = reconstruct(model, E, weight_E, param )
+        function x_hat = reconstruct(model, E, Z, param )
 
             if model.receptive_weight ==false
                 height = size(E, 1) ;
@@ -119,7 +119,7 @@ classdef oriSurroundModel < contrastModel
             %weight_E = model.cal_weight_E( model, E);
             
             % x x y x ori x exp x stim --> x x y x exp x stim
-            d_theta = E ./ ( 1 + w * weight_E); %E :3d
+            d_theta = E ./ ( 1 + w * Z); %E :3d
             v = squeeze( mean( d_theta, 3));
             d = bsxfun(@times, v, model.receptive_weight); 
                 
@@ -208,7 +208,7 @@ classdef oriSurroundModel < contrastModel
         end
         
         % fcross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, weight_E, BOLD_target, verbose, cross_valid, save_info )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, Z, BOLD_target, verbose, cross_valid, save_info )
             
             if (nargin < 6), cross_valid = 'one'; end
             
@@ -217,11 +217,11 @@ classdef oriSurroundModel < contrastModel
                 case 'one'
                     
                     % optimize to find the best 
-                    [loss, param, loss_history] = model.optim( model, E_xy, weight_E, BOLD_target, verbose);
+                    [loss, param, loss_history] = model.optim( model, E_xy, Z, BOLD_target, verbose);
                     params = param;
                     loss_histories = loss_history;
                     % predict test data 
-                    BOLD_pred = model.forward(model, E_xy, weight_E, param );
+                    BOLD_pred = model.forward(model, E_xy, Z, param );
                     % measure the goodness of the fit
                     Rsquare = model.metric( BOLD_pred, BOLD_target);
                      % fix the parameter for the future prediction, usually
@@ -257,19 +257,19 @@ classdef oriSurroundModel < contrastModel
                         % train vector and train data
                         keep_idx = setdiff( stim_vector, knock_idx );
                         E_train  = E_xy( :, :, :, :, keep_idx );
-                        WE_train = weight_E( :, :, :, :, keep_idx);
+                        Z_train = Z( :, :, :, :, keep_idx);
                         target_train = BOLD_target( keep_idx );
                         E_test   = E_xy( :, :, :, :, knock_idx );
-                        WE_test = weight_E( :, :, :, :, knock_idx);
+                        Z_test = Z( :, :, :, :, knock_idx);
                       
                         % fit the training data 
-                        [loss, param, loss_history] = model.optim( model, E_train, WE_train, target_train, verbose );
+                        [loss, param, loss_history] = model.optim( model, E_train, Z_train, target_train, verbose );
                         params( :, knock_idx ) = param;
                         losses( knock_idx ) = loss;
                         loss_histories( :, knock_idx ) = loss_history;
                         
                         % predict test data 
-                        BOLD_pred( knock_idx ) = model.forward(model, E_test, WE_test, param );
+                        BOLD_pred( knock_idx ) = model.forward( model, E_test, Z_test, param);
                         
                         % save files for each cross validated fold
                         save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...

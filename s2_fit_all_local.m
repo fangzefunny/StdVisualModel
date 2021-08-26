@@ -63,11 +63,11 @@ for job_number = 1: len
         disp( 'ori_surround')
 
         % gain weight E
-        weight_E = dataloader( stdnormRootPath, 'weight_E', target, dataset, roi );
+        Z = dataloader( stdnormRootPath, 'Z', target, dataset, roi );
         
         % fit the data without cross validation: knock-1-out, don't show the fit
         [BOLD_pred, params, Rsquare, model] = ...
-            model.fit( model, E, weight_E, BOLD_target, verbose , cross_valid);
+            model.fit( model, E, Z, BOLD_target, verbose , cross_valid);
         
     else 
         % fit the data without cross validation: knock-1-out, don't show the fit

@@ -71,11 +71,11 @@ if strcmp( model.legend, 'oriSurround')
     disp( 'ori_surround')
 
     % gain weight E
-    weight_E = dataloader( stdnormRootPath, 'weight_E', target, dataset, roi );
+    Z = dataloader( stdnormRootPath, 'Z', target, dataset, roi );
     
     % fit the data without cross validation: knock-1-out, don't show the fit
     [BOLD_pred, params, Rsquare, model] = ...
-        model.fit( model, E, weight_E, BOLD_target, verbose , cross_valid, save_info);
+        model.fit( model, E, Z, BOLD_target, verbose , cross_valid, save_info);
     
 else 
     % fit the data without cross validation: knock-1-out, don't show the fit

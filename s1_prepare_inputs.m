@@ -11,7 +11,7 @@ if ~exist(save_address, 'dir'), mkdir(save_address); end
 for which_data = 1:4 % 4 data sets
     
     % Tell the current process
-    fprintf('Computing E_ori, E_xy, weight_E for dataset %d\n', which_data);
+    fprintf('Computing E_ori, E_xy, Z for dataset %d\n', which_data);
     
     % Load the stimuli
     fname = sprintf('stimuli-dataset%02d.mat', which_data);
@@ -39,12 +39,12 @@ for which_data = 1:4 % 4 data sets
     save(fullfile(save_address, fname), 'E_mean','-v7.3')
     
     % W_E denominator for orSurround
-    weight_E = cal_WE( E_xy, labelVec);
+    Z = cal_Z( E_xy, labelVec);
     fname = sprintf('weight_E_%02d.mat', which_data);
-    save(fullfile(save_address, fname), 'weight_E','-v7.3')
+    save(fullfile(save_address, fname), 'Z','-v7.3')
 
     clear E_xy
     clear E_mean
-    clear weight_E
+    clear Z
 end
 
