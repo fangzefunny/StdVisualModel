@@ -119,9 +119,9 @@ switch which_obj
         
     case 'Z'
         fname = sprintf('Z_%02d.mat', dataset);
-        path = fullfile(prevPath, 'Data', 'Z', fname );
+        path = fullfile(prevPath, 'Data', 'E', fname );
         load( path, 'Z');
-        data  = weight_E;
+        data  = Z;
         if strcmp(target,  'target')
                     switch dataset
                         case {1}

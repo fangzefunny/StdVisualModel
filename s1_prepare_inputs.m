@@ -1,5 +1,4 @@
 % download the fmri data
-mkdir('Data')
 url= 'https://osf.io/xv8m2/download';
 pth = fullfile(stdnormRootPath, 'Data', 'Data.zip');
 fname = websave(pth, url);
