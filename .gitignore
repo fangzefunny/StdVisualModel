@@ -1,9 +1,10 @@
 *.mat
 *.DS_Store
 Data/*
-Tables/*
+
 figures/*
 note/*
 Temp/*
 Stimuli/
-Tables
+Tables/Cross/
+Tables/noCross/
