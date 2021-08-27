@@ -41,7 +41,7 @@ for which_data = 1:4 % 4 data sets
     
     % W_E denominator for orSurround
     Z = cal_Z( E_xy, labelVec);
-    fname = sprintf('weight_E_%02d.mat', which_data);
+    fname = sprintf('Z_%02d.mat', which_data);
     save(fullfile(save_address, fname), 'Z','-v7.3')
 
     clear E_xy
