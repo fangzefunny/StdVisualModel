@@ -1,6 +1,6 @@
 #! /bin/bash
-#SBATCH --job-name=StdModel
-#SBATCH -a 5-8 # these numbers are read in to SLURM_ARRAY_TASK_ID
+#SBATCH --job-name=StdModel_target
+#SBATCH -a 1-12 # these numbers are read in to SLURM_ARRAY_TASK_ID
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16g
@@ -15,6 +15,9 @@ module load matlab/2021a
 matlab <<EOF
 
 addpath(genpath('~/toolboxes/StdVisualModel'));
+doCross=true;
+target='target';
+start_idx=1;
+choose_model='oriSurround';
 s2_fit_all_cluster
 EOF
-

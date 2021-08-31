@@ -6,7 +6,7 @@
 if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 if ~exist('start_idx', 'var'), start_idx = 1; end % what fold in the cross validation to start
-if ~exist('choose_model', 'var'), choose_model = 'oriSurround'; end
+if ~exist('choose_model', 'var'), choose_model = 'all'; end
 
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime             = 40;        % how many initialization. value space: Integer
