@@ -107,6 +107,7 @@ switch quick_choice
     case {'SOC', 'soc'}
         model_idx = [ 4];
     case 'oriSurround'
+        datasets = [ 1, 2, 3, 4];
         model_idx = [ 5];
     case 'noVar'
         model_idx = [1, 4, 5];

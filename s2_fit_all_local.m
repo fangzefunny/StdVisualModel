@@ -2,10 +2,11 @@
 
 optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
 fittime             = 40;         % how many initialization. value space: Integer
-choose_model        = 'soc';     % choose some preset data 
+choose_model        = 'oriSurround';     % choose some preset data 
 verbose             = 'off'; %'off'; 
-doCross             = false;
-target              = 'all';
+doCross             = true;
+target              = 'target';
+start_idx          = 1;
 
 switch doCross
     case false
@@ -41,7 +42,7 @@ for job_number = 1: len
     save_info.roi = roi;
     save_info.model_idx = model_idx;
     save_info.dataset = dataset;
-    %save_info.start_idx = start_idx;
+    save_info.start_idx = start_idx;
 
     % display information to keep track
     display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
@@ -67,7 +68,7 @@ for job_number = 1: len
         
         % fit the data without cross validation: knock-1-out, don't show the fit
         [BOLD_pred, params, Rsquare, model] = ...
-            model.fit( model, E, Z, BOLD_target, verbose , cross_valid);
+            model.fit( model, E, Z, BOLD_target, verbose , cross_valid, save_info);
         
     else 
         % fit the data without cross validation: knock-1-out, don't show the fit

@@ -93,7 +93,7 @@ else
     doModel          = true;
     optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
     error_bar        = true;
-    data_folder      = 'Cross';  % save in which folder. value space: 'noCross', .....
+    data_folder      = 'noCross';  % save in which folder. value space: 'noCross', .....
     target           = 'target';
     switch fig
         
