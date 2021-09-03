@@ -22,7 +22,10 @@ switch quick_choice
     case {'figure1'}
         model_idx = [1];
         datasets = [1];
-    case {'figure2'}
+%     case {'figure2'}
+%         model_idx = [1];
+%         datasets = [1];
+    case {'figure3'}
         model_idx = [1];
         datasets = [1];
     case {'figure4'}
