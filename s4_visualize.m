@@ -189,7 +189,6 @@ function [] = s4_visualize( fig)
         if strcmp( target, 'target')
             
             %%%%%%%%%%%%%%% Fig. for target data set  %%%%%%%%%%%%%%%%
-            pred_summary_all = NaN(numstimuli,nummodels,numdatasets, numrois);
 
             % Intialize a figure
             fig_width = 20;
