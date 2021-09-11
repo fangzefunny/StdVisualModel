@@ -1,7 +1,7 @@
 Dataset,Number,Pattern,Variation
 DS1,1 2 3 4 5,CURVES,density
 DS1,6 7 8 9 10,GRATINGS,density
-DS1,47 48  3 49 50,CURVES,contrast
+DS1,47 48 3 49 50,CURVES,contrast
 DS1,35 36 8 37 38,GRATINGS,contrast
 DS1,11 12 13 14 15,NOISE BARS,density
 DS1,16 17 18 19 20 21,WAVES,density

@@ -1,23 +1,24 @@
-%% hyperparameter: each time, we only need to edit this section !! 
+%% Parse the hyperparameters
+if ~exist('doCross', 'var'), doCross = true; end
+if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
+if ~exist('start_idx', 'var'), start_idx = 1; end    % what fold in the cross 
+                                                        % validation to start
+if ~exist('choose_model', 'var'), choose_model = 'all'; end
 
-optimizer           = 'fmincon'; % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
-fittime             = 40;         % how many initialization. value space: Integer
-choose_model        = 'oriSurround';     % choose some preset data 
-verbose             = 'off'; %'off'; 
-doCross             = true;
-target              = 'target';
-start_idx          = 1;
+optimizer           = 'fmincon'; % what kind of optimizer,  value space: 'bads', 'fmincon'
+fittime             = 40;        % how many initialization. value space: Integer
+verbose             = 'off'; 
 
 switch doCross
     case false
-        cross_valid = 'one';            % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
-        data_folder  = 'noCross';       % save in which folder. value space: 'noCross', .....
+        cross_valid = 'one';            % 'one': not cross validate; 'cross_valid': cross validate
+        data_folder  = 'noCross';       % save in which folder. value space: 'noCross', 'Cross'
     case true
         cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
 end
 
-%% generate save address and  choose data 
+%% generate save address and choose data 
 
 % save address 
 save_address = fullfile( stdnormRootPath, 'Data', data_folder, target,  optimizer);
@@ -28,66 +29,67 @@ T      = chooseData( choose_model, optimizer, fittime );
 len = size( T, 1 );
 
 %% start Fit
-for job_number = 1: len
+% get the job using loop 
+for hpc_job_number = 1: len
     
-    dataset   = T.dataset(job_number);
-    roi       = T.roiNum(job_number);
-    model_idx = T.modelNum(job_number);
-    model     = T.modelLoader{job_number};
-
-    % set the save info 
+    dataset   = T.dataset(hpc_job_number);
+    roi       = T.roiNum(hpc_job_number);
+    model_idx = T.modelNum(hpc_job_number);
+    model     = T.modelLoader{hpc_job_number};
+    
+    % set the save info, this helps in
+    % continuing job in the broken pipe 
     save_temp = fullfile( save_address, 'temp');
     if ~exist(save_temp, 'dir'), mkdir(save_temp); end
-    save_info.dir = save_temp;
-    save_info.roi = roi;
+    save_info.dir       = save_temp;
+    save_info.roi       = roi;
     save_info.model_idx = model_idx;
-    save_info.dataset = dataset;
+    save_info.dataset   = dataset;
     save_info.start_idx = start_idx;
-
-    % display information to keep track
+    
+    % display information to keep track of fitting 
     display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
     disp( display )
-
+    
     % load training label
     BOLD_target = dataloader( stdnormRootPath, 'BOLD_target', target, dataset, roi );
-
-    % load the input stimuli
+    
+    % load the input E 
     switch model.model_type
-        case 'orientation'
-            which_obj ='E_ori';
-        case 'space'
+        case 'orientation' % CE, NOA 
+            which_obj = 'E_ori';
+        case 'space'       % SOC, OTS
             which_obj = 'E_xy';
     end
     E = dataloader( stdnormRootPath, which_obj, target, dataset, roi, 'old' );
-
+    
     if strcmp( model.legend, 'oriSurround')
-        disp( 'ori_surround')
-
+        disp( 'OTS')
+    
         % gain weight E
         Z = dataloader( stdnormRootPath, 'Z', target, dataset, roi );
         
-        % fit the data without cross validation: knock-1-out, don't show the fit
+        % fit the data without cross validation: knock-1-out
         [BOLD_pred, params, Rsquare, model] = ...
             model.fit( model, E, Z, BOLD_target, verbose , cross_valid, save_info);
         
     else 
-        % fit the data without cross validation: knock-1-out, don't show the fit
+        % fit the data without cross validation: knock-1-out
         [BOLD_pred, params, Rsquare, model] = ...
             model.fit( model, E, BOLD_target, verbose, cross_valid, save_info);
     end
-
+    
     if strcmp( cross_valid, 'one')
         loss_log = model.loss_log;
     end
-
+    
     % save data
     save(fullfile(save_address , sprintf('parameters_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'params');
     save(fullfile(save_address , sprintf('prediction_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'BOLD_pred');
-    save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'Rsquare');
+    save(fullfile(save_address , sprintf('Rsquare_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx ))    , 'Rsquare');
     if strcmp( cross_valid, 'one')
         save(fullfile(save_address , sprintf('loss_log_data-%d_roi-%d_model-%d.mat',dataset, roi, model_idx )) , 'loss_log');
     end
 end
-
 
 

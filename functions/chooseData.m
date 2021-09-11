@@ -19,10 +19,10 @@ models{5} = oriSurroundModel( optimizer, fittime);
 
 switch quick_choice
     % for figures
-    case {'figure1'}
+    case {'figure2'}
         model_idx = [1];
         datasets = [1];
-    case {'figure2'}
+    case {'figure3'}
         model_idx = [1];
         datasets = [1];
     case {'figure4'}
@@ -106,12 +106,12 @@ switch quick_choice
         model_idx = [ 1, 3, 4];
     case {'SOC', 'soc'}
         model_idx = [ 4];
-    case 'oriSurround'
+    case { 'oriSurround', 'OTS'}
         datasets = [ 1, 2, 3, 4];
         model_idx = [ 5];
     case 'noVar'
         model_idx = [1, 4, 5];
-    case 'NOVA'
+    case 'NOA'
         model_idx = [3];
     case 'no_model'
         model_idx = NaN;

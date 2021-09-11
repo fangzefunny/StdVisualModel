@@ -88,9 +88,9 @@ classdef oriSurroundModel < contrastModel
             %weight_E = model.cal_weight_E( model, E);
             
             % x x y x ori x exp x stim --> x x y x exp x stim
-            d_theta = E ./ ( 1 + w * Z); %E :3d
-            v = squeeze( mean( d_theta, 3));
-            d = bsxfun(@times, v, model.receptive_weight);
+            d = E ./ ( 1 + w * Z); 
+            v = squeeze( mean( d, 3));
+            d = bsxfun( @times, v, model.receptive_weight);
                         
             % Sum over spatial position
             s = squeeze(mean(mean( d , 1) , 2)); % ep x stimuli
@@ -179,7 +179,7 @@ classdef oriSurroundModel < contrastModel
             pub = model.param_pbound( :, 2 );
             
             % init param
-            x0_set = ( lb + ( ub - lb ) .* rand( model.num_param, model.fittime ) )';
+            x0_set = ( plb + ( pub - plb ) .* rand( model.num_param, model.fittime ) )';
             
             % storage
             x   = NaN( model.fittime, model.num_param );
@@ -193,7 +193,7 @@ classdef oriSurroundModel < contrastModel
                     case 'bads'
                         [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], [], [], [], opts);
                 end
                 
                 fprintf('   fit: %d, loss: %.4f \n', ii, sse(ii)) 
@@ -234,18 +234,17 @@ classdef oriSurroundModel < contrastModel
                     last_idx = length( size( E_xy));
                     stim_dim = size( E_xy, last_idx); 
                     stim_vector = save_info.start_idx:size(E_xy, last_idx);
-                    % storages
-                    % storages
+
                     % storage, try to load the saved history, if any
                     if save_info.start_idx == 1
                         params    = nan( model.num_param, stim_dim);
                         BOLD_pred = nan( 1, stim_dim);
                     else
                         stim_vector = save_info.start_idx : size( E_xy, last_idx);
-                        load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'params');
-                        load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, save_info.start_idx-1)) , 'BOLD_pred');
+                        load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
+                        load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end
                     losses    = nan( 1, stim_dim);
                     loss_histories = nan( model.fittime, stim_dim);
@@ -257,10 +256,10 @@ classdef oriSurroundModel < contrastModel
                         % train vector and train data
                         keep_idx = setdiff( stim_vector, knock_idx );
                         E_train  = E_xy( :, :, :, :, keep_idx );
-                        Z_train = Z( :, :, :, :, keep_idx);
+                        Z_train  = Z( :, :, :, :, keep_idx);
                         target_train = BOLD_target( keep_idx );
                         E_test   = E_xy( :, :, :, :, knock_idx );
-                        Z_test = Z( :, :, :, :, knock_idx);
+                        Z_test   = Z( :, :, :, :, knock_idx);
                       
                         % fit the training data 
                         [loss, param, loss_history] = model.optim( model, E_train, Z_train, target_train, verbose );
@@ -272,10 +271,10 @@ classdef oriSurroundModel < contrastModel
                         BOLD_pred( knock_idx ) = model.forward( model, E_test, Z_test, param);
                         
                         % save files for each cross validated fold
-                        save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, knock_idx)) , 'params');
+                        save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
                         save(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d_fold-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx, knock_idx)) , 'BOLD_pred');
+                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end 
                     
                     % evaluate performance of the algorithm on test data

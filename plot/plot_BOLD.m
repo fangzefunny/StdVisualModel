@@ -1,10 +1,17 @@
 function [] = plot_BOLD(BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target)
 
-% Input 1: which datasets: dataset 1 or 2...
-% Input 2: which roi area: 'v1' or 'v2' ...
-% input 3: the prediction of the model: a matrix: num_stim x num_models
-% Input 4: legend name:
-% Input 5: This is prepared for arbitrary input: like two class
+%{
+Inputs:
+    BOLD_preds: model prediction
+    BOLD_data: human BOLD target
+    BOLD_err: human BOLD target's bootstrapped error
+    dataset: 1 or 2 or 3 or 4
+    model_in: 1, 4, 5, 3
+    target: 'All' or 'target'
+
+Ouputs: 
+    figure
+%}
 
 % choose colors 
 dark = [52, 73, 94]./255;
@@ -89,6 +96,7 @@ for i = 1:nrows
         bar_color = other;
     end
     
+    % save data 
     materials.x{ end+1}     = x;
     materials.y_bar{ end+1} = y_bar;
     materials.y_err{ end+1} = y_err;

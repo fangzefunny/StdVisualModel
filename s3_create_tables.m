@@ -16,7 +16,6 @@ switch doCross
         cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
         print_loss   = false;           % we don't save all the loss plots when we cross validate
-
 end
 
 %% define model name 
@@ -24,7 +23,7 @@ model_name = { 'contrast', 'soc', 'oriSurrond', 'normVar'};
 
 % define param name
 param_name =  { 'contrastModel: g', 'contrastModel: n',  ...
-                                     'socModel: c', 'socModel: g', 'socModel: n', ...
+                                    'socModel: c', 'socModel: g', 'socModel: n', ...
                                     'oriSurroundModel: w', 'oriSurroundModel: g', 'oriSurroundModel: n',...
                                     'normVarModel: w', 'normVarModel: g', 'normVarModel: n'};
 
