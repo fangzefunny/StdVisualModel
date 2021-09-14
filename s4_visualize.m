@@ -207,16 +207,16 @@ function [] = s4_visualize( fig)
                     % get the total length of the data
                     len_stim  = num_stimuli( data_idx);
                     % get the data for plots
-                    BOLD_data = data_summary_all(1:len_stim, 1, data_idx, roi)';
+                    BOLD_data = data_summary_all( 1:len_stim, 1, data_idx, roi)';
                     % get the error bar for plots
-                    BOLD_err = err_summary_all(1:len_stim, 1, data_idx, roi)';
+                    BOLD_err = err_summary_all( 1:len_stim, 1, data_idx, roi)';
                     % get the model prediction
-                    target_preds = targ_pred_summary_all(1:len_stim, :, data_idx, roi)';
+                    target_preds = targ_pred_summary_all( 1:len_stim, :, data_idx, roi)';
                     
                     % subplot dataset, roi, idx
                     idx = (data_idx-1)*(numrois+1) + roi;
                     subplot( numdatasets, numrois+1, idx)
-                    plot_BOLD( target_preds, BOLD_data, BOLD_err, dataset, model_ind, target);
+                    plot_BOLD( target_preds, BOLD_data, BOLD_err, dataset, model_ind, targetz);
 
                     % display title
                     show_title = sprintf( 'V%d', roi);
@@ -253,11 +253,11 @@ function [] = s4_visualize( fig)
                     % get the total length of the data
                     len_stim  = num_stimuli( data_idx);
                     % get the data for plots
-                    BOLD_data = data_summary_all(1:len_stim, 1, data_idx, roi)';
+                    BOLD_data = data_summary_all( 1:len_stim, 1, data_idx, roi)';
                     % get the error bar for plots
-                    BOLD_err  = err_summary_all(1:len_stim, 1, data_idx, roi)';
+                    BOLD_err  = err_summary_all( 1:len_stim, 1, data_idx, roi)';
                     % get the model prediction
-                    BOLD_preds = pred_summary_all(1:len_stim, :, data_idx, roi)';
+                    BOLD_preds = pred_summary_all( 1:len_stim, :, data_idx, roi)';
                     
                     % subplot dataset, roi, idx
                     subplot( numrois+1, 1, roi)

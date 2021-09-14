@@ -14,14 +14,14 @@ Ouputs:
 %}
 
 % choose colors 
-dark = [52, 73, 94]./255;
-blue = [52, 152, 219]./255;
-red = [231, 76, 60]./255;
-yellow = [ 241, 196, 15]./255;
-green = [46, 204, 113]./255;
-curvy = [ .4, .4, .4] + .1; 
-grating = [ .6, .6, .6] + .1; 
-other = [ .8, .8, .8] + .1;
+dark    = [  52,  73,  94] ./ 255;
+blue    = [  52, 152, 219] ./ 255;
+red     = [ 231,  76,  60] ./ 255;
+yellow  = [ 241, 196,  15] ./ 255;
+green   = [  46, 204, 113] ./ 255;
+curvy   = [  .4,  .4,  .4] + .1; 
+grating = [  .6,  .6,  .6] + .1; 
+other   = [  .8,  .8,  .8] + .1;
 col_vector = {dark, green, red, blue, yellow};
 col_vector = col_vector(model_ind);
 
