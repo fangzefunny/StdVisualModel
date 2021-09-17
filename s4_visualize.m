@@ -43,8 +43,52 @@ function [] = s4_visualize( fig)
             subplot( 5, 10, ii)
             imshow( stim( :, :, 1, ii), []);
         end
+        
+    elseif strcmp( fig, 'figure7')
 
-    elseif strcmp( fig, 'figure8')
+        % get the plot color
+        v3      = [ .1, .1, .1]; 
+        v2      = [ .5, .5, .5]; 
+        v1      = [ .9, .9, .9]; 
+        models = { 'CE', 'SOC', 'OTS', 'NOA', 'Data'};
+        
+        % get stimuli
+        T = readtable( fullfile( stdnormRootPath, 'Tables/hetero_tables.csv'));
+        snakes_mean   = NaN( 3, length(models));
+        gratings_mean = NaN( 3, length(models));
+        snakes_std    = NaN( 3, length(models));
+        gratings_std  = NaN( 3, length(models));
+        
+        for i = 1:length(models)
+           start_idx = (i - 1) * 4 + 1;
+           end_idx   = 4 * i; 
+           vars_nm = T.Properties.VariableNames;
+          
+           for j = 2:length( vars_nm)
+               if mod( j , 2)
+                  gratings_mean( floor(j/2), i) = mean(T{ start_idx:end_idx, vars_nm{j}});
+                  gratings_std( floor(j/2), i)  = std(T{ start_idx:end_idx, vars_nm{j}});
+               else
+                  snakes_mean( floor(j/2), i) = mean(T{ start_idx:end_idx, vars_nm{j}});
+                  snakes_std( floor(j/2), i)  = std(T{ start_idx:end_idx, vars_nm{j}});
+               end
+           end    
+        end
+        contrast = (snakes_mean - gratings_mean) ./ (snakes_mean + gratings_mean) /2;
+        x = 1:length(models);
+        b = bar( x, contrast');
+        b(1).FaceColor  = v1; 
+        b(2).FaceColor  = v2; 
+        b(3).FaceColor  = v3;
+%         hold on
+%         er = errorbar(x,data,errlow,errhigh);    
+%         er.Color = [0 0 0];                            
+%         er.LineStyle = 'none';  
+        xticklabels( models)
+        legend( 'V1', 'V2', 'V3')
+        
+
+    elseif strcmp( fig, 'figure9')
 
         % get the plot color
         curvy = [ .4, .4, .4] + .1; 
@@ -103,7 +147,7 @@ function [] = s4_visualize( fig)
             case {'figure2'}
                 doModel  = false;
             case {
-                    'figure7'  ,... 
+                    'figure8'  ,... 
                     'figureS3a', 'figureS3b', 'figureS3c',...
                     'figureS4a', 'figureS4b', 'figureS4c', 'figureS4d',...
                     'figureS5a', 'figureS5b', 'figureS5c', 'figureS5d',...
