@@ -85,6 +85,7 @@ function [] = s4_visualize( fig)
 %         er.Color = [0 0 0];                            
 %         er.LineStyle = 'none';  
         xticklabels( models)
+        box off 
         legend( 'V1', 'V2', 'V3')
         
 
@@ -126,7 +127,7 @@ function [] = s4_visualize( fig)
             % visualize d 
             subplot( 4, 3, (i-1)*3 + 3)
             bar( d, 'FaceColor', colors{i},...
-                        'EdgeColor', colors{i});
+                    'EdgeColor', colors{i});
             set(gca,'xtick',[])
             ylim( [ 0, .3])
             sum_txt = sprintf( 'sum=%.2f', sum(d));
@@ -260,7 +261,7 @@ function [] = s4_visualize( fig)
                     % subplot dataset, roi, idx
                     idx = (data_idx-1)*(numrois+1) + roi;
                     subplot( numdatasets, numrois+1, idx)
-                    plot_BOLD( target_preds, BOLD_data, BOLD_err, dataset, model_ind, targetz);
+                    plot_BOLD( target_preds, BOLD_data, BOLD_err, dataset, model_ind, target);
 
                     % display title
                     show_title = sprintf( 'V%d', roi);
