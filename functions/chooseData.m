@@ -19,25 +19,24 @@ models{5} = oriSurroundModel( optimizer, fittime);
 
 switch quick_choice
     % for figures
-    case {'figure2'}
-        model_idx = [1];
-        datasets = [1];
     case {'figure3'}
         model_idx = [1];
         datasets = [1];
     case {'figure4'}
-        model_idx = [4];
+        model_idx = [1];
         datasets = [1];
     case {'figure5'}
-        model_idx = [5];
+        model_idx = [4];
         datasets = [1];
     case {'figure6'}
-       % models = {model1, model3};
-        model_idx = [3];
+        model_idx = [5];
         datasets = [1];
     case {'figure7'}
         model_idx = [3];
         datasets  = [1];
+    case {'figure9'}
+        model_idx = [3];
+        datasets  = [1];  
     case {'figureS2a'}
         model_idx = [ 3];
         datasets  = [1, 2, 3, 4];

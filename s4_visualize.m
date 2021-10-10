@@ -7,8 +7,41 @@ function [] = s4_visualize( fig)
     for example, to obtain figure 1, fig = 'figure1'
     although... we do not have figure 1...
     %}
+    set(0,'DefaultFigureVisible', 'off')
+    set (gcf,'Position',[0,0,512,512])
+    if strcmp(fig, 'thumbnails')
+        datasets = [ 1, 2, 3, 4];
+        ep = 5;
+        for i = 1:length( datasets)
+            folder = sprintf('dataset%02d', datasets(i));
+            save_address = fullfile( stdnormRootPath, 'thumbnails', folder);
+            if ~exist(save_address, 'dir'), mkdir(save_address); end
+            stim = dataloader( stdnormRootPath, 'stimuli', 'all', datasets(i));
+            for j = 1: size(stim, 4)
+               imshow( stim( :, :, ep, j), [], 'border', 'tight', 'initialmagnification','fit') 
+               fname = fullfile(save_address, sprintf('%d.png', j));
+               saveas(gcf, fname)
+            end    
+        end
+    end
         
-    if strcmp(fig, 'figure2.1')
+    if strcmp(fig,'figure2')
+        
+        nTheta  = 8;
+        sigma_p = .1;
+        sigma_g = .85;
+        sigma_s = .01;
+        sz      = 30;
+        kernel_w = kernel_weight( sigma_p, sigma_g, sigma_s, sz );
+        for theta1 = 1: nTheta
+            for theta2 = 1:nTheta 
+                subplot( 8, 8, (theta1-1)*nTheta + theta2)
+                imshow( squeeze(kernel_w( :, :, theta1, theta2)), []);
+                axis off
+            end  
+        end 
+        
+    elseif strcmp(fig, 'figure3.1')
         
         open('figures/Figure2E_fitSOCbbpower.fig');
         subplot(8,1,1);
@@ -44,7 +77,7 @@ function [] = s4_visualize( fig)
             imshow( stim( :, :, 1, ii), []);
         end
         
-    elseif strcmp( fig, 'figure7')
+    elseif strcmp( fig, 'figure8')
 
         % get the plot color
         v3      = [ .1, .1, .1]; 
@@ -89,7 +122,7 @@ function [] = s4_visualize( fig)
         legend( 'V1', 'V2', 'V3')
         
 
-    elseif strcmp( fig, 'figure9')
+    elseif strcmp( fig, 'figure10')
 
         % get the plot color
         curvy = [ .4, .4, .4] + .1; 
@@ -145,10 +178,10 @@ function [] = s4_visualize( fig)
         target           = 'target';
         switch fig
             
-            case {'figure2'}
+            case {'figure3'}
                 doModel  = false;
             case {
-                    'figure8'  ,... 
+                    'figure9'  ,... 
                     'figureS3a', 'figureS3b', 'figureS3c',...
                     'figureS4a', 'figureS4b', 'figureS4c', 'figureS4d',...
                     'figureS5a', 'figureS5b', 'figureS5c', 'figureS5d',...
