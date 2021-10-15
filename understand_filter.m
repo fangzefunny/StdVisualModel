@@ -22,8 +22,6 @@ curves = squeeze(E_xy( :, :, :, 1, 3));
 gratings = squeeze(E_xy( :, :, :, 1, 8));
 
 % 
-
-
 blue = [52, 152, 219]./255;
 red  = [231, 76, 60]./255; 
 stims = [ 3, 8];

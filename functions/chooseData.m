@@ -94,6 +94,18 @@ switch quick_choice
     case {'figureS6d'}
         model_idx = [5];
         datasets  = [4];
+    case {'figureS7a'}
+        model_idx = [1, 3, 4, 5];
+        datasets  = [1];
+    case {'figureS7b'}
+        model_idx = [1, 3, 4, 5];
+        datasets  = [2];
+    case {'figureS7c'}
+        model_idx = [1, 3, 4, 5];
+        datasets  = [3];
+    case {'figureS7d'}
+        model_idx = [1, 3, 4, 5];
+        datasets  = [4];
     % for others
     case {'con'}
         model_idx = [1];

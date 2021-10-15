@@ -7,9 +7,11 @@ function [] = s4_visualize( fig)
     for example, to obtain figure 1, fig = 'figure1'
     although... we do not have figure 1...
     %}
-    set(0,'DefaultFigureVisible', 'off')
-    set (gcf,'Position',[0,0,512,512])
+    
     if strcmp(fig, 'thumbnails')
+        
+        set(0,'DefaultFigureVisible', 'off')
+        set (gcf,'Position',[0,0,512,512])
         datasets = [ 1, 2, 3, 4];
         ep = 5;
         for i = 1:length( datasets)
@@ -168,6 +170,71 @@ function [] = s4_visualize( fig)
             box off 
         end
         
+    elseif strcmp( fig, 'figure?')
+        
+        % have a look at the filter
+        nTheta  = 8;
+        sigma_p = .1;
+        sigma_g = .85;
+        sigma_s = .01;
+        sz      = 30;
+        kernel_w = kernel_weight( sigma_p, sigma_g, sigma_s, sz );
+        for theta1 = 1: nTheta
+            for theta2 = 1:nTheta 
+                % subplot( 8, 8, (theta1-1)*nTheta + theta2)
+                % imshow( squeeze(kernel_w( :, :, theta1, theta2)), []);
+                axis off
+            end  
+        end 
+
+        % show the normalization shape
+        E_xy = dataloader( stdnormRootPath, 'E_xy', 'target', 1, 1);
+
+        % choose thete
+        curvy   = [  .4,  .4,  .4] + .1; 
+        grating = [  .6,  .6,  .6] + .1; 
+        stims = [ 3, 8];
+        for idx = 1:2
+            Z = NaN(8,1);
+            stim = stims(idx);
+            for ep = 1 
+                E = squeeze(mean(mean(E_xy( :, :, :, ep, stim),2),1));
+
+                Z2 = NaN(nTheta, 1);
+                for theta1 = 1:nTheta
+                    sum_img = 0;
+                    F2 = squeeze(kernel_w( :, :, :, theta1));
+                    Ex = squeeze(E_xy( :, :, theta1, ep, stim));
+                    Ex = repmat( Ex, 1, 1, 8);
+
+                    for theta2 = 1:nTheta
+                        %subplot( 6, 4, theta2)
+                        F = squeeze(kernel_w( :, :, theta2, theta1));
+                        %imshow( F, []);
+                        %subplot( 6, 4, 8+theta2)
+                        img = squeeze(E_xy( :, :, theta2, ep, stim));
+                        %imshow( img, [0, .25])
+                        %subplot( 6, 4, 16+theta2)
+                        c_img = conv2( img, F, 'same');
+                        %imshow( c_img, [0, .1])
+                        sum_img = sum_img + c_img / nTheta;
+                    end
+                    Z( theta1, 1) = mean(sum_img(:));   
+                    
+                end    
+            end
+            subplot( 1, 2, idx)
+            plot( E, 'color', curvy, 'linewidth', 5)
+            ylim( [ 0, .01])
+            hold on 
+            plot( Z, 'color', grating, 'linewidth', 5)
+            legend( 'E_{ori}', 'Z')
+            ylim( [ 0, .1])
+            box off
+
+        end 
+
+        
     else
         
         % Tune the hyperparameters
@@ -186,6 +253,7 @@ function [] = s4_visualize( fig)
                     'figureS4a', 'figureS4b', 'figureS4c', 'figureS4d',...
                     'figureS5a', 'figureS5b', 'figureS5c', 'figureS5d',...
                     'figureS6a', 'figureS6b', 'figureS6c', 'figureS6d',...
+                    'figureS7a', 'figureS7b', 'figureS7c', 'figureS7d',... 
                 }
                 target   = 'all';
         end
