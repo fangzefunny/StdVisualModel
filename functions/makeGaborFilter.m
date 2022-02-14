@@ -1,7 +1,7 @@
 function [Gabor_cos,Gabor_sin]= makeGaborFilter(ppcvec, thetavec, support)
  
 if ~exist('support', 'var') || isempty(support)
-    support = 2; % 2 cycles per filter
+    support = 3; % 3 cycles per filter
 end
 
 numOrientations = length(thetavec);
@@ -15,7 +15,11 @@ Gabor_sin = cell(numOrientations,numFrequencies);
 for f = 1:numFrequencies
     ppc = ppcvec(f);    
     numPix= round(ppc * support); % number of pixels in 2 cycles
-    [x, y] = meshgrid((1:numPix)/ppc);
+    [x, y] = meshgrid((0:numPix-1)/ppc);
+
+    % Gauss with spatial frequency
+    Gauss = fspecial('gauss',numPix, numPix/support);
+
     for o = 1:numOrientations
         theta = thetavec(o);
         
@@ -25,23 +29,20 @@ for f = 1:numFrequencies
 
         % complex harmonic
         h = exp(1i*(wave_c*x+wave_s*y)*pi*2);
-        
-        % Gauss with spatial frequency
-        Gauss = fspecial('gauss',numPix, numPix/4);
-        
+              
         % 2D Gabor
-        Gabor_A = Gauss.*h;
+        % Gabor_A = Gauss.*h;
         
         % subtract mean to make sure its mean is 0
-        Gabor_A = Gabor_A - mean(Gabor_A(:));
+        % Gabor_A = Gabor_A - mean(Gabor_A(:));
        
         % Cos Gabor
-        Gabor_c = imag(Gabor_A);
-        Gabor_s = real(Gabor_A);
+        Gabor_c = Gauss.*imag(h);
+        Gabor_s = Gauss.*real(h);
         
         %Normalization
-        norm_Gabor_c=Gabor_c.*1/norm(Gabor_c);
-        norm_Gabor_s=Gabor_s.*1/norm(Gabor_s);
+        norm_Gabor_c=Gabor_c.*1/norm(Gabor_c(:));
+        norm_Gabor_s=Gabor_s.*1/norm(Gabor_s(:));
        
         
         % Scale the gobors

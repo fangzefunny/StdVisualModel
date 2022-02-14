@@ -6,7 +6,7 @@ fov         = fovs(which_data);
 numpix      = size(data,1);
 pixperdeg   = numpix / fov;
 ppc         = pixperdeg/filter_cpd; % pixels per cycle
-support     = 2; % cycles per filter
+support     = 6; % cycles per filter
 
 o = linspace(0,pi, 9);
 thetavec = o(1:end-1);
