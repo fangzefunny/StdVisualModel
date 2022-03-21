@@ -193,7 +193,7 @@ classdef SOCModel < contrastModel
                 case 'one'
                     
                     % optimize to find the best local minima
-                    [loss, param, loss_history] = model.optim( model, E_xy, BOLD_target, verbose);
+                    [~, param, loss_history] = model.optim( model, E_xy, BOLD_target, verbose);
                     params = param;
                     loss_histories = loss_history;
                     % predict test data 
@@ -222,7 +222,6 @@ classdef SOCModel < contrastModel
                         load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
                                         save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end
-                    losses    = nan( 1, stim_dim);
                     loss_histories = nan( model.fittime, stim_dim);
 
                     % cross_valid  
@@ -236,7 +235,7 @@ classdef SOCModel < contrastModel
                         E_test   = E_xy( :, :, :, :, knock_idx);
                       
                         % fit the training data 
-                        [ loss, param, loss_history] = model.optim( model, E_train, target_train, verbose );
+                        [ ~, param] = model.optim( model, E_train, target_train, verbose );
                         params( :, knock_idx) = param;
                         
                         % use the fitted parameter to predict test data 
