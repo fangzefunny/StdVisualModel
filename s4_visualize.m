@@ -1,5 +1,5 @@
 
-function [] = s4_visualize( fig)
+function [] = s4_visualize( fig, plotData)
 %{
     A function used to generate figures in the paper.
     Replace the fig with any figure index (as str) you see in the paper.
@@ -8,6 +8,7 @@ function [] = s4_visualize( fig)
     although... we do not have figure 1...
 %}
 
+if ~exist('plotData', 'var') || isempty(plotData), plotData = true; end
 if strcmp(fig, 'thumbnails')
     
     set(0,'DefaultFigureVisible', 'off')
@@ -454,7 +455,7 @@ else
                 % subplot dataset, roi, idx
                 idx = (data_idx-1)*(numrois+1) + roi;
                 subplot( numdatasets, numrois+1, idx)
-                plot_BOLD( target_preds, BOLD_data, BOLD_err, dataset, model_ind, target);
+                plot_BOLD( target_preds, BOLD_data, BOLD_err, dataset, model_ind, target, plotData);
                 
                 % display title
                 show_title = sprintf( 'V%d', roi);
@@ -501,7 +502,7 @@ else
                 subplot( numrois+1, 1, roi)
                 
                 % if we add model prediction
-                plot_BOLD( BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target)
+                plot_BOLD( BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target, plotData)
                 
                 % display title
                 show_title = sprintf( 'V%d', roi);
