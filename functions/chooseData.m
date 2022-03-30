@@ -110,7 +110,7 @@ switch quick_choice
     case {'con'}
         model_idx = [1];
     case {'all', 'All' }
-        model_idx = [ 1, 4, 5, 3];
+        model_idx = [ 1, 3, 4, 5];
     case 'orientation'
         model_idx = [ 1, 3];
     case 'noOri'

@@ -1,9 +1,9 @@
 %% download the fmri data
 
-url= 'https://osf.io/xv8m2/download';
-pth = fullfile(stdnormRootPath, 'Data', 'Data.zip');
-fname = websave(pth, url);
-unzip( fname, fullfile(stdnormRootPath, 'Data'));
+% url= 'https://osf.io/xv8m2/download';
+% pth = fullfile(stdnormRootPath, 'Data', 'Data.zip');
+% fname = websave(pth, url);
+% unzip( fname, fullfile(stdnormRootPath, 'Data'));
 
 %% Prepare input for the Φ() fn.
 

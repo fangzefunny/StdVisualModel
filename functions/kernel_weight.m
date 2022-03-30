@@ -33,7 +33,6 @@ for theta = thetas
         x2(:,:,ii) = reshape(tmp(1,:), [numx, numx]);
         y2(:,:,ii) = reshape(tmp(2,:), [numx, numx]);
     end
-    
  
     % Build an unoriented suppression field near the image center
     G = exp(- ( y.^2./(2*sigma_s^2)+ x.^2./(2*sigma_s^2)));
@@ -45,7 +44,7 @@ for theta = thetas
     Gauss(:,:,:,theta_prime) = G(:,:,:) / sum( G(:) );
 
 end
-Gauss = Gauss ./ sum(Gauss(:));
 Gauss1 = Gauss;
 Gauss1( :, :, 1:4, 1:4) = Gauss( :, :, 5:8, 5:8);
 Gauss1( :, :, 5:8, 5:8) = Gauss( :, :, 1:4, 1:4);
+Gauss1 = Gauss1 ./ sum(Gauss1(:));

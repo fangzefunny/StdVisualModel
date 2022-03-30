@@ -39,11 +39,12 @@ if strcmp(fig,'figure2')
         for theta2 = 1:nTheta
             subplot( 8, 8, (theta1-1)*nTheta + theta2)
             imshow( squeeze(kernel_w( :, :, theta1, theta2)), []);
+            title( sum(kernel_w( :, :, theta1, theta2),[1,2]))
             axis off
         end
     end
     
-
+  
 elseif strcmp(fig, 'checkOTS')
     
     % Some variables
@@ -56,7 +57,7 @@ elseif strcmp(fig, 'checkOTS')
     colors   = { grating, snake};
     
     % Parameters
-    w        = 1;
+    w        = 680;
     g        = 1;
     n        = 1;
     
