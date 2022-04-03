@@ -380,7 +380,7 @@ switch fig
         
         switch fig
             case 'S3H1.1'
-                CEfolder = { 'E_ori', 'oE_ori'};
+                CEfolder = { 'oE_ori', 'E_ori'};
                 paramsfolder = { 'oCross', 'oCross'};
                 lg = { 'Old filter', 'New filters' };
                 tit = 'Old parameters on new filters and old filters  ';
