@@ -3,17 +3,17 @@ function revisitOTS(fig, ds, roi)
     Function for the supplement document revisitOTS
     ds: dataset, default 1
     roi: region of interest, default 1, v1
-    Inputs: fig, the corresponding figures for the document
+    Inputs: fig, the corresponding figures for the document 
             S means section, H means the hypothesis put forward in the
             very section. 'S2H1' means section 2 hypothesis 1.
             - 'S2H1': compare the new and old fitlers
             - 'S2H2.1': compare the E with new and old filters
             - 'S2H2.2': compare the density effect of S with new and old filters varying w
             - 'S2H3': compare the contrast effect
-            - 'S2H4.0': get the old contrast energy for all target parameters E.
+            - 'S2H4.0': get the old contrast energy for all target parameters E.  
             - 'S2H4': compare the prediction of the old and new filters,
             make sure the 'H4.0' has been run at least once, before making
-            this figure.
+            this figure. 
             - 'S3H1':  check the std of the new filter
               
 %}
@@ -23,7 +23,7 @@ if (nargin < 3), roi = 1; end
 if (nargin < 2), ds = 1; end
 
 % get color
-viz = ColorPalette();
+viz = ColorPalette(); 
 
 switch fig
     
@@ -119,7 +119,7 @@ switch fig
         % dim2: gratings or snakes; 2
         % dim3: contrast level; 5
         %cls = [ 35, 36, 8, 37, 38; 47, 48, 3, 49, 50];
-        % visualize the filters
+         % visualize the filters
         colors = [  viz.Red; viz.Blue; viz.Red.*.7; viz.Blue.*.7];
         switch fig; case 'S2H2.2'; group='den'; case 'S2H3'; group='con'; end
         cls = getDataCls( ds, group) ;
@@ -375,39 +375,30 @@ switch fig
             end
         end
         
-        % ------------------------ WHY NOA IS WORSE -------------------------%
-    case { 'S3H1.1','S3H1.2','S3H2.5'}
-       
-        % variables
-        datasets  = [1, 4];
-        rois      = 1:3;
-        optimizer = 'fmincon';
-        fittime   = 40;
-        target    = 'target';
-        n_stimuli = 50;
+     % ------------------------ WHY NOA IS WORSE -------------------------%
+    case { 'S3H1.1','S3H1.2'}
+        
         switch fig
             case 'S3H1.1'
                 CEfolder = { 'oE_ori', 'E_ori'};
                 paramsfolder = { 'oCross', 'oCross'};
                 lg = { 'Old filter', 'New filters' };
                 tit = 'Old parameters on new filters and old filters  ';
-                model1     = normVarModel( optimizer, fittime);
-                model2     = normVarModel( optimizer, fittime);
-            case 'S3H1.2'
+             case 'S3H1.2'
                 CEfolder = { 'E_ori', 'E_ori'};
                 paramsfolder = { 'oCross', 'Cross'};
                 lg = { 'Old param', 'New param' };
                 tit = 'Old & New parameters on new filters';
-                model1     = normVarModel( optimizer, fittime);
-                model2     = normVarModel( optimizer, fittime);
-            case 'S3H2.5'
-                CEfolder = { 'E_ori', 'E_ori'};
-                paramsfolder = { 'Cross', 'Cross'};
-                lg = { 'NOA', 'STD' };
-                tit = 'NOA & STD on new filters';
-                model1     = normVarModel( optimizer, fittime);
-                model2     = normStdModel( optimizer, fittime);
         end
+        
+          % variables
+        datasets  = [1, 4];
+        rois      = 1:3;
+        optimizer = 'fmincon';
+        fittime   = 40;
+        target    = 'target';
+        model     = normVarModel( optimizer, fittime);
+        n_stimuli = 50;
         
         % prediction matrix, NewOldData x datasets x rois x pred
         BOLD_pred = nan( 2, length(datasets), length(rois), n_stimuli);
@@ -430,13 +421,13 @@ switch fig
                 % get prediction with old params
                 oparams = dataloader( stdnormRootPath, 'param',...
                     target, ds, roi, paramsfolder{1}, 3, 'fmincon');
-                BOLD_pred( 1, ds_idx, roi, target_ind) = model1.predict( model1, E, oparams);
+                BOLD_pred( 1, ds_idx, roi, target_ind) = model.predict( model, E, oparams);
                 % get new prediction
                 E = dataloader( stdnormRootPath, CEfolder{2},...
                     target, ds, roi);
                 params = dataloader( stdnormRootPath, 'param',...
                     target, ds, roi, paramsfolder{2}, 3, 'fmincon');
-                BOLD_pred( 2, ds_idx, roi, target_ind) = model2.predict( model2, E, params);
+                BOLD_pred( 2, ds_idx, roi, target_ind) = model.predict( model, E, params);
                 % load human data
                 data = dataloader( stdnormRootPath, 'BOLD_target',...
                     target, ds, roi);
@@ -482,15 +473,15 @@ switch fig
             end
         end
         sgtitle( tit, 'FontSize', 16)
-        
+     
     case {'S3H2.1','S3H2.2','S3H2.3','S3H2.4'}
         
-        % check the density effect
+         % check the density effect
         % dim1: old or new; 2
         % dim2: gratings or snakes; 2
         % dim3: contrast level; 5
         %cls = [ 35, 36, 8, 37, 38; 47, 48, 3, 49, 50];
-        % visualize the filters
+         % visualize the filters
         colors = [  viz.Red; viz.Blue; viz.Red.*.7; viz.Blue.*.7];
         switch fig; case {'S3H2.1','S3H2.3'}; group='con'; case {'S3H2.2','S3H2.4'}; group='den'; end
         cls = getDataCls( ds, group) ;
@@ -515,18 +506,12 @@ switch fig
             for j=1:size(cls,1)
                 for k=1:size(cls,2)
                     E = E_cls{i,j,k};
-                    switch fig
-                        case {'S3H2.1','S3H2.2'}
-                            Z = var(E);
-                            sum_E(i,j,k) = mean(E(:));
-                            sum_Z(i,j,k) = mean(Z(:));
-                            D = E.^2 ./ ( 1 + w^2 * Z);
-                        case {'S3H2.3','S3H2.4'}
-                            Z = std(E);
-                            sum_E(i,j,k) = mean(E(:));
-                            sum_Z(i,j,k) = mean(Z(:));
-                            D = E ./ ( 1 + w * Z);
-                    end
+                    Z = var(E);
+                    switch fig 
+                        case 
+                    sum_E(i,j,k) = mean(E(:));
+                    sum_Z(i,j,k) = mean(Z(:));
+                    D = E.^2 ./ ( 1 + w^2 * Z);
                     sum_D(i,j,k) = mean(D(:));
                 end
             end
@@ -588,22 +573,15 @@ switch fig
                 for j=1:size(cls,1)
                     for k=1:size(cls,2)
                         E = E_cls{i,j,k};
-                        switch fig
-                            case {'S3H2.1','S3H2.2'}
-                                Z = var(E);
-                                D = E.^2 ./ ( 1 + w^2 * Z);
-                                
-                            case {'S3H2.3','S3H2.4'}
-                                Z = std(E);
-                                D = E ./ ( 1 + w * Z);
-                        end
+                        Z = var(E);
+                        D = E.^2 ./ ( 1 + w^2 * Z);
                         x = g(i) .* mean(D, 1).^n(i);
                         sum_D(i,j,k,wi) = mean(x(:));
                     end
                 end
             end
         end
-        
+       
         x  = sum_D;
         for k=1:length(ws)
             w = ws(k);
@@ -660,36 +638,36 @@ nX = numpix + padsize*2;
 S = dataloader( stdnormRootPath, 'stimuli', 'all', dataset, roi);
 
 if ep
-    epvec = ep;
-    E = nan(nX, nX, nO, length(epvec));
-    oE = nan(nX, nX, nO, length(epvec));
-else
-    epvec = 1:9;
-    E = nan(nX, nX, nO, 9);
-    oE = nan(nX, nX, nO, 9);
+        epvec = ep;
+        E = nan(nX, nX, nO, length(epvec));
+        oE = nan(nX, nX, nO, length(epvec));
+else 
+        epvec = 1:9;
+        E = nan(nX, nX, nO, 9);
+        oE = nan(nX, nX, nO, 9);
 end
-for i=1:length(epvec)
-    iep = epvec(i);
-    s = S( :, :, iep, idx);
-    padstimulus=zeros(nX, nX);
-    padstimulus(padsize+(1:numpix),padsize+(1:numpix))=s;
-    s=padstimulus;
-    
-    % Get filters
-    [ Gabor_c, Gabor_s]=getFilters( 'new', dataset);
-    [ oGabor_c, oGabor_s] = getFilters( 'old', dataset);
-    
-    % Get contrast energy
-    e = squeeze(Icontrast(s, Gabor_c, Gabor_s, ppc, thetavec));
-    oe = squeeze(Icontrast(s, oGabor_c, oGabor_s, ppc, thetavec));
-    
-    % add to the matrix
-    E( :, :, :, i) = e;
-    oE( :, :, :, i) = oe;
-end
+    for i=1:length(epvec)
+        iep = epvec(i);
+        s = S( :, :, iep, idx);
+        padstimulus=zeros(nX, nX);
+        padstimulus(padsize+(1:numpix),padsize+(1:numpix))=s;
+        s=padstimulus;
 
-E = squeeze(E);
-oE = squeeze(oE);
+        % Get filters
+        [ Gabor_c, Gabor_s]=getFilters( 'new', dataset);
+        [ oGabor_c, oGabor_s] = getFilters( 'old', dataset);
+
+        % Get contrast energy
+        e = squeeze(Icontrast(s, Gabor_c, Gabor_s, ppc, thetavec));
+        oe = squeeze(Icontrast(s, oGabor_c, oGabor_s, ppc, thetavec));
+
+        % add to the matrix
+        E( :, :, :, i) = e;
+        oE( :, :, :, i) = oe;
+    end
+    
+    E = squeeze(E);
+    oE = squeeze(oE);
 end
 
 function cls = getDataCls(ds, group )
