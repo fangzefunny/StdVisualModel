@@ -13,8 +13,8 @@ classdef SOCModel < contrastModel
             model = model@contrastModel();
             
             % the parameters here are log params
-            if (nargin < 4), param_pbound  = log([  .5, 1;  1e-2, 2;   .1,.5 ]); end
-            if (nargin < 3), param_bound   = log([ eps, 1;  eps, 50;  eps, 1 ]); end
+            if (nargin < 4), param_pbound  = log([  .5, 1; 1e-2,   2;   .1,  .5]); end
+            if (nargin < 3), param_bound   = [ log(eps), log(1); -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -108,41 +108,7 @@ classdef SOCModel < contrastModel
             y_hat = squeeze(mean(yi_hat, 1));
            
         end
-        
-        % foward model to generate an image 
-        function x_hat = reconstruct(model, E, param )
-
-            if model.receptive_weight ==false
-                height = size(E, 1) ;
-                model = model.disk_weight(model, height);
-            end
-             
-            c = exp(param(1));
-            g = exp(param(2));
-            n = exp(param(3));
-            
-            % x x y x ori x exp x stim --> x x y x exp x stim
-            E = squeeze( mean( E, 3));
-            
-            % d: x x y x exp x stim
-            E_mean = mean( mean(E, 1), 2);
-            v = (E - c * E_mean).^2; 
-            d = bsxfun(@times, v, model.receptive_weight);
-                
-            % sum over orientation, s: exp x stim 
-            x_hat = g .* d.^n;
-
-        end
-
-        function err = recon_error( model, x, param)
-
-
-            x_hat = model.reconstruct( x, param);
-            err2 = (x - x_hat).^2;
-            err  = mean( err2(:));
-
-        end
-            
+                    
         % predict the BOLD response: y_hat = f(x)
         function BOLD_pred = predict( model, E_ori )
             

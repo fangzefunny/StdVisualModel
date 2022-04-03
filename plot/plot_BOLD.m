@@ -17,10 +17,10 @@ if ~exist('plotData', 'var') || isempty (plotData), plotData = true; end
 
 % choose colors 
 dark    = [  52,  73,  94] ./ 255;
-blue    = [  52, 152, 219] ./ 255;
-red     = [ 231,  76,  60] ./ 255;
-yellow  = [ 241, 196,  15] ./ 255;
-green   = [  46, 204, 113] ./ 255;
+blue    = [   9, 132, 227] ./ 255;
+red     = [ 255, 118, 117] ./ 255 .* .8;
+yellow  = [ 253, 203, 110] ./ 255;
+green   = [   0, 184, 148] ./ 255;
 curvy   = [  .4,  .4,  .4] + .1; 
 grating = [  .6,  .6,  .6] + .1; 
 other   = [  .8,  .8,  .8] + .1;

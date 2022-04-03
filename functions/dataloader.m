@@ -18,7 +18,7 @@ switch which_obj
         if exist(load_path, 'file')
             load( load_path, 'BOLD_pred');
             data = BOLD_pred;
-        else 
+        else
             data = [];
         end
         
@@ -26,7 +26,7 @@ switch which_obj
         fname = sprintf('dataset%02d.mat', dataset);
         load_path = fullfile(prevPath, 'Data','fMRIdata', fname );
         load(load_path, 'v_mean');
-        data = v_mean(roi, : ); %matrix: num_roi x num_stim --> vector: num_stimuli 
+        data = v_mean(roi, : ); %matrix: num_roi x num_stim --> vector: num_stimuli
         if strcmp(target,  'target')
             switch dataset
                 case {1}
@@ -41,23 +41,23 @@ switch which_obj
             end
         end
         
-    case 'BOLD_target_error' 
+    case 'BOLD_target_error'
         fname = sprintf('dataset%02d.mat', dataset);
         load_path = fullfile(prevPath, 'Data','fMRIdata', fname );
         load(load_path, 'BOLD_se');
         data = BOLD_se( roi, :);
         if strcmp(target,  'target')
-                    switch dataset
-                        case {1}
-                            stim_idx = [1:10, 35:38, 47:50];
-                            data = data(stim_idx);
-                        case{2}
-                            stim_idx = [1:10, 33:36, 45:48];
-                            data = data(stim_idx);
-                        case{3, 4}
-                            stim_idx = [9:12, 26, 28:39];
-                            data = data(stim_idx);
-                    end
+            switch dataset
+                case {1}
+                    stim_idx = [1:10, 35:38, 47:50];
+                    data = data(stim_idx);
+                case{2}
+                    stim_idx = [1:10, 33:36, 45:48];
+                    data = data(stim_idx);
+                case{3, 4}
+                    stim_idx = [9:12, 26, 28:39];
+                    data = data(stim_idx);
+            end
         end
         
     case 'param'
@@ -73,89 +73,104 @@ switch which_obj
         data  = Rsquare;
         
     case 'Loss_log'
-               
+        
         fname = sprintf('loss_log_data-%01d_roi-%01d_model-%01d.mat', dataset, roi, model );
         path = fullfile(prevPath, 'Data', data_folder, target, optimizer, fname );
         load( path, 'loss_log')
         data  = loss_log;
         
-    case 'E_ori'
+    case {'E_ori', 'oE_ori'}
         fname = sprintf('E_ori_%02d.mat', dataset);
-        path = fullfile(prevPath, 'Data', 'E', fname );
+        switch which_obj
+            case 'E_ori'
+                path = fullfile(prevPath, 'Data', 'E', fname );
+            case 'oE_ori'
+                path = fullfile(prevPath, 'Data', 'oE', fname );
+        end
         load( path, 'E_ori');
         data  = E_ori;
         if strcmp(target,  'target')
-                    switch dataset
-                        case {1}
-                            stim_idx = [1:10, 35:38, 47:50];
-                            data = data(:, :, stim_idx);
-                        case{2}
-                            stim_idx = [1:10, 33:36, 45:48];
-                            data = data(:, :, stim_idx);
-                        case{3, 4}
-                            stim_idx = [9:12, 26, 28:39];
-                            data = data(:, :, stim_idx);
-                    end
+            switch dataset
+                case {1}
+                    stim_idx = [1:10, 35:38, 47:50];
+                    data = data(:, :, stim_idx);
+                case{2}
+                    stim_idx = [1:10, 33:36, 45:48];
+                    data = data(:, :, stim_idx);
+                case{3, 4}
+                    stim_idx = [9:12, 26, 28:39];
+                    data = data(:, :, stim_idx);
+            end
         end
         
-   case 'E_xy'
+    case {'E_xy', 'oE_xy'}
         fname = sprintf('E_xy_%02d.mat', dataset);
-        path = fullfile(prevPath, 'Data', 'E', fname );
+        switch which_obj
+            case 'E_xy'
+                path = fullfile(prevPath, 'Data', 'E', fname );
+            case 'oE_xy'
+                path = fullfile(prevPath, 'Data', 'oE', fname );
+        end
         load( path, 'E_xy');
         data  = E_xy;
         if strcmp(target,  'target')
-                    switch dataset
-                        case {1}
-                            stim_idx = [1:10, 35:38, 47:50];
-                            data = data(:, :, :, :, stim_idx);
-                        case{2}
-                            stim_idx = [1:10, 33:36, 45:48];
-                            data = data(:, :, :, :, stim_idx);
-                        case{3, 4}
-                            stim_idx = [9:12, 26, 28:39];
-                            data = data(:, :, :, :, stim_idx);
-                    end
+            switch dataset
+                case {1}
+                    stim_idx = [1:10, 35:38, 47:50];
+                    data = data(:, :, :, :, stim_idx);
+                case{2}
+                    stim_idx = [1:10, 33:36, 45:48];
+                    data = data(:, :, :, :, stim_idx);
+                case{3, 4}
+                    stim_idx = [9:12, 26, 28:39];
+                    data = data(:, :, :, :, stim_idx);
+            end
         end
         
-    case 'Z'
+    case {'Z_xy', 'oZ_xy'}
         fname = sprintf('Z_%02d.mat', dataset);
-        path = fullfile(prevPath, 'Data', 'E', fname );
+        switch which_obj
+            case 'Z_xy'
+                path = fullfile(prevPath, 'Data', 'E', fname );
+            case 'oZ_xy'
+                path = fullfile(prevPath, 'Data', 'oE', fname );
+        end
         load( path, 'Z');
         data  = Z;
         if strcmp(target,  'target')
-                    switch dataset
-                        case {1}
-                            stim_idx = [1:10, 35:38, 47:50];
-                            data = data(:, :, :, :, stim_idx);
-                        case{2}
-                            stim_idx = [1:10, 33:36, 45:48];
-                            data = data(:, :, :, :, stim_idx);
-                        case{3, 4}
-                            stim_idx = [9:12, 26, 28:39];
-                            data = data(:, :, :, :, stim_idx);
-                    end
+            switch dataset
+                case {1}
+                    stim_idx = [1:10, 35:38, 47:50];
+                    data = data(:, :, :, :, stim_idx);
+                case{2}
+                    stim_idx = [1:10, 33:36, 45:48];
+                    data = data(:, :, :, :, stim_idx);
+                case{3, 4}
+                    stim_idx = [9:12, 26, 28:39];
+                    data = data(:, :, :, :, stim_idx);
+            end
         end
         
-   case 'E_mean'
+    case 'E_mean'
         fname = sprintf('E_mean_%02d.mat', dataset);
         path = fullfile(prevPath, 'Data', 'E', fname );
         load( path, 'E_mean');
         data  = E_mean;
         if strcmp(target,  'target')
-                    switch dataset
-                        case {1}
-                            stim_idx = [1:10, 35:38, 47:50];
-                            data = data(:, :, :, :, stim_idx);
-                        case{2}
-                            stim_idx = [1:10, 33:36, 45:48];
-                            data = data(:, :, :, :, stim_idx);
-                        case{3, 4}
-                            stim_idx = [9:12, 26, 28:39];
-                            data = data(:, :, :, :, stim_idx);
-                    end
+            switch dataset
+                case {1}
+                    stim_idx = [1:10, 35:38, 47:50];
+                    data = data(:, :, :, :, stim_idx);
+                case{2}
+                    stim_idx = [1:10, 33:36, 45:48];
+                    data = data(:, :, :, :, stim_idx);
+                case{3, 4}
+                    stim_idx = [9:12, 26, 28:39];
+                    data = data(:, :, :, :, stim_idx);
+            end
         end
         
-    case 'stimuli' 
+    case 'stimuli'
         fname = sprintf('stimuli-dataset0%1d', dataset);
         path=fullfile(prevPath, 'Data', 'Stimuli', fname);
         load(path, 'stimuli');

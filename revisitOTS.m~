@@ -41,9 +41,8 @@ switch dataset
 end
 ep          = 5;
 Blue        = [   9, 132, 227] / 255;
-Dark        = [  52,  73,  94] ./ 255;
 Green       = [   0, 184, 148] / 255;
-Red         = [ 255, 118, 117] / 255 .* .8;
+Red         = [ 255, 118, 117] / 255;
 Yellow      = [ 253, 203, 110] / 255;
 Grey        = [ .7, .7, .7];
 filter_cpd  = 3; % the images were band-passed at 3 cycles per degree
@@ -331,10 +330,18 @@ switch fig
         xticklabels('')
         hold off
         
-    case 'preOlddata'
+    case 'H4'
         
-        % get target data 
+        % variables
         datasets  = [1, 4];
+        rois      = 1:3;
+        optimizer = 'fmincon';
+        fittime   = 40;
+        target    = 'target';
+        model     = oriSurroundModel( optimizer, fittime);
+        cross_valid = 'cross_valid';
+        data_fold = 'Cross';
+        n_stimuli = 50;
         
         % save address
         save_address = fullfile(stdnormRootPath, 'Data', 'oE');
@@ -378,24 +385,11 @@ switch fig
             clear Z
         end
         
-    case 'H4'
-        
-        % variables
-        datasets  = [1, 4];
-        rois      = 1:3;
-        optimizer = 'fmincon';
-        fittime   = 40;
-        target    = 'target';
-        model     = oriSurroundModel( optimizer, fittime);
-        data_folder = 'Cross';
-        n_stimuli = 50;
-        
         % prediction matrix, NewOldData x datasets x rois x pred
         BOLD_pred = nan( 2, length(datasets), length(rois), n_stimuli);
-        BOLD_data = nan( 2, length(datasets), length(rois), n_stimuli);
+        BOLD_da
         for roi = rois
-            for ds_idx = 1:length(datasets)
-                ds = datasets(ds_idx);
+            for ds = 1:length(datasets)
                 switch ds
                     case 1
                         target_ind = [ 1:10, 35:38, 47:50];
@@ -404,66 +398,42 @@ switch fig
                     case {3, 4}
                         target_ind = [ 9:12,    26, 28:39];
                 end
-                
+               
                 % get old prediction
                 oE = dataloader( stdnormRootPath, 'oE_xy',...
-                    target, ds, roi);
+                    target, dataset, roi);
                 oZ = dataloader( stdnormRootPath, 'oZ_xy',...
-                    target, ds, roi);
+                    target, dataset, roi);
                 params = dataloader( stdnormRootPath, 'param',...
-                    target, ds, roi, data_folder, 5, 'fmincon');
-                BOLD_pred( 1, ds_idx, roi, target_ind) = model.predict( model, oE, oZ, params);
+                    target, dataset, roi);
+                BOLD_pred( 1, ds, roi, target_ind) = model.predict( model, oE, oZ, params);
                 % get new prediction
-                BOLD_pred( 2, ds_idx, roi, target_ind) = dataloader( stdnormRootPath, 'BOLD_pred',...
-                    target, ds, roi, data_folder, 5, 'fmincon');
+                BOLD_pred( 2, ds, roi, target_ind) = dataloader( stdnormRootPath, 'BOLD_pred',...
+                    target, dataset, roi);
                 % load human data
-                data = dataloader( stdnormRootPath, 'BOLD_target',...
-                    target, ds, roi);
-                err  = dataloader( stdnormRootPath, 'BOLD_target_error',...
-                    target, ds, roi );
-                BOLD_data( 1, ds_idx, roi, target_ind) = data;
-                BOLD_data( 2, ds_idx, roi, target_ind) = err;
+                data = dataloader( stdnormRootPath, 'BOLD_pred',...
+                    target, dataset, roi);
+                BOLD_pred( 3, ds, roi, target_ind) = data;
             end
         end
-        clear E_xy
-        clear Z
         
         figure()
         for roi = rois
-            for ds_idx = 1:length(datasets)
-                ds = datasets(ds_idx);
-                i = (ds_idx-1)*(length(rois)+1)+roi;
-                subplot( length(datasets), length(rois)+1, i)
+            for ds = datasets
+                i = (ds-1)*(length(rois)+1)+roi;
+                subplot( length(datasets), length(rois), i)
                 if (ds==1); len=50; else; len=39; end
-                % get data for prediction
-                pred = BOLD_pred( :, ds_idx, roi, 1:len);
-                data = BOLD_data( 1, ds_idx, roi, 1:len);
-                err  = BOLD_data( 2, ds_idx, roi, 1:len);
-                % generate plot
-                plot_BOLD( pred, data, err, ds, [1,4], target, true);
-            if i == length(rois)
-                subplot(length(datasets), length(rois)+1, i+1)
-                plot( 1:2,[nan, nan], '-o',... 
-                    'MarkerSize', 4.5,...
-                    'MarkerEdgeColor', Dark, ...
-                    'MarkerFaceColor', Dark,...
-                    'LineWidth', 1.5,...
-                    'Color', Dark);
-                hold on
-                plot( 1:2,[nan, nan], '-o',... 
-                    'MarkerSize', 4.5,...
-                    'MarkerEdgeColor', Blue, ...
-                    'MarkerFaceColor', Blue,...
-                    'LineWidth', 1.5,...
-                    'Color', Blue);
-               legend({'OLD', 'NEW'}, 'Location', 'East', 'FontSize', 13)
-               axis( 'off' )
-               hold off 
-            end
+                % get data for prediction 
+                pred  = BOLD_data( 2:3, ds, roi, 1:len);
+                target = BOLD_data( 3, ds, roi, 1:len);
+                %
+                plot_BOLD(pred,target, 
+                
             end
         end
+        
+        
 end
-
 
     function [E, oE]= idx2CE( idx)
         
@@ -502,76 +472,75 @@ end
             oE( :, :, :, iep) = oe;
         end
     end
-end
 
-function E = cal_oE( data, labelVec, mode, which_data)
-
-filter_cpd  = 3; % the images were band-passed at 3 cycles per degree
-fovs        = 12.5 * [1, 3/2, 1, 1]; % deg (the second data set had a larger field of view than the others)
-fov         = fovs(which_data);
-numpix      = size(data,1);
-pixperdeg   = numpix / fov;
-ppc         = pixperdeg/filter_cpd; % pixels per cycle
-support     = 6; % cycles per filter
-
-o = linspace(0,pi, 9);
-thetavec = o(1:end-1);
-nO=length(thetavec);
-
-[ Gabor_c, Gabor_s]=makeOldFilter(ppc, thetavec, support);
-
-padsize = ppc * support;
-sz = numpix + padsize*2;
-
-switch mode
-    case 'orientation'
-        E = zeros(nO, 9, length(labelVec));
-    case 'space'
-        E = nan( sz, sz, nO, 9, length( labelVec ) );
-end
-
-idx = round((1:10)/10*length(labelVec));
-
-fprintf('\n');
-for ii= 1:length(labelVec)
-    if ismember(ii, idx), fprintf('.'); end
-    
-    label = labelVec(ii);
-    
-    for ep = 1 : 9 % Each have 9 examples.
+    function E = cal_oE( data, labelVec, mode, which_data)
         
-        stimulus = data( : , : , ep , label );
+        filter_cpd  = 3; % the images were band-passed at 3 cycles per degree
+        fovs        = 12.5 * [1, 3/2, 1, 1]; % deg (the second data set had a larger field of view than the others)
+        fov         = fovs(which_data);
+        numpix      = size(data,1);
+        pixperdeg   = numpix / fov;
+        ppc         = pixperdeg/filter_cpd; % pixels per cycle
+        support     = 6; % cycles per filter
         
-        %Pad the stimulus to avoid edge effect
-        padstimulus=zeros(numpix + padsize*2, numpix + padsize*2);
-        padstimulus(padsize+(1:numpix),padsize+(1:numpix))=stimulus;
-        stimulus=padstimulus;
+        o = linspace(0,pi, 9);
+        thetavec = o(1:end-1);
+        nO=length(thetavec);
         
-        % Filtering and rectification to get the CONTRAST of the image
-        con = squeeze(Icontrast(stimulus, Gabor_c, Gabor_s, ppc, thetavec)); %3 - D x , y , theta
+        [ Gabor_c, Gabor_s]=makeOldFilter(ppc, thetavec, support);
         
-        if strcmpi( mode, 'orientation' )
-            
-            % Create a disk-like weight to prevent edge effect
-            w = gen_disk( size( con ,  1 ));  %3 - D x , y , theta
-            
-            % Calculate E_ori for orientation-type model
-            % Sum over space
-            E_ori = squeeze(mean(mean(w.*con , 2 ), 1)); % 1- D theta
-            
-            % Store the data into a matrix
-            E( : ,  ep , ii ) = E_ori';
-            
-        elseif strcmp( mode, 'space' )
-            % Calculate E_space for space-type model
-            % Assign the data into a matrix
-            E( : , : , : , ep , ii ) = con;
-            
+        padsize = ppc * support;
+        sz = numpix + padsize*2;
+        
+        switch mode
+            case 'orientation'
+                E = zeros(nO, 9, length(labelVec));
+            case 'space'
+                E = nan( sz, sz, nO, 9, length( labelVec ) );
         end
+       
+        idx = round((1:10)/10*length(labelVec));
+        
+        fprintf('\n');
+        for ii= 1:length(labelVec)
+            if ismember(ii, idx), fprintf('.'); end
+            
+            label = labelVec(ii);
+            
+            for ep = 1 : 9 % Each have 9 examples.
+                
+                stimulus = data( : , : , ep , label );
+                
+                %Pad the stimulus to avoid edge effect
+                padstimulus=zeros(numpix + padsize*2, numpix + padsize*2);
+                padstimulus(padsize+(1:numpix),padsize+(1:numpix))=stimulus;
+                stimulus=padstimulus;
+                
+                % Filtering and rectification to get the CONTRAST of the image
+                con = squeeze(Icontrast(stimulus, Gabor_c, Gabor_s, ppc, thetavec)); %3 - D x , y , theta
+                
+                if strcmpi( mode, 'orientation' )
+                    
+                    % Create a disk-like weight to prevent edge effect
+                    w = gen_disk( size( con ,  1 ));  %3 - D x , y , theta
+                    
+                    % Calculate E_ori for orientation-type model
+                    % Sum over space
+                    E_ori = squeeze(mean(mean(w.*con , 2 ), 1)); % 1- D theta
+                    
+                    % Store the data into a matrix
+                    E( : ,  ep , ii ) = E_ori';
+                    
+                elseif strcmp( mode, 'space' )
+                    % Calculate E_space for space-type model
+                    % Assign the data into a matrix
+                    E( : , : , : , ep , ii ) = con;
+                    
+                end
+            end
+        end
+        fprintf('\n');
+        
+        
     end
-end
-fprintf('\n');
-
-
-end
 

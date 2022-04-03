@@ -19,8 +19,10 @@ classdef contrastModel
         % init the model
         function model = contrastModel( optimizer, fittime, param_bound, param_pbound )
             
-            if (nargin < 4), param_pbound = [ 1,  10;  .1, .5 ]; end
-            if (nargin < 3), param_bound  = [ -6, 5;  -6,   1  ]; end
+            % pbound is possible bound, used to init the parameters
+            % bound is the real bound of the parameters
+            if (nargin < 4), param_pbound = log([    1,  10;   .1,  .5]); end
+            if (nargin < 3), param_bound  =     [ -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -68,53 +70,16 @@ classdef contrastModel
             y_hat = squeeze(mean(yi_hat, 2))';
    
         end
-
-        % foward model to generate an image 
-        function x_hat = reconstruct(model, E_xy, param)
-
-            % set param
-            g = exp(param(1));
-            n = exp(param(2));
-            
-            % d: ori x exp x stim
-            d = squeeze(mean(E_xy,3));
-            
-            % sum over orientation, s: exp x stim 
-            x_hat = g .* d.^n;
-
-        end
-
-        function err = recon_err( model, x, E, params)
-
-            x_hat = model.reconstruct( model, E, params);
-            mean(x(:))
-            nX = size(E,1);
-            nS = size(E,5);
-            %pad the stimuli
-            pad_x = zeros(nX, nX, 9, nS);
-            nP = (nX - size(x,1))/2;
-            pad_x( nP+1:nX-nP, nP+1:nX-nP, :, :) = x( :, :, :, :);
-            err2 = (pad_x - x_hat).^2;
-            err  = mean( err2(1:3));
-
-        end
-            
-        % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_ori )
-            
-            BOLD_pred = model.forward(model, E_ori, model.param );
-            
-        end
         
         % measure the goodness of 
-        function Rsquare = metric( BOLD_pred, BOLD_target )
+        function Rsquare = metric( BOLD_pred, BOLD_target)
             
             Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
             
         end
         
         % measure the mse 
-        function loss = rmse( BOLD_pred, BOLD_target )
+        function loss = rmse( BOLD_pred, BOLD_target)
             
             loss = double(sqrt(mean((BOLD_pred- BOLD_target).^2)));
             
@@ -122,13 +87,13 @@ classdef contrastModel
         
         
         % loss function with sum sqaure error: sum( y - y_hat ).^2
-        function sse = loss_fn(param, model, E_ori, y_target )
+        function sse = loss_fn(param, model, E_ori, y_target)
             
             % predict y_hat: 1 x stim 
-            y_hat = model.forward(model, E_ori, param );
+            y_hat = model.forward( model, E_ori, param);
             
             % square error
-            square_error = (y_target - y_hat).^2;
+            square_error = ( y_target - y_hat).^2;
             
             % sse
             sse = double(mean(square_error));
@@ -144,10 +109,10 @@ classdef contrastModel
             opts.Display = verbose;
             
             % set up the bound
-            lb  = model.param_bound( :, 1 );
-            ub  = model.param_bound( :, 2 );
-            plb = model.param_pbound( :, 1 );
-            pub = model.param_pbound( :, 2 );
+            lb  = model.param_bound( :, 1);
+            ub  = model.param_bound( :, 2);
+            plb = model.param_pbound( :, 1);
+            pub = model.param_pbound( :, 2);
             
             % init param
             x0_set = ( plb + ( pub - plb ) .* rand( model.num_param, model.fittime ) )';
@@ -164,7 +129,7 @@ classdef contrastModel
                     case 'bads'
                         [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], [], [], [], opts);
+                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
                 fprintf('   fit: %d, loss: %.4f \n   params:', ii, sse(ii)) 
@@ -176,8 +141,30 @@ classdef contrastModel
             trial = find( sse == loss );
             param = x( trial(1), : ); 
             loss_history = sse;
+           
+        end
+        
+        % Predict the BOLD response: y_hat = f(x)
+        function BOLD_hat = predict( model, E, params, if_cross)
             
+            if (nargin < 3), if_cross='cross_valid'; end
             
+            switch if_cross
+            
+                case 'one'
+                    BOLD_hat = model.forward(model, E, params);
+                    
+                case 'cross_valid'
+                    stim_dim = size( E, length(size(E)));
+                    stim_ind = 1:stim_dim;
+                    BOLD_hat = nan( length(size(E)), 1);
+                    % predict the BOLD value with given param
+                    for idx = stim_ind
+                        param_test = params( idx, :);
+                        E_test = E( :, :, idx);
+                        BOLD_hat(idx) = model.forward( model, E_test, param_test);
+                    end 
+            end
         end
         
         % fit the data
@@ -203,7 +190,6 @@ classdef contrastModel
                     
                 case 'cross_valid'
                  
-                    % achieve stim vector
                     % achieve stim vector
                     last_idx = length(size( E_ori ));
                     stim_dim = size( E_ori, last_idx ); 
@@ -252,7 +238,6 @@ classdef contrastModel
                     model  = model.fixparameters( model, params_boot );
             end
             
-                      
         end
                 
     end
