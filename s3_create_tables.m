@@ -3,7 +3,7 @@ if ~exist('doCross', 'var'), doCross = false; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
 
 fittime          = [];         % how manoy initialization. value space: Integer
-choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
+choose_model     = 'more';      % choose some preset data  ('all' or 'noOri');
 error_bar        = false;
 
 switch doCross
@@ -19,13 +19,14 @@ switch doCross
 end
 
 %% define model name 
-model_name = { 'CE', 'SOC', 'OTS', 'NOA'};
+model_name = { 'CE', 'SOC', 'OTS', 'NOA', 'STD'};
 
 % define param name
 param_name =  { 'CE: g', 'CE: n',  ...
                                     'SOC: c', 'SOC: g', 'SOC: n', ...
                                     'OTS: w', 'OTS: g', 'OTS: n',...
-                                    'NOA: w', 'NOA: g', 'NOA: n'};
+                                    'NOA: w', 'NOA: g', 'NOA: n',...
+                                    'STD: w', 'STD: g', 'STD: n'};
 
 % save address
 save_address = fullfile( stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
@@ -38,7 +39,7 @@ T  = chooseData( choose_model, 'fmincon', fittime );
 
 % obtain some features of the storages
 nummodels   = length(unique(T.modelNum));
-model_vector = [ 1, 4, 5, 3];
+model_vector = [ 1, 4, 5, 3, 2];
 numrois     = length(unique(T.roiNum));
 numdatasets = length(unique(T.dataset));
 numstimuli = 50;

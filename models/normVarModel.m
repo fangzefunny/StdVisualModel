@@ -36,9 +36,7 @@ classdef normVarModel < contrastModel
         end
            
     end
-           
-    
-           
+          
     methods ( Static = true )
         
         % fix parameters
@@ -71,35 +69,12 @@ classdef normVarModel < contrastModel
             y_hat = squeeze(mean(yi_hat, 2))';
            
         end
-
-        % foward model to generate an image 
-        function x_hat = reconstruct(model, x, param)
-
-            w = exp(param(1));
-            g = exp(param(2));
-            n = exp(param(3));
-            
-            % d: ori x exp x stim
-            d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 
-            d = squeeze(mean(d, 3));
-                
-            % sum over orientation, s: exp x stim 
-            x_hat = g .* d.^n;
-
-        end
-
-        function err = recon_err( model, x, E, params)
-
-            % call subclass
-            err = recon_err@contrastModel( model, x, E, params);
-
-        end
             
         % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_ori )
-            
+        function BOLD_pred = predict( model, E_ori , params, if_cross)
+            if (nargin < 4), if_cross='cross_valid'; end
             % call subclass
-            BOLD_pred = predict@contrastModel( model, E_ori);
+            BOLD_pred = predict@contrastModel( model, E_ori, params, if_cross);
             
         end
         

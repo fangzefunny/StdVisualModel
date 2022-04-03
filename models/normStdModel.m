@@ -13,7 +13,7 @@ classdef normStdModel < contrastModel
             model = model@contrastModel();
          
             if (nargin < 4), param_pbound = log([   .1,  10;    1,  10;  .1,   .5]); end
-            if (nargin < 3), param_bound  =     [ -inf, inf; -inf, inf; -inf, inf]; end
+            if (nargin < 3), param_bound  =          [ -inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -111,12 +111,12 @@ classdef normStdModel < contrastModel
         end
         
         % fcross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid )
+        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid, save_info )
             
             if (nargin < 5), cross_valid = 'one'; end
            
             % call subclass
-            [BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid );
+            [BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid, save_info );
             
         end
             

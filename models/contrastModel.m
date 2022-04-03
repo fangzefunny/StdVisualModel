@@ -147,7 +147,7 @@ classdef contrastModel
         % Predict the BOLD response: y_hat = f(x)
         function BOLD_hat = predict( model, E, params, if_cross)
             
-            if (nargin < 3), if_cross='cross_valid'; end
+            if (nargin < 4), if_cross='cross_valid'; end
             
             switch if_cross
             
@@ -157,10 +157,10 @@ classdef contrastModel
                 case 'cross_valid'
                     stim_dim = size( E, length(size(E)));
                     stim_ind = 1:stim_dim;
-                    BOLD_hat = nan( length(size(E)), 1);
+                    BOLD_hat = nan( size( E, length(size(E))), 1);
                     % predict the BOLD value with given param
                     for idx = stim_ind
-                        param_test = params( idx, :);
+                        param_test = params( :, idx);
                         E_test = E( :, :, idx);
                         BOLD_hat(idx) = model.forward( model, E_test, param_test);
                     end 
