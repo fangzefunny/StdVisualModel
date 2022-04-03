@@ -1,4 +1,4 @@
-function [] = plot_BOLD(BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target)
+function [] = plot_BOLD(BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target, plotData)
 
 %{
 Inputs:
@@ -13,12 +13,14 @@ Ouputs:
     figure
 %}
 
+if ~exist('plotData', 'var') || isempty (plotData), plotData = true; end
+
 % choose colors 
 dark    = [  52,  73,  94] ./ 255;
-blue    = [  52, 152, 219] ./ 255;
-red     = [ 231,  76,  60] ./ 255;
-yellow  = [ 241, 196,  15] ./ 255;
-green   = [  46, 204, 113] ./ 255;
+blue    = [   9, 132, 227] ./ 255;
+red     = [ 255, 118, 117] ./ 255 .* .8;
+yellow  = [ 253, 203, 110] ./ 255;
+green   = [   0, 184, 148] ./ 255;
 curvy   = [  .4,  .4,  .4] + .1; 
 grating = [  .6,  .6,  .6] + .1; 
 other   = [  .8,  .8,  .8] + .1;
@@ -52,7 +54,7 @@ end
 % select the visualize families using the 
 % supplementary table and filter the target data
 T = readtable( fullfile(stdnormRootPath, 'Tables/SupplememtaryTable3.csv'));
-T = T( find(contains(T.Dataset,sprintf('DS%d',dataset))), :);
+T = T( contains(T.Dataset,sprintf('DS%d',dataset)), :);
 nrows = size(T,1);
 % the first 4th rows are our targets
 if strcmp( target, 'target')
@@ -111,6 +113,7 @@ hold on
 for i = 1:nrows
 
     % show BOLD target 
+    if plotData
     bar( materials.x{i}, materials.y_bar{i},... 
         'Facecolor', materials.color{i},... 
         'EdgeColor', materials.color{i});
@@ -119,6 +122,7 @@ for i = 1:nrows
         materials.y_err{i}, materials.y_err{i},...
         'LineStyle', 'none',...
         'Color', [ .5, .5, .5]);
+    end
     % loop to plot all model predictions
     for j = 1:n_models
         col = col_vector{j};

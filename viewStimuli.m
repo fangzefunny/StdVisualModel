@@ -8,7 +8,7 @@ function [] = viewStimuli( data_set, pattern, variation)
             Note data set should be a int, 
                  pattern should be a uppercase string,
                  vairation should be a lowercase string.
-        
+        pw
         2. If only data set is input: it displays all stimuli families 
         in the selected data set. 
         e.g. viewStimuli(1)

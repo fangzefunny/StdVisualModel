@@ -12,8 +12,8 @@ classdef normStdModel < contrastModel
             
             model = model@contrastModel();
          
-            if (nargin < 4), param_pbound = [ .1, 4; 1,  10;  .1, .5 ]; end
-            if (nargin < 3), param_bound  = [ 0, 10; 0, 100; 0,   1  ]; end
+            if (nargin < 4), param_pbound = log([   .1,  10;    1,  10;  .1,   .5]); end
+            if (nargin < 3), param_bound  =     [ -inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -68,28 +68,6 @@ classdef normStdModel < contrastModel
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';
            
-        end
-
-        % foward model to generate an image 
-        function x_hat = reconstruct(model, x, param)
-
-            w = exp(param(1));
-            g = exp(param(2));
-            n = exp(param(3));
-            
-            % d: ori x exp x stim
-            d = x ./ (1 + w .* std(x, 1) ); 
-            
-            % sum over orientation, s: exp x stim 
-            x_hat = g .* d.^n;
-
-        end
-            
-        function err = recon_err( model, x, E, params)
-
-            % call subclass
-            err = recon_err@contrastModel( model, x, E, params);
-
         end
 
         % predict the BOLD response: y_hat = f(x)

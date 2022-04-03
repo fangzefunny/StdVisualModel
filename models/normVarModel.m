@@ -8,12 +8,12 @@ classdef normVarModel < contrastModel
     methods
         
         % init the model
-        function model = normVarModel( optimizer, fittime, param_bound, param_pbound )
+        function model = normVarModel( optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
            
-            if (nargin < 4), param_pbound = [ .1, 8; 1,  10;  .1, .5 ]; end
-            if (nargin < 3), param_bound  = [ -6, 6; -6, 6; -6,  2  ]; end
+            if (nargin < 4), param_pbound = log([   .1,  10;    1,  10;  .1,   .5]); end
+            if (nargin < 3), param_bound  =     [ -inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             

@@ -1,5 +1,5 @@
 
-function [] = s4_visualize( fig)
+function [] = s4_visualize( fig, plotData)
 %{
     A function used to generate figures in the paper.
     Replace the fig with any figure index (as str) you see in the paper.
@@ -8,6 +8,7 @@ function [] = s4_visualize( fig)
     although... we do not have figure 1...
 %}
 
+if ~exist('plotData', 'var') || isempty(plotData), plotData = true; end
 if strcmp(fig, 'thumbnails')
     
     set(0,'DefaultFigureVisible', 'off')
@@ -39,8 +40,78 @@ if strcmp(fig,'figure2')
         for theta2 = 1:nTheta
             subplot( 8, 8, (theta1-1)*nTheta + theta2)
             imshow( squeeze(kernel_w( :, :, theta1, theta2)), []);
+            title( sum(kernel_w( :, :, theta1, theta2),[1,2]))
             axis off
         end
+    end
+    
+  
+elseif strcmp(fig, 'checkOTS')
+    
+    % Some variables
+    dataset  = 1;
+    labelVec = 1:50;
+    roi      = 1;
+    ep       = 5;
+    snake    = [ .4, .4, .4] + .1;
+    grating  = [ .6, .6, .6] + .1;
+    colors   = { grating, snake};
+    
+    % Parameters
+    w        = 680;
+    g        = 1;
+    n        = 1;
+    
+    % Get model prediction
+    % get stimulus: S
+    % x x y x exp x stim --> x x y x stim
+    S = dataloader( stdnormRootPath, 'stimuli', 'all', dataset, roi);
+    S = squeeze( S( :, :, ep, :));
+    % get numerator: E
+    E = dataloader( stdnormRootPath, 'E_xy', 'all', dataset, roi);
+    E_viz = squeeze( mean(mean(E( :, :, :, ep, :),2),1)); % orixstim
+    % get denominator: Z
+    Z = cal_Z( E, labelVec);
+    % get normalized energy
+    % x x y x ori x exp x stim --> x x y x ori x stim
+    d = E ./ ( 1 + w * Z); 
+    v = squeeze( d( :, :, :, ep, :));
+    v = g .* v .^n;
+    
+    % Viualization: understand the OTS using figure 10
+    % x x y x ori x stim --> ori x stim
+    v_viz = squeeze( mean( mean( v, 2), 1));
+    % gratings-snakes vector
+    stim_ind = [ 8, 3];
+    for i = 1:2 
+        % stim index 
+        stim_idx = stim_ind(i);
+        % show the stimuli 
+        subplot( 2, 3, (i-1)*3 + 1)
+        imshow( S( :, :, stim_idx), [-.1, .1]);
+        axis off
+        % visualize E: contrast energy - ori 
+        subplot( 2, 3, (i-1)*3 + 2)
+        e = E_viz( :, stim_idx);
+        bar( e, 'FaceColor', colors{i},...
+            'EdgeColor', colors{i});
+        set(gca,'xtick',[])
+        ylim( [ 0, .3])
+        sum_txt = sprintf( 'sum=%.2f', sum(e));
+        text( .1, .28, sum_txt)
+        var_txt = sprintf( 'var=%.6f', var(e));
+        text( .1, .25, var_txt)
+        box off
+        % visualize d: normalized energy - ori 
+        subplot( 2, 3, (i-1)*3 + 3)
+        d = v_viz( :, stim_idx);
+        bar( d, 'FaceColor', colors{i},...
+            'EdgeColor', colors{i});
+        set(gca,'xtick',[])
+        ylim( [ 0, .3])
+        sum_txt = sprintf( 'sum=%.2f', sum(d));
+        text( .1, .28, sum_txt)
+        box off
     end
     
 elseif strcmp(fig, 'figure3.1')
@@ -384,7 +455,7 @@ else
                 % subplot dataset, roi, idx
                 idx = (data_idx-1)*(numrois+1) + roi;
                 subplot( numdatasets, numrois+1, idx)
-                plot_BOLD( target_preds, BOLD_data, BOLD_err, dataset, model_ind, target);
+                plot_BOLD( target_preds, BOLD_data, BOLD_err, dataset, model_ind, target, plotData);
                 
                 % display title
                 show_title = sprintf( 'V%d', roi);
@@ -431,7 +502,7 @@ else
                 subplot( numrois+1, 1, roi)
                 
                 % if we add model prediction
-                plot_BOLD( BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target)
+                plot_BOLD( BOLD_preds, BOLD_data, BOLD_err, dataset, model_ind, target, plotData)
                 
                 % display title
                 show_title = sprintf( 'V%d', roi);

@@ -110,17 +110,16 @@ switch quick_choice
     case {'con'}
         model_idx = [1];
     case {'all', 'All' }
-        model_idx = [ 1, 4, 5, 3];
+        model_idx = [ 1, 3, 4, 5];
     case 'orientation'
         model_idx = [ 1, 3];
     case 'noOri'
         model_idx = [ 1, 3, 4];
     case {'SOC', 'soc'}
         model_idx = [ 4];
-    case { 'oriSurround', 'OTS'}
-        datasets = [ 1, 2, 3, 4];
+    case {'OTS'}
         model_idx = [ 5];
-    case 'noVar'
+    case 'noNOA'
         model_idx = [1, 4, 5];
     case 'NOA'
         model_idx = [3];
