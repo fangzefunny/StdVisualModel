@@ -12,8 +12,8 @@ classdef normStdModel < contrastModel
             
             model = model@contrastModel();
          
-            if (nargin < 4), param_pbound = log([   .1,  10;    1,  10;  .1,   .5]); end
-            if (nargin < 3), param_bound  =          [ -inf, inf; -inf, inf; -inf, inf]; end
+            if (nargin < 4), param_pbound = [   .1,  10;    1,  10; -20,  20]; end
+            if (nargin < 3), param_bound  = [ -inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -50,11 +50,10 @@ classdef normStdModel < contrastModel
         end
         
         % function: f()
-        function y_hat = forward( model, x, param )
-             
-            w = exp(param(1));
-            g = exp(param(2));
-            n = exp(param(3));
+        function y_hat = forward( model, x, param)
+            
+            % get the parameters
+            [w, g, n] = model.get_param( model, param);
             
             % d: ori x exp x stim
             d = x ./ (1 + w .* std(x, 1) ); 
@@ -70,11 +69,19 @@ classdef normStdModel < contrastModel
            
         end
 
+        % print the parameters
+        function [ w, g, n] = get_param(model, param)
+            % set param
+            w = param(1);
+            g = param(2);
+            n = Sigmoid(param(3));
+        end
+
         % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_ori )
-            
+        function BOLD_pred = predict( model, E_ori , params, if_cross)
+            if (nargin < 4), if_cross='cross_valid'; end
             % call subclass
-            BOLD_pred = predict@contrastModel( model, E_ori);
+            BOLD_pred = predict@contrastModel( model, E_ori, params, if_cross);
             
         end
         

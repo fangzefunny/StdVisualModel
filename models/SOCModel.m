@@ -13,8 +13,8 @@ classdef SOCModel < contrastModel
             model = model@contrastModel();
             
             % the parameters here are log params
-            if (nargin < 4), param_pbound  = log([  .5, 1; 1e-2,   2;   .1,  .5]); end
-            if (nargin < 3), param_bound   = [ log(eps), log(1); -inf, inf; -inf, inf]; end
+            if (nargin < 4), param_pbound  = [   .5,   1; 1e-2,   2;  -20,  20]; end
+            if (nargin < 3), param_bound   = [ -inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -81,9 +81,8 @@ classdef SOCModel < contrastModel
                 model = model.disk_weight(model, height);
             end
              
-            c = exp(param(1));
-            g = exp(param(2));
-            n = exp(param(3));
+            % get the parameters
+            [c, g, n] = model.get_param( model, param);
             
             %fprintf('c:%5.4f\tg:%5.4f\tn:%5.4f\n',c,g,n);
             
@@ -107,6 +106,14 @@ classdef SOCModel < contrastModel
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));
            
+        end
+
+        % print the parameters
+        function [ c, g, n] = get_param(model, param)
+            % set param
+            c = Sigmoid(param(1));
+            g = param(2);
+            n = Sigmoid(param(3));
         end
                     
         % predict the BOLD response: y_hat = f(x)

@@ -21,8 +21,8 @@ classdef contrastModel
             
             % pbound is possible bound, used to init the parameters
             % bound is the real bound of the parameters
-            if (nargin < 4), param_pbound = log([    1,  10;   .1,  .5]); end
-            if (nargin < 3), param_bound  =     [ -inf, inf; -inf, inf]; end
+            if (nargin < 4), param_pbound = [    1,  10;  -20,  20]; end
+            if (nargin < 3), param_bound  = [ -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -54,8 +54,8 @@ classdef contrastModel
         function y_hat = forward(model, x, param )
             
             % set param
-            g = exp(param(1));
-            n = exp(param(2));
+            % get the parameters
+            [g,n] = model.get_param(model, param);
             
             % d: ori x exp x stim
             d = x;
@@ -71,6 +71,13 @@ classdef contrastModel
    
         end
         
+        % print the parameters
+        function [g,n] = get_param(model, param)
+            % set param
+            g = param(1);
+            n = Sigmoid(param(2));
+        end
+
         % measure the goodness of 
         function Rsquare = metric( BOLD_pred, BOLD_target)
             

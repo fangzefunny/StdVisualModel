@@ -12,8 +12,8 @@ classdef normVarModel < contrastModel
             
             model = model@contrastModel();
            
-            if (nargin < 4), param_pbound = log([   .1,  10;    1,  10;  .1,   .5]); end
-            if (nargin < 3), param_bound  =     [ -inf, inf; -inf, inf; -inf, inf]; end
+            if (nargin < 4), param_pbound = [   .1,  10;    1,  10; -20,  20]; end
+            if (nargin < 3), param_bound  = [ -inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -52,9 +52,8 @@ classdef normVarModel < contrastModel
         % function: f()
         function y_hat = forward( model, x, param )
              
-            w = exp(param(1));
-            g = exp(param(2));
-            n = exp(param(3));
+            % get the parameters
+            [w, g, n] = model.get_param( model, param);
             
             % d: ori x exp x stim
             d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 
@@ -76,6 +75,14 @@ classdef normVarModel < contrastModel
             % call subclass
             BOLD_pred = predict@contrastModel( model, E_ori, params, if_cross);
             
+        end
+
+        % print the parameters
+        function [ w, g, n]= get_param( model, param)
+            % set param
+            w = param(1);
+            g = param(2);
+            n = Sigmoid(param(3));
         end
         
         % measure the goodness of 

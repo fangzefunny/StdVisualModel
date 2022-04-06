@@ -3,6 +3,7 @@
 add_path()
 
 function []=add_path()
+    addpath( genpath( fullfile( stdnormRootPath, 'analyses' )))
     addpath( genpath( fullfile( stdnormRootPath, 'functions' )))
     addpath( genpath( fullfile( stdnormRootPath, 'models' )))
     addpath( genpath( fullfile( stdnormRootPath, 'plot' )))

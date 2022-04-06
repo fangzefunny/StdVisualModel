@@ -42,6 +42,7 @@ nummodels   = length(unique(T.modelNum));
 model_vector = [ 1, 4, 5, 3, 2];
 numrois     = length(unique(T.roiNum));
 numdatasets = length(unique(T.dataset));
+modelLoader = T.modelLoader;
 numstimuli = 50;
 
 %% create Rsquare tables: 3 (roi) x ( model x dataset )
@@ -102,8 +103,9 @@ for roi = 1: numrois
     parammean= NaN(numparams,numdatasets);
     
     for idx = 1:nummodels
-        % obain model index
+        % obain model index and model 
         model_idx = model_vector(idx);
+        model = modelLoader{model_idx};
         
         for dataset = 1:numdatasets
             % desgin index 
@@ -111,12 +113,8 @@ for roi = 1: numrois
             row_idx = unique( max( 1, row_idx_array-1) );
             col_idx = (dataset-1) * 2 + 1;
             % load value  
-            if model_idx < 6
-                param = exp(dataloader( stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
-            else
-                param = (dataloader( stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
-            end
-            
+            param = model.get_param(dataloader( stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
+                    
             % assign value 
             if strcmp( cross_valid, 'one')
                 parammean( row_idx, col_idx ) = param';

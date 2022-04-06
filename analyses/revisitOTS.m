@@ -391,6 +391,7 @@ switch fig
                 paramsfolder = { 'oCross', 'oCross'};
                 lg = { 'Old filter', 'New filters' };
                 tit = 'Old parameters on new filters and old filters  ';
+                model_ind  = [ 3, 3];
                 model1     = normVarModel( optimizer, fittime);
                 model2     = normVarModel( optimizer, fittime);
             case 'S3H1.2'
@@ -398,6 +399,7 @@ switch fig
                 paramsfolder = { 'oCross', 'Cross'};
                 lg = { 'Old param', 'New param' };
                 tit = 'Old & New parameters on new filters';
+                model_ind  = [ 3, 3];
                 model1     = normVarModel( optimizer, fittime);
                 model2     = normVarModel( optimizer, fittime);
             case 'S3H2.5'
@@ -405,6 +407,7 @@ switch fig
                 paramsfolder = { 'Cross', 'Cross'};
                 lg = { 'NOA', 'STD' };
                 tit = 'NOA & STD on new filters';
+                model_ind  = [ 3, 2];
                 model1     = normVarModel( optimizer, fittime);
                 model2     = normStdModel( optimizer, fittime);
         end
@@ -429,13 +432,13 @@ switch fig
                     target, ds, roi);
                 % get prediction with old params
                 oparams = dataloader( stdnormRootPath, 'param',...
-                    target, ds, roi, paramsfolder{1}, 3, 'fmincon');
+                    target, ds, roi, paramsfolder{1}, model_ind(1), 'fmincon');
                 BOLD_pred( 1, ds_idx, roi, target_ind) = model1.predict( model1, E, oparams);
                 % get new prediction
                 E = dataloader( stdnormRootPath, CEfolder{2},...
                     target, ds, roi);
                 params = dataloader( stdnormRootPath, 'param',...
-                    target, ds, roi, paramsfolder{2}, 3, 'fmincon');
+                    target, ds, roi, paramsfolder{2}, model_ind(2), 'fmincon');
                 BOLD_pred( 2, ds_idx, roi, target_ind) = model2.predict( model2, E, params);
                 % load human data
                 data = dataloader( stdnormRootPath, 'BOLD_target',...
