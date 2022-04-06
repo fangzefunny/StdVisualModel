@@ -108,7 +108,6 @@ switch fig
         BOLD_pred = nan( n_sample, n_sample, length(lbvec));
 
         % prepare for simulation
-        switch fig; case 'NOA'; a=ws; case 'SOC'; a=cs; end
         param = [ 1, 1, 1];
         for i = 1:n_sample
             for j = 1:n_sample
@@ -183,19 +182,4 @@ switch ds
                 cls = [ 9:12, 26, 28:39];
         end
 end
-end
-
-function opt_g = find_g( model, param, E, target)
-
-% loss function
-func = @(x) loss_fn( x, model, param, E, target);
-opts.Display = 'off';
-opt_g = fmincon( func, 10, [], [], [], [], [], [], [], opts);
-
-end
-
-function sse = loss_fn( g, model, param, E, target)
-param(end-1) = g;
-pred = model.forward( model, E, param);
-sse = double(mean((target - pred).^2));
 end
