@@ -50,13 +50,13 @@ classdef normVarModel < contrastModel
         end
         
         % function: f()
-        function y_hat = forward( model, x, param )
+        function y_hat = forward( model, x, param)
              
             % get the parameters
-            [w, g, n] = model.get_param( model, param);
+            [w, g, n] = model.get_param(model, param);
             
             % d: ori x exp x stim
-            d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 
+            d = x ./ (1 + w .* std(x, 1)); 
             
             % sum over orientation, s: exp x stim 
             s = mean(d, 1);
@@ -78,11 +78,17 @@ classdef normVarModel < contrastModel
         end
 
         % print the parameters
-        function [ w, g, n]= get_param( model, param)
+        function [w, g, n]= get_param(model, param)
             % set param
             w = param(1);
             g = param(2);
             n = Sigmoid(param(3));
+        end
+        
+        % print the parameters
+        function param= print_param(model, param)
+            % set param
+            param(3) = Sigmoid(param(3));
         end
         
         % measure the goodness of 

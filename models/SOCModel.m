@@ -109,11 +109,18 @@ classdef SOCModel < contrastModel
         end
 
         % print the parameters
-        function [ c, g, n] = get_param(model, param)
+        function [c, g, n] = get_param(model, param)
             % set param
             c = Sigmoid(param(1));
             g = param(2);
             n = Sigmoid(param(3));
+        end
+        
+        % print the parameters
+        function param= print_param(model, param)
+            % set param
+            param(1) = Sigmoid(param(1));
+            param(3) = Sigmoid(param(3));
         end
                     
         % predict the BOLD response: y_hat = f(x)

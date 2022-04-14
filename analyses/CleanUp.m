@@ -1,4 +1,4 @@
-function CleanUp(fig, ds, roi, group)
+function CleanUp(fig, ds, roi, group, ns, ws, rescale)
 %{
     Function for the supplement document revisitOTS
     ds: dataset, default 1
@@ -19,122 +19,127 @@ function CleanUp(fig, ds, roi, group)
 %}
 
 % get default input
+if (nargin < 7), rescale = 'avg'; end
+if (nargin < 6), ws = [.1, 1, 10, 100, 1000]; end
+if (nargin < 5), ns = [-5, -1, 0, 1, 5]; end
 if (nargin < 4), group = 'tar'; end
-if (nargin < 3), roi = 1; end
+if (nargin < 3), roi = 2; end
 if (nargin < 2), ds = 1; end
 
 % get target indices
 ind = getDataCls(ds, group);
 
 % get data
-BOLD_all = dataloader( stdnormRootPath, 'BOLD_target',...
+BOLD_all = dataloader(stdnormRootPath, 'BOLD_target',...
     'all', ds, roi);
-BOLD_err  = dataloader( stdnormRootPath, 'BOLD_target_error',...
+BOLD_err  = dataloader(stdnormRootPath, 'BOLD_target_error',...
     'all', ds, roi );
-BOLD_tar = dataloader( stdnormRootPath, 'BOLD_target',...
+BOLD_tar = dataloader(stdnormRootPath, 'BOLD_target',...
     'target', ds, roi);
 
 
 % get some vals
 n_sample = 5;
-ns = [ -5, -1, 0, 1, 5];
-cs = [ -5, -1, 0, 1, 5];
-ws = [ .1, 1, 10, 100, 1000];
+
 
 % get model index
 [lbvec, emo, model, m_idx] = get_config(ds, fig);
 
 % get E
-E = dataloader( stdnormRootPath, emo,...
+E = dataloader(stdnormRootPath, emo,...
     'target', ds, roi);
 
 switch fig
     case 'CE'
         % get storage
-        BOLD_pred = nan( n_sample, length(lbvec));
-
+        BOLD_pred = nan(n_sample, length(lbvec));
+        r2s       = nan(n_sample);
+        
         % prepare for simulation
-        param = [ 1, 1];
+        param = [1, 1];
         for i = 1:n_sample
             param(2) = ns(i);
-            BOLD_hat = model.forward( model, E, param);
-            BOLD_pred(i,ind) = BOLD_hat.*( BOLD_tar(1) / BOLD_hat(1));
+            [BOLD_hat, r2] = get_pred(model, E, param, BOLD_tar, rescale);
+            BOLD_pred(i,ind) = BOLD_hat;
+            r2s(i) = r2;
         end
-
+        
         % visualize
         figure()
         for i = 1:n_sample
             param(2) = ns(i);
-            [~, n] = model.get_param( model, param);
-            subplot( 1, n_sample, i)
-            plot_BOLD( BOLD_pred(i,:), BOLD_all, BOLD_err,...
+            [~, n] = model.get_param(model, param);
+            subplot(1, n_sample, i)
+            plot_BOLD(BOLD_pred(i,:), BOLD_all, BOLD_err,...
                 ds, m_idx, 'target', true);
-            title( sprintf('n=%.3f', n))
+            title(sprintf('r2=%.2f\nn=%.3f', r2s(i), n))
         end
-    case {'NOA', 'SOC'}
+    case {'NOA', 'SOC' 'OTS'}
         % get storage
-        BOLD_pred = nan( n_sample, n_sample, length(lbvec));
-
+        BOLD_pred = nan(n_sample, n_sample, length(lbvec));
+        r2s  = nan(n_sample, n_sample);
+        
         % prepare for simulation
-        switch fig; case 'NOA'; a=ws; case 'SOC'; a=cs; end
-        param = [ 1, 1, 1];
+        switch fig
+            case 'NOA'; a=ws;
+            case 'SOC'; a=cs;
+            case 'OTS'; a=ws;
+                Z = dataloader(stdnormRootPath, 'Z_xy', 'target', ds, roi);
+        end
+        param = [1, 1, 1];
         for i = 1:n_sample
             for j = 1:n_sample
                 param(1)   = a(i);
                 param(end) = ns(j);
-                BOLD_hat = model.forward( model, E, param);
-                BOLD_pred(i,j,ind) = BOLD_hat.*( BOLD_tar(1) / BOLD_hat(1));
+                switch fig
+                    case {'NOA','SOC'}
+                        [BOLD_hat, r2] = get_pred(model, E, param, BOLD_tar, rescale);
+                    case 'OTS'
+                        [BOLD_hat, r2] = get_pred_Z(model, E, Z, param, BOLD_tar, rescale);
+                end
+                BOLD_pred(i,j,ind) = BOLD_hat;
+                r2s(i,j) = r2;
             end
         end
-
+        
         % visualize
         for i = 1:n_sample
             for j = 1:n_sample
                 param(1)   = a(i);
                 param(end) = ns(j);
-                [w,~,n] = model.get_param( model, param);
-                subplot( n_sample, n_sample, (i-1)*n_sample+j)
-                plot_BOLD( BOLD_pred(i,j,:), BOLD_all, BOLD_err,...
+                [w,~,n] = model.get_param(model, param);
+                subplot(n_sample, n_sample, (i-1)*n_sample+j)
+                plot_BOLD(BOLD_pred(i,j,:), BOLD_all, BOLD_err,...
                     ds, m_idx, 'target', true);
-                title( sprintf('w=%.3f,n=%.3f', w, n))
+                title(sprintf('r2=%.2f\nw=%.e,n=%.3f', r2s(i,j), w, n))
             end
         end
-    case {'OTS'}
-        % get Z 
-        Z = dataloader( stdnormRootPath, 'Z_xy',...
-                'target', ds, roi);
-
-        % get storage
-        BOLD_pred = nan( n_sample, n_sample, length(lbvec));
-
-        % prepare for simulation
-        param = [ 1, 1, 1];
-        for i = 1:n_sample
-            for j = 1:n_sample
-                param(1)   = ws(i);
-                param(end) = ns(j);
-                BOLD_hat = model.forward( model, E, Z, param);
-                BOLD_pred(i,j,ind) = BOLD_hat.*( BOLD_tar(1) / BOLD_hat(1));
-            end
-        end
-
-        % visualize
-        for i = 1:n_sample
-            for j = 1:n_sample
-                param(1)   = ws(i);
-                param(end) = ns(j);
-                [w,~,n] = model.get_param( model, param);
-                subplot( n_sample, n_sample, (i-1)*n_sample+j)
-                plot_BOLD( BOLD_pred(i,j,:), BOLD_all, BOLD_err,...
-                    ds, m_idx, 'target', true);
-                title( sprintf('w=%.3f,n=%.3f', w, n))
-            end
-        end
-
 end
 end
 
-function [lbvec, emo, model, m_idx] = get_config( ds, nam)
+function [BOLD_hat, r2] = get_pred(model, E, param, BOLD_tar, rescale)
+BOLD_hat = model.forward(model, E, param);
+switch rescale 
+    case 'first'
+        BOLD_hat = BOLD_hat.* (BOLD_tar(1) / BOLD_hat(1));
+    case 'avg'
+        BOLD_hat = BOLD_hat.* (mean(BOLD_tar(:)) / mean(BOLD_hat(:)));
+end
+r2 = model.metric(BOLD_hat, BOLD_tar);
+end
+
+function [BOLD_hat, r2] = get_pred_Z(model, E, Z, param, BOLD_tar, rescale)
+BOLD_hat = model.forward(model, E, Z, param);
+switch rescale 
+    case 'first'
+        BOLD_hat = BOLD_hat.* (BOLD_tar(1) / BOLD_hat(1));
+    case 'avg'
+        BOLD_hat = BOLD_hat.* (mean(BOLD_tar(:)) / mean(BOLD_hat(:)));
+end
+r2 = model.metric(BOLD_hat, BOLD_tar);
+end
+
+function [lbvec, emo, model, m_idx] = get_config(ds, nam)
 switch ds
     case 1; lbvec = 1:50;
     case 2; lbvec = 1:48;
@@ -142,7 +147,7 @@ switch ds
 end
 switch nam
     case {'CE','NOA'}; emo='E_ori';
-    case {'SOC','OTS'};   emo='E_xy';
+    case {'SOC','OTS'}; emo='E_xy';
 end
 switch nam
     case 'CE';  model=contrastModel('fmincon',1); m_idx=1;
@@ -157,29 +162,29 @@ switch ds
     case 1
         switch group
             case 'den'
-                cls = [ 1, 2, 3, 4, 5; 6, 7, 8, 9, 10];
+                cls = [1, 2, 3, 4, 5; 6, 7, 8, 9, 10];
             case 'con'
-                cls = [ 47, 48, 3, 49, 50; 35, 36, 8, 37, 38];
+                cls = [47, 48, 3, 49, 50; 35, 36, 8, 37, 38];
             case 'tar'
-                cls = [ 1:10, 35:38, 47:50];
+                cls = [1:10, 35:38, 47:50];
         end
     case 2
         switch group
             case 'den'
-                cls = [ 1, 2, 3, 4, 5;6, 7, 8, 9, 10];
+                cls = [1, 2, 3, 4, 5;6, 7, 8, 9, 10];
             case 'con'
-                cls = [ 45, 46, 2, 47, 48; 33, 34, 7, 35, 36];
+                cls = [45, 46, 2, 47, 48; 33, 34, 7, 35, 36];
             case 'tar'
-                cls = [ 1:10, 33:36, 45:48];
+                cls = [1:10, 33:36, 45:48];
         end
     case {3,4}
         switch group
             case 'den'
-                cls = [ 39, 38, 37, 36; 26, 27, 28, 29];
+                cls = [39, 38, 37, 36; 26, 27, 28, 29];
             case 'con'
-                cls = [ 34, 33, 32, 31; 9, 10, 11, 12];
+                cls = [34, 33, 32, 31; 9, 10, 11, 12];
             case 'tar'
-                cls = [ 9:12, 26, 28:39];
+                cls = [9:12, 26, 28:39];
         end
 end
 end

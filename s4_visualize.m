@@ -214,9 +214,6 @@ elseif strcmp( fig, 'figure8')
     set( gcf, 'Color', 'w')
     box off
     
-    
-    
-    
 elseif strcmp( fig, 'figure10')
     
     % get the plot color

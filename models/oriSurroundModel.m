@@ -110,6 +110,12 @@ classdef oriSurroundModel < contrastModel
             n = Sigmoid(param(3));
         end
         
+        % print the parameters
+        function param= print_param(model, param)
+            % set param
+            param(3) = Sigmoid(param(3));
+        end
+        
         % measure the goodness of 
         function Rsquare = metric( BOLD_pred, BOLD_target )
             

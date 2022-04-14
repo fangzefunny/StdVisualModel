@@ -3,7 +3,7 @@ if ~exist('doCross', 'var'), doCross = false; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
 
 fittime          = [];         % how manoy initialization. value space: Integer
-choose_model     = 'more';      % choose some preset data  ('all' or 'noOri');
+choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
 error_bar        = false;
 
 switch doCross
@@ -19,14 +19,13 @@ switch doCross
 end
 
 %% define model name 
-model_name = { 'CE', 'SOC', 'OTS', 'NOA', 'STD'};
+model_name = { 'CE', 'SOC', 'OTS', 'NOA'};
 
 % define param name
 param_name =  { 'CE: g', 'CE: n',  ...
                                     'SOC: c', 'SOC: g', 'SOC: n', ...
                                     'OTS: w', 'OTS: g', 'OTS: n',...
-                                    'NOA: w', 'NOA: g', 'NOA: n',...
-                                    'STD: w', 'STD: g', 'STD: n'};
+                                    'NOA: w', 'NOA: g', 'NOA: n',};
 
 % save address
 save_address = fullfile( stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
@@ -39,7 +38,7 @@ T  = chooseData( choose_model, 'fmincon', fittime );
 
 % obtain some features of the storages
 nummodels   = length(unique(T.modelNum));
-model_vector = [ 1, 4, 5, 3, 2];
+model_vector = [ 1, 4, 5, 3];
 numrois     = length(unique(T.roiNum));
 numdatasets = length(unique(T.dataset));
 modelLoader = T.modelLoader;
@@ -105,22 +104,22 @@ for roi = 1: numrois
     for idx = 1:nummodels
         % obain model index and model 
         model_idx = model_vector(idx);
-        model = modelLoader{model_idx};
+        model = modelLoader{idx};
         
         for dataset = 1:numdatasets
             % desgin index 
             row_idx_array = (idx - 1) * 3+1: idx * 3;
             row_idx = unique( max( 1, row_idx_array-1) );
             col_idx = (dataset-1) * 2 + 1;
-            % load value  
-            param = model.get_param(dataloader( stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
+            % load value
+            param = model.print_param(model, dataloader( stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
                     
             % assign value 
             if strcmp( cross_valid, 'one')
                 parammean( row_idx, col_idx ) = param';
                 parammean( row_idx, col_idx+1) = NaN( size(param'));
             else
-                parammean( row_idx, col_idx ) = mean(param, 2);
+                parammean( row_idx, col_idx ) = nanmean(param, 2);
                 parammean( row_idx, col_idx +1 ) = std(param, [], 2);
             end
             

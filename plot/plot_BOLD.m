@@ -16,11 +16,12 @@ Ouputs:
 if ~exist('plotData', 'var') || isempty (plotData), plotData = true; end
 
 % choose colors 
-dark    = [  52,  73,  94] ./ 255;
-blue    = [   9, 132, 227] ./ 255;
-red     = [ 255, 118, 117] ./ 255 .* .8;
-yellow  = [ 253, 203, 110] ./ 255;
-green   = [   0, 184, 148] ./ 255;
+viz = ColorPalette();
+dark    = viz.Dark;
+blue    = viz.Blue;
+red     = viz.Red;
+yellow  = viz.Yellow;
+green   = viz.Green;
 curvy   = [  .4,  .4,  .4] + .1; 
 grating = [  .6,  .6,  .6] + .1; 
 other   = [  .8,  .8,  .8] + .1;

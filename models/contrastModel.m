@@ -51,9 +51,8 @@ classdef contrastModel
         end
         
         % the core model function 
-        function y_hat = forward(model, x, param )
+        function y_hat = forward(model, x, param)
             
-            % set param
             % get the parameters
             [g,n] = model.get_param(model, param);
             
@@ -64,7 +63,7 @@ classdef contrastModel
             s = mean(d, 1);
 
             % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = g .* s.^n;
+            yi_hat = g .* s .^ n;
       
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';
@@ -76,6 +75,12 @@ classdef contrastModel
             % set param
             g = param(1);
             n = Sigmoid(param(2));
+        end
+        
+        % print the parameters
+        function param= print_param(model, param)
+            % set param
+            param(2) = Sigmoid(param(2));
         end
 
         % measure the goodness of 
@@ -136,7 +141,7 @@ classdef contrastModel
                     case 'bads'
                         [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], [], [], [], opts);
                 end
                 
                 fprintf('   fit: %d, loss: %.4f \n   params:', ii, sse(ii)) 
