@@ -1,4 +1,4 @@
-function E = cal_E( data, labelVec, mode, which_data )
+function E = cal_E(data, labelVec, mode, which_data)
 
 filter_cpd  = 3; % the images were band-passed at 3 cycles per degree
 fovs        = 12.5 * [1, 3/2, 1, 1]; % deg (the second data set had a larger field of view than the others)
@@ -7,63 +7,59 @@ numpix      = size(data,1);
 pixperdeg   = numpix / fov;
 ppc         = pixperdeg/filter_cpd; % pixels per cycle
 support     = 6; % cycles per filter
+o           = linspace(0,pi, 9); % orientation
+thetavec    = o(1:end-1); % exclude the pi deg
+nO          = length(thetavec);
+padsize     = ppc * support;
 
-o = linspace(0,pi, 9);
-thetavec = o(1:end-1);
-nO=length(thetavec);
+% create filters
+[Gabor_c, Gabor_s]=makeGaborFilter(ppc, thetavec, support);
 
-[ Gabor_c, Gabor_s]=makeGaborFilter(ppc, thetavec, support);
-
-padsize = ppc * support;
-sz = numpix + padsize*2;
-
+% get placeholders,
 switch mode
     case 'orientation'
-        E = zeros(nO, 9, length(labelVec));
-    case 'space'  
-        E = nan( sz, sz, nO, 9, length( labelVec ) );
+        % dims: ori x ep x labels
+        E = nan(nO, 9, length(labelVec));
+    case 'space'
+        % The size the size
+        sz = numpix + padsize*2;
+        % dims: X x Y x ori x ep x labels
+        E = nan(sz, sz, nO, 9, length( labelVec ));
 end
 
-
+% progress tracking
 idx = round((1:10)/10*length(labelVec));
-
 fprintf('\n');
+
 for ii= 1:length(labelVec)
     if ismember(ii, idx), fprintf('.'); end
     
+    % the stimululi label
     label = labelVec(ii);
-   
     for ep = 1 : 9 % Each have 9 examples.
         
-        stimulus = data( : , : , ep , label );
+        % get the stimulus and pad the stimulus
+        stimulus = data(:, :, ep, label);
+        padstimulus = zeros(numpix+padsize*2, numpix+padsize*2);
+        padstimulus(padsize+(1:numpix), padsize+(1:numpix)) = stimulus;
+        stimulus = padstimulus;
         
-        
-        %Pad the stimulus to avoid edge effect
-        padstimulus=zeros(numpix + padsize*2, numpix + padsize*2);
-        padstimulus(padsize+(1:numpix),padsize+(1:numpix))=stimulus;
-        stimulus=padstimulus;
-        
-        % Filtering and rectification to get the CONTRAST of the image
-        con = squeeze(Icontrast(stimulus, Gabor_c, Gabor_s, ppc, thetavec)); %3 - D x , y , theta
-        
-        if strcmpi( mode, 'orientation' )           
-            
-            % Create a disk-like weight to prevent edge effect
-            w = gen_disk( size( con ,  1 ));  %3 - D x , y , theta
-            
-            % Calculate E_ori for orientation-type model
-            % Sum over space
-            E_ori = squeeze(mean(mean(w.*con , 2 ), 1)); % 1- D theta
-            
-            % Store the data into a matrix
-            E( : ,  ep , ii ) = E_ori';
-            
-        elseif strcmp( mode, 'space' )
-            % Calculate E_space for space-type model
-            % Assign the data into a matrix
-            E( : , : , : , ep , ii ) = con;
-            
+        % filter and get the CONTRAST of the image
+        % dims: X x Y x ori
+        conEnergy = Icontrast(stimulus, Gabor_c, Gabor_s, ppc, thetavec); 
+           
+        % assign the data
+        switch mode
+            case 'orientation'
+                % create a disk-like weight to prevent edge effect
+                w = gen_disk(size(conEnergy, 1));
+                % calculate E_ori for orientation-type model
+                E_ori = squeeze(mean(mean(w.*conEnergy, 2), 1)); % 1- D theta
+                E(:, ep, ii) = E_ori';
+            case 'space'
+                E(:, :, :, ep,  ii) = conEnergy;   
         end
     end
 end
 fprintf('\n');
+end

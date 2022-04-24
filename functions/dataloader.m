@@ -127,15 +127,15 @@ switch which_obj
             end
         end
         
-    case {'Z_xy', 'oZ_xy'}
+    case {'Z_xy', 'oZ_xy', 'Z'}
         fname = sprintf('Z_%02d.mat', dataset);
         switch which_obj
-            case 'Z_xy'
+            case {'Z_xy','Z'}
                 path = fullfile(prevPath, 'Data', 'E', fname );
             case 'oZ_xy'
                 path = fullfile(prevPath, 'Data', 'oE', fname );
         end
-        load( path, 'Z');
+        load(path, 'Z');
         data  = Z;
         if strcmp(target,  'target')
             switch dataset

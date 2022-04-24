@@ -1,4 +1,4 @@
-function T = chooseData(  quick_choice, optimizer, fittime )
+function T = chooseData( quick_choice, optimizer, fittime)
 % This is a simple function to help select model
 
 % The input value means: selectioning one of the dataset: 
@@ -8,15 +8,15 @@ function T = chooseData(  quick_choice, optimizer, fittime )
 
 % dataset is [which_dataset (1-4) | which_roi (V1-V3)];
 datasets = [1, 2, 3, 4];
-roi_idx  = [1, 2, 3 ];
+roi_idx  = [1, 2, 3];
 ROIs     = {'V1', 'V2', 'V3'};
 
-models = cell( 4, 1);
-models{1} = contrastModel( optimizer, fittime);
-models{2} = normStdModel( optimizer, fittime);
-models{3} = normVarModel( optimizer, fittime);
-models{4} = SOCModel( optimizer, fittime);
-models{5} = oriSurroundModel( optimizer, fittime);
+models = cell(4, 1);
+models{1} = contrastModel(optimizer, fittime);
+models{2} = normStdModel(optimizer, fittime);
+models{3} = normVarModel(optimizer, fittime);
+models{4} = SOCModel(optimizer, fittime);
+models{5} = oriSurroundModel(optimizer, fittime);
 
 switch quick_choice
     % for figures
@@ -110,26 +110,23 @@ switch quick_choice
     % for others
     case {'con'}
         model_idx = 1;
-    case {'all', 'All' }
-        model_idx = [ 1, 3, 4, 5];
+    case {'all', 'All'}
+        model_idx = [1, 3, 4, 5];
     case {'more'}
-        model_idx = [ 1, 2, 3, 4, 5];
+        model_idx = [1, 2, 3, 4, 5];
     case 'orientation'
-        model_idx = [ 1, 3];
+        model_idx = [1, 3];
     case 'noOri'
-        model_idx = [ 1, 3, 4];
+        model_idx = [1, 3, 4];
     case {'SOC', 'soc'}
         model_idx = 4;
-    case {'OTS'}
-        model_idx = 5;
-    case 'noNOA'
-        model_idx = [1, 4, 5];
-    case 'NOA'
-        model_idx = 3;
-    case 'STD'
-        model_idx = 2;
-    case 'no_model'
-        model_idx = NaN;
+    case {'OTS'}; model_idx = 5;
+    case 'noNOA'; model_idx = [1, 4, 5];
+    case 'NOA';  model_idx = 3;
+    case 'STD';  model_idx = 2;
+    case 'no_model'; model_idx = NaN;
+    case 'SOC_test'; model_idx = 4; datasets = 1; 
+    case 'OTS_test'; model_idx = 5; datasets = 1; 
 end
 
 

@@ -4,11 +4,6 @@ if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 if ~exist('start_idx', 'var'), start_idx = 1; end    % what fold in the cross 
                                                         % validation to start
 if ~exist('choose_model', 'var'), choose_model = 'all'; end
-
-optimizer           = 'fmincon'; % what kind of optimizer,  value space: 'bads', 'fmincon'
-fittime             = 40;        % how many initialization. value space: Integer
-verbose             = 'off'; 
-
 switch doCross
     case false
         cross_valid = 'one';            % 'one': not cross validate; 'cross_valid': cross validate
@@ -18,19 +13,22 @@ switch doCross
         data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
 end
 
-%% generate save address and choose data 
+optimizer            = 'fmincon'; % what kind of optimizer,  value space: 'bads', 'fmincon'
+fittime              = 40;        % how many initialization. value space: Integer
+verbose              = 'off';     % show the fit details? 
+
+%% save address and create a table for all jobs
 
 % save address 
 save_address = fullfile( stdnormRootPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
-% choose data as if we are doing parallel computing 
-T      = chooseData( choose_model, optimizer, fittime );
-len = size( T, 1 );
+% create jobs 
+T = chooseData(choose_model, optimizer, fittime);
 
 %% start Fit
 % get the job using loop 
-for hpc_job_number = 1: len
+for hpc_job_number = 1:size(T, 1)
     
     dataset   = T.dataset(hpc_job_number);
     roi       = T.roiNum(hpc_job_number);
@@ -48,30 +46,28 @@ for hpc_job_number = 1: len
     save_info.start_idx = start_idx;
     
     % display information to keep track of fitting 
-    display = [ 'dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
-    disp( display )
+    display = ['dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
+    disp(display)
     
     % load training label
-    BOLD_target = dataloader( stdnormRootPath, 'BOLD_target', target, dataset, roi );
+    BOLD_target = dataloader(stdnormRootPath, 'BOLD_target', target, dataset, roi);
     
     % load the input E 
     switch model.model_type
-        case 'orientation' % CE, NOA 
-            which_obj = 'E_ori';
-        case 'space'       % SOC, OTS
-            which_obj = 'E_xy';
+        case 'orientation'; which_obj = 'E_ori'; % CE, NOA 
+        case 'space';       which_obj = 'E_xy';  % SOC, OTS
     end
-    E = dataloader( stdnormRootPath, which_obj, target, dataset, roi, 'old' );
+    E = dataloader(stdnormRootPath, which_obj, target, dataset, roi, 'old');
     
     if strcmp( model.legend, 'oriSurround')
         disp( 'OTS')
     
         % gain weight E
-        Z = dataloader( stdnormRootPath, 'Z', target, dataset, roi );
+        Z = dataloader(stdnormRootPath, 'Z', target, dataset, roi);
         
         % fit the data without cross validation: knock-1-out
         [BOLD_pred, params, Rsquare, model] = ...
-            model.fit( model, E, Z, BOLD_target, verbose , cross_valid, save_info);
+            model.fit(model, E, Z, BOLD_target, verbose, cross_valid, save_info);
         
     else 
         % fit the data without cross validation: knock-1-out

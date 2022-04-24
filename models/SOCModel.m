@@ -8,13 +8,13 @@ classdef SOCModel < contrastModel
     methods
         
         % init the model
-        function model = SOCModel( optimizer, fittime, param_bound, param_pbound)
+        function model = SOCModel(optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
             
             % the parameters here are log params
-            if (nargin < 4), param_pbound  = [   .5,   1; 1e-2,   2;  -20,  20]; end
-            if (nargin < 3), param_bound   = [ -inf, inf; -inf, inf; -inf, inf]; end
+            if (nargin < 4), param_pbound  = [ .5,   1; 1e-2,   2;  -20,  20]; end
+            if (nargin < 3), param_bound   = [-inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
             
@@ -31,7 +31,7 @@ classdef SOCModel < contrastModel
             model.fittime      = fittime;
             model.optimizer    = optimizer; 
             model.num_param    = param_num ;
-            model.param_name   = [ 'c'; 'g'; 'n' ];
+            model.param_name   = ['c'; 'g'; 'n'];
             model.legend       = 'SOC'; 
             model.model_type   = 'space';
             model.param        = [];
@@ -40,41 +40,33 @@ classdef SOCModel < contrastModel
                        
     end
            
-    methods ( Static = true )
+    methods (Static = true)
         
-        % fix parameters
-        function model = fixparameters( model, param )
-            model.param = param;
-            model.legend = sprintf('normVar %s=%.2f %s=%.2f %s=%.2f',...
-                            model.param_name(1), param(1),...
-                            model.param_name(2), param(2),...
-                            model.param_name(3), param(3));
-                            
-        end
+
         
        % function: choose weight 
-       function model = disk_weight( model, height)
+       function model = disk_weight(model, height)
            
            % create a meshgrid
-           [ X , Y ] = meshgrid( linspace( -1 , 1, height));
+           [X , Y] = meshgrid(linspace(-1 , 1, height));
            
            % Create a disk with certain size
-            w = zeros( height,  height);
+            w = zeros(height,  height);
             panel = X.^2 + Y.^2;
 
             % Choose the radius of the disk ,  3 std of the edge size 
             theresold = .75;
             
             % pixels < theresold
-            [index ] = find( panel < theresold);
-            w( index) = 1;
+            [index] = find(panel < theresold);
+            w(index) = 1;
             
             % assgin weight 
            model.receptive_weight = w;
        end
         
        % function: f()
-        function y_hat = forward(model, E, param )
+        function y_hat = forward(model, E, param)
             
             if model.receptive_weight ==false
                 height = size(E, 1) ;
@@ -82,23 +74,25 @@ classdef SOCModel < contrastModel
             end
              
             % get the parameters
-            [c, g, n] = model.get_param( model, param);
+            c = Sigmoid(param(1));
+            g = param(2);
+            n = Sigmoid(param(3));
             
             %fprintf('c:%5.4f\tg:%5.4f\tn:%5.4f\n',c,g,n);
             
             % x x y x ori x exp x stim --> x x y x exp x stim
-            E = squeeze( mean( E, 3));
+            E = squeeze(mean(E, 3));
             
             % d: x x y x exp x stim
-            E_mean = mean( mean(E, 1), 2);
+            E_mean = mean(mean(E, 1), 2);
             v = (E - c * E_mean).^2; 
             d = bsxfun(@times, v, model.receptive_weight);
             
             % Sum over spatial position
-            s = squeeze(mean(mean( d , 1) , 2)); % ep x stimuli
+            s = squeeze(mean(mean(d , 1) , 2)); % ep x stimuli
         
             % add nonlinearity, yi_hat: exp x stim
-            si_n = s .^n; 
+            si_n = s .^ n; 
             
             % add gain: exp x stim
             yi_hat = g .* si_n;
@@ -107,119 +101,93 @@ classdef SOCModel < contrastModel
             y_hat = squeeze(mean(yi_hat, 1));
            
         end
-
-        % print the parameters
-        function [c, g, n] = get_param(model, param)
-            % set param
-            c = Sigmoid(param(1));
-            g = param(2);
-            n = Sigmoid(param(3));
-        end
         
         % print the parameters
-        function param= print_param(model, param)
+        function param= print_param(param)
             % set param
             param(1) = Sigmoid(param(1));
             param(3) = Sigmoid(param(3));
         end
                     
         % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_ori )
-            
-            % call subclass
-            BOLD_pred = predict@contrastModel( model, E_ori);
-            
+        function BOLD_pred = predict(model, E_ori)
+            BOLD_pred = predict@contrastModel(model, E_ori);
         end
         
         % measure the goodness of 
-        function Rsquare = metric( BOLD_pred, BOLD_target )
-            
-            % call subclass
-            Rsquare = metric@contrastModel( BOLD_pred, BOLD_target );
-            
+        function Rsquare = metric(pred, tar)
+            Rsquare = metric@contrastModel(pred, tar);
         end
         
          % measure the goodness of 
-        function loss= rmse( BOLD_pred, BOLD_target )
-            
-            % call subclass
-            loss = rmse@contrastModel( BOLD_pred, BOLD_target );
-            
+        function loss= rmse(pred, tar)
+            loss = rmse@contrastModel(pred, tar);
         end
         
-        % loss function with sum sqaure error: sum( y - y_hat ).^2
-        function sse = loss_fn( param, model, E_ori, y_target )
-            
-            % call subclass 
-            sse = loss_fn@contrastModel( param, model, E_ori, y_target );
-            
+        % loss function with sum sqaure error: sum(y - y_hat).^2
+        function sse = loss_fn(param, model, E, y_tar)
+            sse = loss_fn@contrastModel(param, model, E, y_tar);
         end
         
         % fit the data 
-        function [loss, param, loss_history]  = optim( model, E_ori, BOLD_target, verbose )
-            
-            % call subclass
-            [loss, param, loss_history]  = optim@contrastModel( model, E_ori, BOLD_target, verbose );
-        
+        function [loss, param, loss_history]  = optim(model, E, BOLD_tar, verbose)
+            [loss, param, loss_history]  = optim@contrastModel(model, E, BOLD_tar, verbose);
         end
         
         % fit and cross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_xy, BOLD_target, verbose, cross_valid, save_info)
+        function [BOLD_pred, params, R2, model] = fit(model, E, BOLD_tar, verbose, cross_valid, save_info)
             
            if (nargin < 5), cross_valid = 'one'; end
             
             switch cross_valid
                 
                 case 'one'
-                    
                     % optimize to find the best local minima
-                    [~, param, loss_history] = model.optim( model, E_xy, BOLD_target, verbose);
+                    [~, param, loss_history] = model.optim(model, E, BOLD_tar, verbose);
                     params = param;
                     loss_histories = loss_history;
+                    model.loss_log = loss_histories;
                     % predict test data 
-                    BOLD_pred = model.forward( model, E_xy, param);
+                    BOLD_pred = model.forward(model, E, param);
                     % measure the goodness of the fit
-                    Rsquare = model.metric( BOLD_pred, BOLD_target);
-                     % fix the parameter for the future prediction, usually
-                     % not used 
-                    model  = model.fixparameters( model, param );
+                    R2 = model.metric(BOLD_pred, BOLD_tar);
                     
                 case 'cross_valid'
                  
                     % achieve stim vector
-                    last_idx = length( size( E_xy));
-                    stim_dim = size( E_xy, last_idx); 
-                    stim_vector = 1 : size( E_xy, last_idx);
+                    last_idx = length(size(E));
+                    stim_dim = size(E, last_idx); 
+                    stim_vector = 1 : size(E, last_idx);
     
                     % storages
                     % storage, try to load the saved history, if any
                     if save_info.start_idx == 1
-                        params    = nan( model.num_param, stim_dim);
-                        BOLD_pred = nan( 1, stim_dim);
+                        params    = nan(model.num_param, stim_dim);
+                        BOLD_pred = nan(1, stim_dim);
                     else
                         load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
                                         save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
                         load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
                                         save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end
-                    loss_histories = nan( model.fittime, stim_dim);
+                    loss_histories = nan(model.fittime, stim_dim);
 
                     % cross_valid  
                     for knock_idx = stim_vector
                         fprintf('fold %d \n', knock_idx)
 
                         % train vector and train data
-                        keep_idx = setdiff( stim_vector, knock_idx);
-                        E_train  = E_xy( :, :, :, :, keep_idx);
-                        target_train = BOLD_target( keep_idx);
-                        E_test   = E_xy( :, :, :, :, knock_idx);
+                        keep_idx = setdiff(stim_vector, knock_idx);
+                        E_train  = E(:, :, :, :, keep_idx);
+                        tar_train = BOLD_tar(keep_idx);
+                        E_test   = E(:, :, :, :, knock_idx);
                       
                         % fit the training data 
-                        [ ~, param] = model.optim( model, E_train, target_train, verbose );
-                        params( :, knock_idx) = param;
+                        [~, param] = model.optim(model, E_train, tar_train, verbose);
+                        params(:, knock_idx) = param;
                         
                         % use the fitted parameter to predict test data 
-                        BOLD_pred( knock_idx ) = model.forward(model, E_test, param );
+                        BOLD_pred(knock_idx) = model.forward(model, E_test, param);
                         
                         % save files for each cross validated fold
                         save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
@@ -229,16 +197,8 @@ classdef SOCModel < contrastModel
                     end 
                     
                     % evaluate performance of the algorithm on test data
-                    Rsquare = model.metric( BOLD_pred, BOLD_target);
-                    
-                    % bootstrap to get the param
-                    params_boot = mean( params, 1 );
-                    model  = model.fixparameters( model, params_boot );
-                    
-            end
-            
-            model.loss_log = loss_histories;
-                      
+                    R2 = model.metric(BOLD_pred, BOLD_tar);     
+            end         
         end
             
     end
