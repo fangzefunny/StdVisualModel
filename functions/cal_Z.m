@@ -6,7 +6,8 @@ sigma_p = .1;
 sigma_g = .85;
 sigma_s = .01;
 sz = round(size(E_xy, 1) / 20)*2;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 F = kernel_weight(sigma_p, sigma_g, sigma_s, sz);
 nO = size(F, 4);
 

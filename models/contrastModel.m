@@ -106,10 +106,10 @@ classdef contrastModel
             opts.Display = verbose;
             
             % set up the bound
-            lb  = model.param_bound( :, 1);
-            ub  = model.param_bound( :, 2);
-            plb = model.param_pbound( :, 1);
-            pub = model.param_pbound( :, 2);
+            lb  = model.param_bound(:, 1);
+            ub  = model.param_bound(:, 2);
+            plb = model.param_pbound(:, 1);
+            pub = model.param_pbound(:, 2);
             
             % init param using possible bound 
             x0_set = (plb + (pub - plb) .* rand(model.num_param, model.fittime))';
