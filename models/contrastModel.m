@@ -56,7 +56,7 @@ classdef contrastModel
             % add gain and nonlinearity, yi_hat: exp x stim
             yi_hat = g .* s .^ n;
       
-            % Sum over different examples, y_hat: stim 
+            % mean over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';
             
         end
@@ -126,7 +126,7 @@ classdef contrastModel
                     case 'bads'
                         [x(ii, :), sse(ii)] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        [x(ii, :), sse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], [], [], [], opts);
+                        [x(ii, :), sse(ii)] = fmincon( func, x0_set(ii, :), lb', ub', [], [], [], [], [], opts);
                 end
                 
                 fprintf('   fit: %d, loss: %.4f \n   params:', ii, sse(ii)) 
@@ -163,7 +163,7 @@ classdef contrastModel
                 case 'cross_valid'
                  
                     % achieve stim vector
-                    stim_dim = size( E, length(size(E))); 
+                    stim_dim = size(E, length(size(E))); 
                     stim_vector = save_info.start_idx : size(E, length(size(E)));
     
                     % storage, try to load the saved history, if any

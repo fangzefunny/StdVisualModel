@@ -1,6 +1,6 @@
 %% hyperparameter: each time, we only need to edit this section !!
 if ~exist('doCross', 'var'), doCross = false; end
-if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
+if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'all';
 
 fittime          = [];         % how manoy initialization. value space: Integer
 choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');

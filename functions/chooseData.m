@@ -1,4 +1,4 @@
-function T = chooseData( quick_choice, optimizer, fittime)
+function T = chooseData(quick_choice, optimizer, fittime)
 % This is a simple function to help select model
 
 % The input value means: selectioning one of the dataset: 

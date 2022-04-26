@@ -41,9 +41,7 @@ classdef SOCModel < contrastModel
     end
            
     methods (Static = true)
-        
-
-        
+       
        % function: choose weight 
        function model = disk_weight(model, height)
            
@@ -170,7 +168,6 @@ classdef SOCModel < contrastModel
                         load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
                                         save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
                     end
-                    loss_histories = nan(model.fittime, stim_dim);
 
                     % cross_valid  
                     for knock_idx = stim_vector

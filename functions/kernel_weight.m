@@ -1,4 +1,4 @@
-function F1 = kernel_weight (sigma_p,sigma_g,sigma_s, numx)
+function F1 = kernel_weight(sigma_p,sigma_g,sigma_s, numx)
 
 numthetas   = 8; % The number of the \theta in the parameter 
 thetas      = (0:numthetas-1)*pi/numthetas; % \theta vector  
