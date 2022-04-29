@@ -126,11 +126,10 @@ classdef contrastModel
                     case 'bads'
                         [x(ii, :), sse(ii)] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        [x(ii, :), sse(ii)] = fmincon( func, x0_set(ii, :), lb', ub', [], [], [], [], [], opts);
+                        [x(ii, :), sse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
-                fprintf('   fit: %d, loss: %.4f \n   params:', ii, sse(ii)) 
-                disp(exp(x(ii, :)))
+                fprintf('   fit: %d, loss: %.4f', ii, sse(ii)) 
             end
             
             % find the lowest sse

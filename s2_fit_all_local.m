@@ -1,6 +1,6 @@
 %% Parse the hyperparameters
-if ~exist('doCross', 'var'), doCross = true; end
-if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
+if ~exist('doCross', 'var'), doCross = false; end
+if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
 if ~exist('start_idx', 'var'), start_idx = 1; end    % what fold in the cross 
                                                         % validation to start
 if ~exist('choose_model', 'var'), choose_model = 'all'; end
