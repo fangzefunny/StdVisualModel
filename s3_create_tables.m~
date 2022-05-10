@@ -39,10 +39,7 @@ T  = chooseData(choose_model, 'fmincon', fittime);
 % obtain some features of the storages
 nummodels    = length(unique(T.modelNum));
 model_vector = [1, 4, 5, 3];
-modelLoader  = {contrastModel('fmincon', 40),... 
-                SOCModel('fmincon', 40),...
-                oriSurroundModel('fmincon', 40),...
-                normVarModel('fmincon', 40),};
+modelLoader  = {
 numrois      = length(unique(T.roiNum));
 numdatasets  = length(unique(T.dataset));
 numstimuli   = 50;

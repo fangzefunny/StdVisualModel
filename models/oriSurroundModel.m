@@ -94,7 +94,7 @@ classdef oriSurroundModel < contrastModel
         % print the parameters
         function param= print_param(param)
             % set param
-            param(3) = Sigmoid(param(3));
+            param(3, :) = Sigmoid(param(3, :));
         end
         
         % measure the goodness of 

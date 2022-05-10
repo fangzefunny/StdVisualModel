@@ -64,7 +64,7 @@ classdef contrastModel
         % print the parameters, used in s3 
         function param = print_param(param)
             % set param
-            param(2) = Sigmoid(param(2));
+            param(2, :) = Sigmoid(param(2, :));
         end
 
         % measure the goodness of 
@@ -129,7 +129,7 @@ classdef contrastModel
                         [x(ii, :), sse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
-                fprintf('   fit: %d, loss: %.4f', ii, sse(ii)) 
+                fprintf('   fit: %d, loss: %.4f\n', ii, sse(ii)) 
             end
             
             % find the lowest sse
@@ -156,7 +156,7 @@ classdef contrastModel
                   
                     % predict test data 
                     BOLD_pred = model.forward(model, E, param );
-                    R2 = model.metric(pred, tar);                 
+                    R2 = model.metric(BOLD_pred, BOLD_tar);                 
                     model.loss_log = loss_histories;
                     
                 case 'cross_valid'
