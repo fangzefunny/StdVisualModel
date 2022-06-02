@@ -62,7 +62,9 @@ classdef contrastModel
         end
                 
         % print the parameters, used in s3 
-        function param = print_param(param)
+        function param = print_param(model, param)          
+            % reshape
+            param = reshape(param, model.num_param, []);
             % set param
             param(2, :) = Sigmoid(param(2, :));
         end

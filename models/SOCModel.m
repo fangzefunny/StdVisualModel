@@ -101,7 +101,9 @@ classdef SOCModel < contrastModel
         end
         
         % print the parameters
-        function param= print_param(param)
+        function param= print_param(model, param)
+            % reshape 
+            param = reshape(param, model.num_param, []);
             % set param
             param(1, :) = Sigmoid(param(1, :));
             param(3, :) = Sigmoid(param(3, :));

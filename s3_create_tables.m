@@ -115,7 +115,7 @@ for roi = 1: numrois
             row_idx = unique(max(1, row_idx_array-1));
             col_idx = (dataset-1) * 2 + 1;
             % load value
-            param = model.print_param(dataloader(stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
+            param = model.print_param(model, dataloader(stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
                     
             % assign value 
             if strcmp(cross_valid, 'one')

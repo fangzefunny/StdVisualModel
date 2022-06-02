@@ -69,7 +69,9 @@ classdef normVarModel < contrastModel
         end
         
         % print the parameters
-        function param= print_param(param)
+        function param= print_param(model, param)
+            % reshape param
+            param = reshape(param, model.num_param, []);
             % set param
             param(3, :) = Sigmoid(param(3, :));
         end
