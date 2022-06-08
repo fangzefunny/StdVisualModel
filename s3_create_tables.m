@@ -8,7 +8,7 @@ error_bar        = false;
 
 switch doCross
     case false
-        cross_valid  = 'one';            % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
+        cross_valid  = 'one';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'noCross';       % save in which folder. value space: 'noCross', .....
         print_loss   = true;
 
