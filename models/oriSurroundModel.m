@@ -205,7 +205,7 @@ classdef oriSurroundModel < contrastModel
                     R2 = model.metric(BOLD_pred, BOLD_tar);
                      % fix the parameter for the future prediction, usually
                      % not used 
-                    model  = model.fixparameters(model, param);
+                     % model  = model.fixparameters(model, param);
                     
                 case 'cross_valid'
                     
@@ -218,7 +218,7 @@ classdef oriSurroundModel < contrastModel
                     if save_info.start_idx == 1
                         params    = nan(model.num_param, stim_dim);
                         BOLD_pred = nan(1, stim_dim);
-                    else
+                    else 
                         stim_vector = save_info.start_idx : size(E, last_idx);
                         load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
                                         save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
