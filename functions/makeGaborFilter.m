@@ -1,7 +1,7 @@
 function [Gabor_cos,Gabor_sin]= makeGaborFilter(ppcvec, thetavec, support)
  
 if ~exist('support', 'var') || isempty(support)
-    support = 3; % 3 cycles per filter
+    support = 3; % 3 cycles per filter --// 
 end
 
 numOrientations = length(thetavec);

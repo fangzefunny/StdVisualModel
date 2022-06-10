@@ -203,9 +203,9 @@ classdef oriSurroundModel < contrastModel
                     BOLD_pred = model.forward(model, E, Z, param);
                     % measure the goodness of the fit
                     R2 = model.metric(BOLD_pred, BOLD_tar);
-                     % fix the parameter for the future prediction, usually
-                     % not used 
-                     % model  = model.fixparameters(model, param);
+                    % fix the parameter for the future prediction, usually
+                    % not used 
+                    % model  = model.fixparameters(model, param);
                     
                 case 'cross_valid'
                     

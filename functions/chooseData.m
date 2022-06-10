@@ -13,7 +13,7 @@ ROIs     = {'V1', 'V2', 'V3'};
 
 models = cell(4, 1);
 models{1} = contrastModel(optimizer, fittime);
-models{2} = normStdModel(optimizer, fittime);
+models{2} = normCEModel(optimizer, fittime);
 models{3} = normVarModel(optimizer, fittime);
 models{4} = SOCModel(optimizer, fittime);
 models{5} = oriSurroundModel(optimizer, fittime);
@@ -127,6 +127,7 @@ switch quick_choice
     case 'no_model'; model_idx = NaN;
     case 'SOC_test'; model_idx = 4; datasets = 1; 
     case 'OTS_test'; model_idx = 5; datasets = 1; 
+    case 'NCE_model'; model_idx = 2;
 end
 
 
