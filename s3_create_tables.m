@@ -3,7 +3,7 @@ if ~exist('doCross', 'var'), doCross = false; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'all';
 
 fittime          = [];         % how manoy initialization. value space: Integer
-choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
+choose_model     = 'more';      % choose some preset data  ('all' or 'noOri');
 error_bar        = false;
 
 switch doCross
@@ -23,10 +23,10 @@ model_name = { 'CE', 'SOC', 'OTS', 'NOA','NCE'};
 
 % define param name
 param_name =  { 'CE: g', 'CE: n',  ...
-                                    'SOC: c', 'SOC: g', 'SOC: n', ...
-                                    'OTS: w', 'OTS: g', 'OTS: n',...
-                                    'NOA: w', 'NOA: g', 'NOA: n',...
-                                    'NCE: w', 'NCE: g', 'NCE: n',};
+                'SOC: c', 'SOC: g', 'SOC: n', ...
+                'OTS: w', 'OTS: g', 'OTS: n',...
+                'NOA: w', 'NOA: g', 'NOA: n',...
+                'NCE: w', 'NCE: g', 'NCE: n',};
 
 % save address
 save_address = fullfile(stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
@@ -43,7 +43,8 @@ model_vector = [1, 4, 5, 3, 2];
 modelLoader  = {contrastModel('fmincon', 40),... 
                 SOCModel('fmincon', 40),...
                 oriSurroundModel('fmincon', 40),...
-                normVarModel('fmincon', 40),};
+                normVarModel('fmincon', 40),...
+                normCEModel('fmincon', 40)};
 numrois      = length(unique(T.roiNum));
 numdatasets  = length(unique(T.dataset));
 numstimuli   = 50;
@@ -142,12 +143,12 @@ end
 %% Create table heterogeneity
 
 
-roi_sets   = { 'v1', 'v2', 'v3'};
-pat_sets   = { 'snakes', 'gratings'};
-data_sets  = { 'DS1', 'DS2', 'DS3', 'DS4'};
-agent_sets = {  'CE', 'SOC', 'OTS', 'NOA', 'NCE', 'Data'}; 
+roi_sets   = {'v1', 'v2', 'v3'};
+pat_sets   = {'snakes', 'gratings'};
+data_sets  = {'DS1', 'DS2', 'DS3', 'DS4'};
+agent_sets = {'CE', 'SOC', 'OTS', 'NOA', 'NCE', 'Data'}; 
 agent_ind  = [1, 4, 5, 3, 2, 99]; 
-row_names  = { };
+row_names  = {};
 
 table_mat = NaN(length(data_sets) * length(agent_sets), ... 
                  length(roi_sets)  * length(pat_sets));
@@ -173,12 +174,12 @@ for ii = 1:length(agent_sets)
 
             %% Assign the data to the matrix 
             switch ii
-                case { 1, 2, 3, 4}
+                case {1, 2, 3, 4, 5}
                     which_obj = 'BOLD_pred';
                     model_idx = agent_ind(ii);
                     BOLD = dataloader(stdnormRootPath, which_obj, 'target',...
                                         jj, pp, data_folder, model_idx, 'fmincon');
-                case 5
+                case 6
                     which_obj = 'BOLD_target';
                     BOLD = dataloader(stdnormRootPath, which_obj, 'target', jj, pp);
             end 
@@ -190,6 +191,7 @@ for ii = 1:length(agent_sets)
                     s_ind = [5:8, 14:17];
                     g_ind = [1:4, 9:13];
             end 
+
             table_mat(r_idx, c_idx+1) = mean(BOLD(s_ind));
             table_mat(r_idx, c_idx+2) = mean(BOLD(g_ind));
         end 

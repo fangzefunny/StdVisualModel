@@ -128,6 +128,11 @@ switch quick_choice
     case 'SOC_test'; model_idx = 4; datasets = 1; 
     case 'OTS_test'; model_idx = 5; datasets = 1; 
     case 'NCE_model'; model_idx = 2;
+    case {'figureS8a'}; model_idx = [2, 3, 5]; datasets  = 1;
+    case {'figureS8b'}; model_idx = [2, 3, 5]; datasets  = 2;
+    case {'figureS8c'}; model_idx = [2, 3, 5]; datasets  = 3;
+    case {'figureS8d'}; model_idx = [2, 3, 5]; datasets  = 4;
+    case {'Ori_Model'}; model_idx = [2, 3, 5]; 
 end
 
 
