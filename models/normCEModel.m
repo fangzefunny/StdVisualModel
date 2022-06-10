@@ -1,4 +1,4 @@
-classdef normVarModel < contrastModel 
+classdef normCEModel < contrastModel 
     
     % The basic properties of the class
     properties 
@@ -7,7 +7,7 @@ classdef normVarModel < contrastModel
     methods
         
         % init the model
-        function model = normVarModel( optimizer, fittime, param_bound, param_pbound)
+        function model = normCEModel( optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
       
@@ -30,7 +30,7 @@ classdef normVarModel < contrastModel
             model.optimizer    = optimizer; 
             model.num_param    = param_num ;
             model.param_name   = [ 'w'; 'g'; 'n' ];
-            model.legend       = 'normVar'; 
+            model.legend       = 'normCE'; 
             model.param        = [];
         end
            
@@ -47,7 +47,7 @@ classdef normVarModel < contrastModel
             n = Sigmoid(param(3));
             
             % d: ori x exp x stim
-            d = x ./ (1 + w*std(x, 1)); 
+            d = x ./ (1 + w.*x); 
             
             % sum over orientation, s: exp x stim 
             s = mean(d, 1);

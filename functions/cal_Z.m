@@ -1,14 +1,26 @@
-function Z = cal_Z(E_xy, labelVec)
+function Z = cal_Z(E_xy, labelVec, sig_long, sig_short, sig_dot)
+%{ 
+    Calculate the normalization of the OTS
+    
+    Args:
+        E_xy: a 5-D matrix, contrast energy 
+        labelVec: an array, tell the label of the dataset 
+        sig_long: the sigma of the longer side
+        sig_short: the sigma of the shorter side
+        sig_dot: the sigma of the local suppression
+    
+    Returns:
+        Z: a 5-D matrix, normalization
+%}
 
-%%%%%%%% Tune these parameters %%%%%%% 
-% set up filter and print
-sigma_p = .1;
-sigma_g = .85;
-sigma_s = .01;
+% set the default parameter 
+if (nargin < 5), sig_dot   = .01; end
+if (nargin < 4), sig_short = .1; end
+if (nargin < 3), sig_long  = .85; end
 sz = round(size(E_xy, 1) / 20)*2;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-F = kernel_weight(sigma_p, sigma_g, sigma_s, sz);
+% get the filter 
+F = kernel_weight(sig_long, sig_short, sig_dot, sz);
 nO = size(F, 4);
 
 % holders
