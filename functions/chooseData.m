@@ -1,10 +1,10 @@
 function T = chooseData(quick_choice, optimizer, fittime)
 % This is a simple function to help select model
 
-% The input value means: selectioning one of the dataset: 
+% The input value means: selectioning one of the dataset:
 % 'all'
 % 'orientation',
-% 'space' 
+% 'space'
 
 % dataset is [which_dataset (1-4) | which_roi (V1-V3)];
 datasets = [1, 2, 3, 4];
@@ -37,7 +37,7 @@ switch quick_choice
         datasets  = 1;
     case {'figure9'}
         model_idx = 3;
-        datasets  = 1;  
+        datasets  = 1;
     case {'figureS2a'}
         model_idx = 3;
         datasets  = [1, 2, 3, 4];
@@ -107,7 +107,7 @@ switch quick_choice
     case {'figureS7d'}
         model_idx = [1, 3, 4, 5];
         datasets  = 4;
-    % for others
+        % for others
     case {'con'}
         model_idx = 1;
     case {'all', 'All'}
@@ -125,14 +125,44 @@ switch quick_choice
     case 'NOA';  model_idx = 3;
     case 'STD';  model_idx = 2;
     case 'no_model'; model_idx = NaN;
-    case 'SOC_test'; model_idx = 4; datasets = 1; 
-    case 'OTS_test'; model_idx = 5; datasets = 1; 
+    case 'SOC_test'; model_idx = 4; datasets = 1;
+    case 'OTS_test'; model_idx = 5; datasets = 1;
     case 'NCE_model'; model_idx = 2;
     case {'figureS8a'}; model_idx = [2, 3, 5]; datasets  = 1;
     case {'figureS8b'}; model_idx = [2, 3, 5]; datasets  = 2;
     case {'figureS8c'}; model_idx = [2, 3, 5]; datasets  = 3;
     case {'figureS8d'}; model_idx = [2, 3, 5]; datasets  = 4;
-    case {'Ori_Model'}; model_idx = [2, 3, 5]; 
+    case {'Ori_Model'}; model_idx = [2, 3, 5];
+    case 'tar-noCorss'; model_idx = [1, 2, 3, 4, 5, 6];
+    case 'tar-noCross-m3-m5-m6'; model_idx = [3, 5, 6];
+    case 'all-noCross-m1-ds1'; model_idx = 1; datasets  = 1;
+    case 'all-noCross-m1-ds2'; model_idx = 1; datasets  = 2;
+    case 'all-noCross-m1-ds3'; model_idx = 1; datasets  = 3;
+    case 'all-noCross-m1-ds4'; model_idx = 1; datasets  = 4;
+    case 'all-noCross-m2-ds1'; model_idx = 2; datasets  = 1;
+    case 'all-noCross-m2-ds2'; model_idx = 2; datasets  = 2;
+    case 'all-noCross-m2-ds3'; model_idx = 2; datasets  = 3;
+    case 'all-noCross-m2-ds4'; model_idx = 2; datasets  = 4;
+    case 'all-noCross-m3-ds1'; model_idx = 3; datasets  = 1;
+    case 'all-noCross-m3-ds2'; model_idx = 3; datasets  = 2;
+    case 'all-noCross-m3-ds3'; model_idx = 3; datasets  = 3;
+    case 'all-noCross-m3-ds4'; model_idx = 3; datasets  = 4;
+    case 'all-noCross-m4-ds1'; model_idx = 4; datasets  = 1;
+    case 'all-noCross-m4-ds2'; model_idx = 4; datasets  = 2;
+    case 'all-noCross-m4-ds3'; model_idx = 4; datasets  = 3;
+    case 'all-noCross-m4-ds4'; model_idx = 4; datasets  = 4;
+    case 'all-noCross-m5-ds1'; model_idx = 5; datasets  = 1;
+    case 'all-noCross-m5-ds2'; model_idx = 5; datasets  = 2;
+    case 'all-noCross-m5-ds3'; model_idx = 5; datasets  = 3;
+    case 'all-noCross-m5-ds4'; model_idx = 5; datasets  = 4;
+    case 'all-noCross-m6-ds1'; model_idx = 6; datasets  = 1;
+    case 'all-noCross-m6-ds2'; model_idx = 6; datasets  = 2;
+    case 'all-noCross-m6-ds3'; model_idx = 6; datasets  = 3;
+    case 'all-noCross-m6-ds4'; model_idx = 6; datasets  = 4;
+    case 'all-noCross-m3m5m6-ds1'; model_idx = [3, 5, 6]; datasets  = 1;
+    case 'all-noCross-m3m5m6-ds2'; model_idx = [3, 5, 6]; datasets  = 2;
+    case 'all-noCross-m3m5m6-ds3'; model_idx = [3, 5, 6]; datasets  = 3;
+    case 'all-noCross-m3m5m6-ds4'; model_idx = [3, 5, 6]; datasets  = 4;
 end
 
 
@@ -148,15 +178,15 @@ idx = 0;
 for d = 1:length(datasets)
     for r = 1:length(ROIs)
         for m = 1:length(model_idx)
-             
+            
             idx = idx+1;
-        
+            
             dataset(idx)     = datasets(d);
             roiNum(idx)      = roi_idx(r);
             roiName(idx)     = ROIs(r);
             modelNum(idx)    = model_idx(m);
             modelLoader{idx} = models{model_idx(m)};
-
+            
         end
     end
 end
