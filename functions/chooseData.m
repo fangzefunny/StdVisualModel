@@ -17,6 +17,7 @@ models{2} = normCEModel(optimizer, fittime);
 models{3} = normVarModel(optimizer, fittime);
 models{4} = SOCModel(optimizer, fittime);
 models{5} = oriSurroundModel(optimizer, fittime);
+models{6} = normCEModel2(optimizer, fittime);
 
 switch quick_choice
     % for figures
@@ -133,6 +134,7 @@ switch quick_choice
     case {'figureS8c'}; model_idx = [2, 3, 5]; datasets  = 3;
     case {'figureS8d'}; model_idx = [2, 3, 5]; datasets  = 4;
     case {'Ori_Model'}; model_idx = [2, 3, 5]; 
+    case 'NCE_model2'; model_idx = 6;
 end
 
 

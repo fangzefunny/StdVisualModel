@@ -70,6 +70,8 @@ for hpc_job_number = 1:size(T, 1)
             model.fit(model, E, Z, BOLD_target, verbose, cross_valid, save_info);
         
     else 
+        disp(model.legend)
+        
         % fit the data without cross validation: knock-1-out
         [BOLD_pred, params, Rsquare, model] = ...
             model.fit( model, E, BOLD_target, verbose, cross_valid, save_info);
