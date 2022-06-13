@@ -22,10 +22,11 @@ blue    = viz.Blue;
 red     = viz.Red;
 yellow  = viz.Yellow;
 green   = viz.Green;
+purple  = viz.Purple;
 curvy   = [  .4,  .4,  .4] + .1; 
 grating = [  .6,  .6,  .6] + .1; 
 other   = [  .8,  .8,  .8] + .1;
-col_vector = {dark, green, red, blue, yellow};
+col_vector = {dark, green, red, blue, yellow, purple};
 col_vector = col_vector(model_ind);
 
 % fix visualize hyperparams

@@ -19,14 +19,15 @@ switch doCross
 end
 
 %% define model name 
-model_name = { 'CE', 'SOC', 'OTS', 'NOA','NCE'};
+model_name = { 'CE', 'SOC', 'OTS', 'NOA','NCE', 'NCE2'};
 
 % define param name
 param_name =  { 'CE: g', 'CE: n',  ...
                 'SOC: c', 'SOC: g', 'SOC: n', ...
                 'OTS: w', 'OTS: g', 'OTS: n',...
                 'NOA: w', 'NOA: g', 'NOA: n',...
-                'NCE: w', 'NCE: g', 'NCE: n',};
+                'NCE: w', 'NCE: g', 'NCE: n',...
+                'NCE2: w', 'NCE2: g', 'NCE2: n',};
 
 % save address
 save_address = fullfile(stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
@@ -39,12 +40,13 @@ T  = chooseData(choose_model, 'fmincon', fittime);
 
 % obtain some features of the storages
 nummodels    = length(unique(T.modelNum));
-model_vector = [1, 4, 5, 3, 2];
+model_vector = [1, 4, 5, 3, 2, 6];
 modelLoader  = {contrastModel('fmincon', 40),... 
                 SOCModel('fmincon', 40),...
                 oriSurroundModel('fmincon', 40),...
                 normVarModel('fmincon', 40),...
-                normCEModel('fmincon', 40)};
+                normCEModel('fmincon', 40),...
+                normCEModel2('fmincon', 40)};
 numrois      = length(unique(T.roiNum));
 numdatasets  = length(unique(T.dataset));
 numstimuli   = 50;

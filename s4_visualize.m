@@ -361,6 +361,9 @@ else
                 'all-noCross-m4-ds1', 'all-noCross-m4-ds2', 'all-noCross-m4-ds3', 'all-noCross-m4-ds4',...
                 'all-noCross-m5-ds1', 'all-noCross-m5-ds2', 'all-noCross-m5-ds3', 'all-noCross-m5-ds4',...
                 'all-noCross-m6-ds1', 'all-noCross-m6-ds2', 'all-noCross-m6-ds3', 'all-noCross-m6-ds4',...
+                'all-noCross-m3m5m6-ds1','all-noCross-m3m5m6-ds2','all-noCross-m3m5m6-ds3','all-noCross-m3m5m6-ds4'...
+                'all-noCross-m2m3m6-ds1','all-noCross-m2m3m6-ds2','all-noCross-m2m3m6-ds3','all-noCross-m2m3m6-ds4'...
+                'all-noCross-m2m3m5m6-ds1','all-noCross-m2m3m5m6-ds2','all-noCross-m2m3m5m6-ds3','all-noCross-m2m3m5m6-ds4'...
              }
             data_folder = 'noCross';
             target   = 'all';
@@ -432,7 +435,9 @@ else
                         case {3, 4}
                             target_ind = [ 9:12,    26, 28:39];
                     end
-                    targ_pred_summary_all(target_ind, idx, data_idx, roi) = target_BOLD_pred';
+                    switch target
+                        case 'target'; targ_pred_summary_all(target_ind, idx, data_idx, roi) = target_BOLD_pred';
+                    end
                 end
             end
         end

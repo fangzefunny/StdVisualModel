@@ -114,7 +114,7 @@ switch quick_choice
     case {'all', 'All'}
         model_idx = [1, 3, 4, 5];
     case {'more'}
-        model_idx = [1, 2, 3, 4, 5];
+        model_idx = [1, 2, 3, 4, 5, 6];
     case 'orientation'
         model_idx = [1, 3];
     case 'noOri'
@@ -135,7 +135,7 @@ switch quick_choice
     case {'figureS8d'}; model_idx = [2, 3, 5]; datasets  = 4;
     case {'Ori_Model'}; model_idx = [2, 3, 5];
     case 'NCE_model2'; model_idx = 6;
-    case 'tar-noCorss'; model_idx = [1, 2, 3, 4, 5, 6];
+    case 'tar-noCross'; model_idx = [1, 2, 3, 4, 5];
     case 'tar-noCross-m3-m5-m6'; model_idx = [3, 5, 6];
     case 'all-noCross-m1-ds1'; model_idx = 1; datasets  = 1;
     case 'all-noCross-m1-ds2'; model_idx = 1; datasets  = 2;
@@ -165,6 +165,14 @@ switch quick_choice
     case 'all-noCross-m3m5m6-ds2'; model_idx = [3, 5, 6]; datasets  = 2;
     case 'all-noCross-m3m5m6-ds3'; model_idx = [3, 5, 6]; datasets  = 3;
     case 'all-noCross-m3m5m6-ds4'; model_idx = [3, 5, 6]; datasets  = 4;
+    case 'all-noCross-m2m3m6-ds1'; model_idx = [2, 3, 6]; datasets  = 1;
+    case 'all-noCross-m2m3m6-ds2'; model_idx = [2, 3, 6]; datasets  = 2;
+    case 'all-noCross-m2m3m6-ds3'; model_idx = [2, 3, 6]; datasets  = 3;
+    case 'all-noCross-m2m3m6-ds4'; model_idx = [2, 3, 6]; datasets  = 4;    
+    case 'all-noCross-m2m3m5m6-ds1'; model_idx = [2, 3, 5, 6]; datasets  = 1;
+    case 'all-noCross-m2m3m5m6-ds2'; model_idx = [2, 3, 5, 6]; datasets  = 2;
+    case 'all-noCross-m2m3m5m6-ds3'; model_idx = [2, 3, 5, 6]; datasets  = 3;   
+    case 'all-noCross-m2m3m5m6-ds4'; model_idx = [2, 3, 5, 6]; datasets  = 4;
 end
 
 

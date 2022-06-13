@@ -7,6 +7,7 @@ classdef ColorPalette
         Red         = [ 255, 118, 117] / 255 .* .8;
         Yellow      = [ 253, 203, 110] / 255;
         Grey        = [ .7, .7, .7];
+        Purple      = [108,  92, 231] / 255
    end
    methods
       function colors = getPalette(obj)
