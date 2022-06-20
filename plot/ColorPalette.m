@@ -12,7 +12,7 @@ classdef ColorPalette
    methods
       function colors = getPalette(obj)
           %  get the palette for plot
-         colors   = {obj.Dark, obj.Green, obj.Red, obj.Blue, obj.Yellow, obj.Grey};
+         colors   = {obj.Dark, obj.Green, obj.Red, obj.Blue, obj.Yellow, obj.Purple};
       end
    end
 end
