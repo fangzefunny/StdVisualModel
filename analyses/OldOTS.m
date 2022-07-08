@@ -147,7 +147,7 @@ switch f_idx
         if gcon_loc < nG; xline(gcon_loc,'Color','red','LineStyle','--');end
         if wcon_loc < nW; yline(wcon_loc,'Color','red','LineStyle','--');end
         
-    case {'remove_redundacy_linspace', 'remove_redundacy_logspace', 'OTS_v3_lossLand'}
+    case {'remove_redundacy_linspace', 'remove_redundacy_logspace', 'OTS_v3_lossLand', 'OTS_classic_lossLand'}
         
         switch f_idx
             
@@ -170,6 +170,12 @@ switch f_idx
                 nW = 40; nG = nW; sp=6;
                 w_Lst = linspace(1, 1000, nW);
                 g_Lst = linspace(1, 1000, nG);
+                
+            case 'OTS_classic_lossLand'
+                
+                nW = 40; nG = nW; sp=6;
+                w_Lst = linspace(1e-5, 1e-4, nW);
+                g_Lst = linspace(1e-1, 5, nG);
         end
         
         if n_fix; n_opt = n_fix; end
@@ -191,6 +197,8 @@ switch f_idx
                          y_hat = model.forward2(model, E, Z, param);
                     case 'OTS_v3_lossLand'
                          y_hat = model.forward(model, E, Z, param);
+                    case 'OTS_classic_lossLand'
+                         y_hat = model.forwardClassic(model, E, Z, param);
                 end
                
                 square_error = (y_tar - y_hat).^2;
@@ -213,7 +221,7 @@ switch f_idx
         xticklabels(g_Lst(1:sp:nG))
         yticks(1:sp:nW)
         yticklabels(w_Lst(1:sp:nW))
-        xlabel('b')
+        xlabel('g')
         ylabel('w')
         axis equal;
         hold on

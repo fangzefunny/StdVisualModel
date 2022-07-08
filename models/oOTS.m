@@ -120,5 +120,34 @@ classdef oOTS < contrastModel
             y_hat = squeeze(mean(yi_hat, 1));
            
         end
+        
+        % function: f()
+        function y_hat = forwardClassic(model, E, Z, param)
+            
+            if model.receptive_weight ==false
+                height = size(E, 1) ;
+                model = model.disk_weight(model, height);
+            end
+             
+            % get the parameters
+            w = param(1);
+            g = param(2);
+            n = param(3);
+            
+            % x x y x ori x exp x stim --> x x y x exp x stim
+            d = E ./ (w + Z); 
+            v = squeeze(mean(d, 3));
+            d = bsxfun(@times, v, model.receptive_weight);
+                        
+            % Sum over spatial position
+            s = squeeze(mean(mean(d , 1) , 2)); % ep x stimuli
+            
+            % add gain and nonlinearity, yi_hat: exp x stim
+            yi_hat = g .* s .^ n; 
+
+            % Sum over different examples, y_hat: stim 
+            y_hat = squeeze(mean(yi_hat, 1));
+           
+        end
     end
 end
