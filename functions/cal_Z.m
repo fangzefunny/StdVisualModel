@@ -15,8 +15,8 @@ function Z = cal_Z(E_xy, labelVec, sig_long, sig_short, sig_dot)
 
 % set the default parameter 
 if (nargin < 5), sig_dot   = .01; end
-if (nargin < 4), sig_short = .1; end
-if (nargin < 3), sig_long  = .85; end
+if (nargin < 4), sig_short = .8; end
+if (nargin < 3), sig_long  = .8; end
 sz = round(size(E_xy, 1) / 20)*2;
 
 % get the filter 

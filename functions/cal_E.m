@@ -1,31 +1,22 @@
-function E = cal_E(data, labelVec, mode, which_data, filter_cpd)
-if (nargin < 5), filter_cpd = 3;end
+function [E_ori, E] = cal_E(data, ds, Gabor_c, Gabor_s)
 
-fovs        = 12.5 * [1, 3/2, 1, 1]; % deg (the second data set had a larger field of view than the others)
-fov         = fovs(which_data);
-numpix      = size(data,1);
-pixperdeg   = numpix / fov;
-ppc         = pixperdeg ./ filter_cpd; % pixels per cycle
-support     = 6; % cycles per filter
-o           = linspace(0,pi, 9); % orientation
-thetavec    = o(1:end-1); % exclude the pi deg
-nO          = length(thetavec);
-padsize     = max(ppc) .* support;
+% define the orientation
+o        = linspace(0,pi, 9); % orientation
+thetavec = o(1:end-1); % exclude the pi deg
+nO       = length(thetavec);
+labelVec = 1:size(data, 4);
 
-% create filters
-[Gabor_c, Gabor_s]=makeGaborFilter(ppc, thetavec, support);
+% get the size of the pad image
+numpix  = size(data,1);
+re_szs  = [150, 225, 150, 150]; 
+support = 6;
+padsize = 12 .* support; % need to check
+re_sz   = re_szs(ds) + ceil(padsize*re_szs(ds)/numpix)*2;
 
 % get placeholders,
-switch mode
-    case 'orientation'
-        % dims: ori x ep x labels
-        E = nan(nO, 9, length(labelVec));
-    case 'space'
-        % The size the size
-        sz = numpix + padsize*2;
-        % dims: X x Y x ori x ep x labels
-        E = nan(sz, sz, nO, 9, length( labelVec ));
-end
+% dims: X x Y x ori x ep x labels
+E = nan(re_sz, re_sz, nO, 9, length(labelVec));
+E_ori = nan(nO, 9, length(labelVec));
 
 % progress tracking
 idx = round((1:10)/10*length(labelVec));
@@ -46,20 +37,18 @@ for ii= 1:length(labelVec)
         
         % filter and get the CONTRAST of the image
         % dims: X x Y x ori
-        conEnergy = Icontrast(stimulus, Gabor_c, Gabor_s, ppc, thetavec); 
-           
-        % assign the data
-        switch mode
-            case 'orientation'
-                % create a disk-like weight to prevent edge effect
-                w = gen_disk(size(conEnergy, 1));
-                % calculate E_ori for orientation-type model
-                E_ori = squeeze(mean(mean(w.*conEnergy, 2), 1)); % 1- D theta
-                E(:, ep, ii) = E_ori';
-            case 'space'
-                E(:, :, :, ep,  ii) = conEnergy;   
-        end
+        conEnergy = Icontrast(stimulus, Gabor_c, Gabor_s);
+        
+        % get E_ori and E space
+        % create a disk-like weight to prevent edge effect
+        w = gen_disk(size(conEnergy, 1));
+        % calculate E_ori for orientation-type model
+        E_o = squeeze(mean(mean(w.*conEnergy, 2), 1)); % 1- D theta
+        E_ori(:, ep, ii) = E_o';
+        E(:, :, :, ep,  ii) = imresize(conEnergy, [re_sz, re_sz]);
     end
 end
+
 fprintf('\n');
 end
+

@@ -1,17 +1,18 @@
 
-function conEnergy = Icontrast(stimulus,G_c,G_s, sfvec, thetavec)
+function conEnergy = Icontrast(stimulus, G_c, G_s)
 
 % contrast image size 
 sz = size(stimulus,1);
+[nT, nF] = size(G_c);
 
 % placeholders 
-conEnergy = nan(sz, sz, length(thetavec), length(sfvec));
+conEnergy = nan(sz, sz, nT, nF);
 
 % for all frequencies, 
 % in this project, there is only 1 frequency
-for i = 1:length(sfvec)
+for i = 1:nF
     % for all orientaitons 
-    for j = 1:length(thetavec)
+    for j = 1:nT
         
         % get the Gabor filters
         Gabor_c = G_c{j, i};
