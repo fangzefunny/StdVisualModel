@@ -10,7 +10,15 @@ labelVec = 1:size(data, 4);
 numpix  = size(data,1);
 re_szs  = [150, 225, 150, 150]; 
 support = 6;
-padsize = 12 .* support; % need to check
+
+% ----  Adjusted by IB
+fovs    = 12.5 * [1, 3/2, 1, 1]; % deg (the second data set had a larger field of view than the others)
+fov     = fovs(ds);
+pixperdeg = numpix / fov;
+ppc     = round(pixperdeg./0.75); % pixels per cycle
+padsize = ppc .* support; % need to check
+% -----
+
 re_sz   = re_szs(ds) + ceil(padsize*re_szs(ds)/numpix)*2;
 
 % get placeholders,
@@ -41,11 +49,14 @@ for ii= 1:length(labelVec)
         
         % get E_ori and E space
         % create a disk-like weight to prevent edge effect
-        w = gen_disk(size(conEnergy, 1));
+        w = gen_disk(size(conEnergy, 1), numpix);
+        
+        % ----  Adjusted by IB
+        E(:, :, :, ep,  ii) = imresize(conEnergy.*w, [re_sz, re_sz]);
         % calculate E_ori for orientation-type model
-        E_o = squeeze(mean(mean(w.*conEnergy, 2), 1)); % 1- D theta
-        E_ori(:, ep, ii) = E_o';
-        E(:, :, :, ep,  ii) = imresize(conEnergy, [re_sz, re_sz]);
+        E_ori(:, ep, ii) = squeeze(mean(E(:, :, :, ep,  ii), [1, 2])); % 1- D theta
+        % ---- 
+        
     end
 end
 
