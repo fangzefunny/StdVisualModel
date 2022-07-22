@@ -65,11 +65,6 @@ classdef SOCModel < contrastModel
         
        % function: f()
         function y_hat = forward(model, E, param)
-            
-            if model.receptive_weight ==false
-                height = size(E, 1) ;
-                model = model.disk_weight(model, height);
-            end
              
             % get the parameters
             c = Sigmoid(param(1));
@@ -83,18 +78,14 @@ classdef SOCModel < contrastModel
             
             % d: x x y x exp x stim
             E_mean = mean(mean(E, 1), 2);
-            v = (E - c * E_mean).^2; 
-            d = bsxfun(@times, v, model.receptive_weight);
-            
+            d = (E - c * E_mean).^2; 
+         
             % Sum over spatial position
             s = squeeze(mean(mean(d , 1) , 2)); % ep x stimuli
         
-            % add nonlinearity, yi_hat: exp x stim
-            si_n = s .^ n; 
+            % add gain and exp, yi_hat: exp x stim
+            yi_hat = g .* s .^ n; 
             
-            % add gain: exp x stim
-            yi_hat = g .* si_n;
-
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));
            

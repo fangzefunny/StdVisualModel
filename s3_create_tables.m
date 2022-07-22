@@ -3,7 +3,7 @@ if ~exist('doCross', 'var'), doCross = false; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'all';
 
 fittime          = [];         % how manoy initialization. value space: Integer
-choose_model     = 'more';      % choose some preset data  ('all' or 'noOri');
+choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
 error_bar        = false;
 
 switch doCross
@@ -19,15 +19,13 @@ switch doCross
 end
 
 %% define model name 
-model_name = { 'CE', 'SOC', 'OTS', 'NOA','NCE', 'NCE2'};
+model_name = { 'CE', 'SOC', 'OTS', 'NOA'};
 
 % define param name
 param_name =  { 'CE: g', 'CE: n',  ...
                 'SOC: c', 'SOC: g', 'SOC: n', ...
                 'OTS: w', 'OTS: g', 'OTS: n',...
-                'NOA: w', 'NOA: g', 'NOA: n',...
-                'NCE: w', 'NCE: g', 'NCE: n',...
-                'NCE2: w', 'NCE2: g', 'NCE2: n',};
+                'NOA: w', 'NOA: g', 'NOA: n'};
 
 % save address
 save_address = fullfile(stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
@@ -40,7 +38,7 @@ T  = chooseData(choose_model, 'fmincon', fittime);
 
 % obtain some features of the storages
 nummodels    = length(unique(T.modelNum));
-model_vector = [1, 4, 5, 3, 2, 6];
+model_vector = [1, 4, 5, 3];
 modelLoader  = {contrastModel('fmincon', 40),... 
                 SOCModel('fmincon', 40),...
                 oriSurroundModel('fmincon', 40),...
@@ -148,8 +146,8 @@ end
 roi_sets   = {'v1', 'v2', 'v3'};
 pat_sets   = {'snakes', 'gratings'};
 data_sets  = {'DS1', 'DS2', 'DS3', 'DS4'};
-agent_sets = {'CE', 'SOC', 'OTS', 'NOA', 'NCE', 'Data'}; 
-agent_ind  = [1, 4, 5, 3, 2, 99]; 
+agent_sets = {'CE', 'SOC', 'OTS', 'NOA', 'Data'}; 
+agent_ind  = [1, 4, 5, 3, 99]; 
 row_names  = {};
 
 table_mat = NaN(length(data_sets) * length(agent_sets), ... 

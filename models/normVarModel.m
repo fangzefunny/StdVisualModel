@@ -43,17 +43,17 @@ classdef normVarModel < contrastModel
              
             % get the parameters
             w = param(1);
-            g = param(2);
+            b = param(2);
             n = Sigmoid(param(3));
             
             % d: ori x exp x stim
-            d = x ./ (1 + w*std(x, 1)); 
+            d = x ./ (b + w*std(x, 1)); 
             
             % sum over orientation, s: exp x stim 
             s = mean(d, 1);
             
             % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = g .* s .^ n; 
+            yi_hat = s .^ n; 
 
             % Sum over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';

@@ -72,7 +72,8 @@ classdef oriSurroundModel < contrastModel
             
             % x x y x ori x exp x stim --> x x y x exp x stim
             d = E ./ (b + w * Z); 
-            d = squeeze(mean(d, 3));
+            v = squeeze(mean(d, 3));
+         
                         
             % Sum over spatial position
             s = squeeze(mean(mean(d , 1) , 2)); % ep x stimuli
