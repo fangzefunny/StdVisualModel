@@ -127,16 +127,40 @@ switch which_obj
             end
         end
         
-    case {'Z_xy', 'oZ_xy', 'Z'}
-        fname = sprintf('Z_%02d.mat', dataset);
+    case {'Z1_xy', 'oZ1_xy', 'Z1'}
+        fname = sprintf('Z1_%02d.mat', dataset);
         switch which_obj
-            case {'Z_xy','Z'}
+            case {'Z1_xy','Z1'}
                 path = fullfile(prevPath, 'Data', 'E', fname );
-            case 'oZ_xy'
+            case 'oZ1_xy'
                 path = fullfile(prevPath, 'Data', 'oE', fname );
         end
-        load(path, 'Z');
-        data  = Z;
+        load(path, 'Z1');
+        data  = Z1;
+        if strcmp(target,  'target')
+            switch dataset
+                case {1}
+                    stim_idx = [1:10, 35:38, 47:50];
+                    data = data(:, :, :, :, stim_idx);
+                case{2}
+                    stim_idx = [1:10, 33:36, 45:48];
+                    data = data(:, :, :, :, stim_idx);
+                case{3, 4}
+                    stim_idx = [9:12, 26, 28:39];
+                    data = data(:, :, :, :, stim_idx);
+            end
+        end
+        
+      case {'Z2_xy', 'oZ2_xy', 'Z2'}
+        fname = sprintf('Z2_%02d.mat', dataset);
+        switch which_obj
+            case {'Z2_xy','Z2'}
+                path = fullfile(prevPath, 'Data', 'E', fname );
+            case 'oZ2_xy'
+                path = fullfile(prevPath, 'Data', 'oE', fname );
+        end
+        load(path, 'Z2');
+        data  = Z2;
         if strcmp(target,  'target')
             switch dataset
                 case {1}

@@ -17,7 +17,7 @@ models{2} = normCEModel(optimizer, fittime);
 models{3} = normVarModel(optimizer, fittime);
 models{4} = SOCModel(optimizer, fittime);
 models{5} = oriSurroundModel(optimizer, fittime);
-models{6} = normCEModel2(optimizer, fittime);
+models{6} = normModel(optimizer, fittime);
 
 switch quick_choice
     % for figures

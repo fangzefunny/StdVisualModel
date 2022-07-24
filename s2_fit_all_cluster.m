@@ -7,7 +7,7 @@ if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
 if ~exist('start_idx', 'var'), start_idx = 1; end    % what fold in the cross 
                                                         % validation to start
-if ~exist('choose_model', 'var'), choose_model = 'all'; end
+if ~exist('choose_model', 'var'), choose_model = 'more'; end % "all" means model 1-5, "more" means 1-6
 switch doCross
     case false
         cross_valid = 'one';            % 'one': not cross validate; 'cross_valid': cross validate
@@ -68,7 +68,17 @@ if strcmp(model.legend, 'oriSurround')
     disp('OTS')
 
     % gain weight E
-    Z = dataloader(stdnormRootPath, 'Z', target, dataset, roi);
+    Z = dataloader(stdnormRootPath, 'Z1', target, dataset, roi);
+    
+    % fit the data without cross validation: knock-1-out
+    [BOLD_pred, params, Rsquare, model] = ...
+        model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
+    
+elseif strcmp(model.legend, 'oriSurround') 
+    disp('norm')
+
+    % gain weight E
+    Z = dataloader(stdnormRootPath, 'Z2', target, dataset, roi);
     
     % fit the data without cross validation: knock-1-out
     [BOLD_pred, params, Rsquare, model] = ...

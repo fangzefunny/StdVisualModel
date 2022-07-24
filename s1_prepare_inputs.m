@@ -18,7 +18,7 @@ save_address = fullfile(stdnormRootPath, 'Data', 'E');
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
  % Tell the current process
-fprintf('Computing E_ori, E_xy, Z for dataset %d\n', ds);
+fprintf('Computing E_ori, E_xy, Z1, Z2 for dataset %d\n', ds);
 
 fname = sprintf('stimuli-dataset%02d_orig.mat', ds); 
 path  = fullfile(stdnormRootPath, 'Data', 'Stimuli', fname);
@@ -35,9 +35,13 @@ save(fullfile(save_address, fname), 'E_ori')
 % save E_xy 
 fname = sprintf('E_xy_%02d.mat', ds);
 save(fullfile(save_address, fname), 'E_xy','-v7.3')
-% cal Z_xy and save 
-Z = cal_Z(E_xy, labelVec);
-fname = sprintf('Z_%02d.mat', ds);
-save(fullfile(save_address, fname), 'Z','-v7.3')
+% cal Z1 and save: Z1 orientation tuned 
+Z1 = cal_Z(E_xy, labelVec);
+fname = sprintf('Z1_%02d.mat', ds);
+save(fullfile(save_address, fname), 'Z1','-v7.3')
+% cal Z2 and save: Z2 not tuned
+Z2 = cal_Z(E_xy, labelVec, 'notTuned');
+fname = sprintf('Z2_%02d.mat', ds);
+save(fullfile(save_address, fname), 'Z2','-v7.3')
 
 

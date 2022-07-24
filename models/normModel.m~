@@ -1,4 +1,4 @@
-classdef oriSurroundModel < contrastModel 
+classdef normModel < oriSurroundModel 
     
     % The basic properties of the class
     properties 
@@ -8,9 +8,9 @@ classdef oriSurroundModel < contrastModel
     methods
         
         % init the model
-        function model = oriSurroundModel(optimizer, fittime, param_bound, param_pbound)
+        function model = normModel(optimizer, fittime, param_bound, param_pbound)
             
-            model = model@contrastModel();
+            model = model@oriSurroundModel();
            
             if (nargin < 4), param_pbound = [  .1,   4;    1,   5;  -20,  20]; end
             if (nargin < 3), param_bound  = [-inf, inf; -inf, inf; -inf, inf]; end
@@ -41,143 +41,42 @@ classdef oriSurroundModel < contrastModel
            
     methods (Static = true)
                 
-       % function: choose weight 
-       function model = disk_weight(model, height)
-           
-           % create a meshgrid
-           [X , Y] = meshgrid(linspace(-1 , 1, height));
-           
-           % Create a disk with certain size
-            w = zeros(height,  height);
-            panel = X.^2 + Y.^2;
-
-            % Choose the radius of the disk ,  3 std of the edge size 
-            theresold = .75;
-            
-            % pixels < theresold
-            [index] = find(panel < theresold);
-            w(index) = 1;
-            
-            % assgin weight 
-           model.receptive_weight = w;
-       end
-        
        % function: f()
         function y_hat = forward(model, E, Z, param)
-             
-            % get the parameters
-            w = param(1);
-            b = param(2);
-            n = Sigmoid(param(3));
-            
-            % x x y x ori x exp x stim --> x x y x exp x stim
-            d = E ./ (b + w * Z); 
-            v = squeeze(mean(d, 3));
-         
-                        
-            % Sum over spatial position
-            s = squeeze(mean(mean(d , 1) , 2)); % ep x stimuli
-            
-            % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = s .^ n; 
-
-            % Sum over different examples, y_hat: stim 
-            y_hat = squeeze(mean(yi_hat, 1));
-           
+             y_hat = forward@oriSurroundModel(model, E, Z, param);
         end
         
         % print the parameters
         function param= print_param(model, param)
-            % reshape 
-            param = reshape(param, model.num_param, []);
-            % set param
-            param(3, :) = Sigmoid(param(3, :));
+            param = print_param@oriSurroundModel(model, param);
         end
         
         % measure the goodness of 
         function R2 = metric(BOLD_pred, BOLD_tar)
-            R2 = metric@contrastModel(BOLD_pred, BOLD_tar);
+            R2 = metric@oriSurroundModel(BOLD_pred, BOLD_tar);
         end
         
          % measure the goodness of 
         function loss= rmse(BOLD_pred, BOLD_tar)
-            loss = rmse@contrastModel(BOLD_pred, BOLD_tar);
+            loss = rmse@oriSurroundModel(BOLD_pred, BOLD_tar);
         end
         
         % loss function with sum sqaure error: sum(y - y_hat).^2
         function mse = loss_fn(param, model, E, Z, y_tar)
-            
-            % predict y_hat: 1 x stim 
-            y_hat = model.forward(model, E, Z, param);
-            % mse 
-            mse = double(mean((y_tar - y_hat).^2));
+            mse = loss_fn@oriSurroundModel(param, model, E, Z, y_tar);
         end
         
         % fit the data 
         function [loss, param, loss_history]  = optim(model, E, Z,  BOLD_tar, verbose)
-            
-           % set up the loss function
-            func=@(x) model.loss_fn(x, model, E, Z, BOLD_tar);
-            
-            opts.Display = verbose;
-            
-            % set up the bound
-            lb  = model.param_bound(:, 1);
-            ub  = model.param_bound(:, 2);
-            plb = model.param_pbound(:, 1);
-            pub = model.param_pbound(:, 2);
-            
-            % init param
-            x0_set = (plb + (pub - plb) .* rand(model.num_param, model.fittime))';
-            
-            % storage
-            x   = NaN(model.fittime, model.num_param);
-            sse = NaN(model.fittime, 1);
-            
-            % fit with n init
-            for ii = 1:model.fittime
-                
-                % optimization
-                switch model.optimizer
-                    case 'bads'
-                        [x(ii, :), sse(ii)] = bads(func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
-                    case 'fmincon'
-                        [x(ii, :), sse(ii)] = fmincon(func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
-                end
-                
-                fprintf('   fit: %d, loss: %.4f \n', ii, sse(ii)) 
-            end
-            
-            % find the lowest sse
-            loss  = min(sse);
-            trial = find(sse == loss);
-            param = x(trial(1), :); 
-            loss_history = sse;
-            
+            [loss, param, loss_history] = ...
+                optim@oriSurroundModel(model, E, Z,  BOLD_tar, verbose);
         end
         
         % Predict the BOLD response: y_hat = f(x)
         function BOLD_hat = predict(model, E, Z, params, if_cross)
             
             if (nargin < 5), if_cross='cross_valid'; end
-            
-            switch if_cross
-            
-                case 'one'
-                    BOLD_hat = model.forward(model, E, Z, params);
-                    
-                case 'cross_valid'
-                    stim_dim = size(E, length(size(E)));
-                    stim_ind = 1:stim_dim;
-                    BOLD_hat = nan(length(size(E)), 1);
-                    % predict the BOLD value with given param
-                    for idx = stim_ind
-                        param_test = params(:, idx);
-                        E_test = E(:, :, :, :, idx);
-                        Z_test = Z(:, :, :, :, idx);
-                        BOLD_hat(idx) = model.forward(model, E_test, Z_test, param_test);
-                    end 
-            end
+            BOLD_hat = predict@
         end
         
         % fcross valid

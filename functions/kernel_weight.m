@@ -1,4 +1,6 @@
-function F1 = kernel_weight(sigma_p,sigma_g,sigma_s, numx)
+function F1 = kernel_weight(sigma_p,sigma_g,sigma_s, numx, mode)
+
+if (nargin < 5), mode = 'oriTuned'; end
 
 numthetas   = 8; % The number of the \theta in the parameter 
 thetas      = (0:numthetas-1)*pi/numthetas; % \theta vector  
@@ -30,17 +32,37 @@ for theta = thetas
  
     % build an unoriented suppression field near the image center
     G = exp(- ( y.^2./(2*sigma_s^2)+ x.^2./(2*sigma_s^2)));
+    G = G ./max(G(:));
     
     % make the surround suppression orientation tuned
     idx = thetas == theta;
-    G(:,:,idx) = exp(-(y2(:,:,idx).^2./(2*sigma_p^2) + x2(:,:,idx).^2./(2*sigma_g^2)));
+    H = exp(-(y2(:,:,idx).^2./(2*sigma_p^2) + x2(:,:,idx).^2./(2*sigma_g^2)));
+    H = H / max(H(:));
+    G(:,:,idx)  = H;
     
     F(:,:,:,theta_prime) = G(:,:,:) / sum(G(:));
 end
 
-% change the sequence
-F1 = F;
-F1(:, :, 1:4, 1:4) = F(:, :, 5:8, 5:8);
-F1(:, :, 5:8, 5:8) = F(:, :, 1:4, 1:4);
-F1 = F1 ./ sum(F1, [1,2,3]);
+% output the filters according different mode 
+switch mode
+    case 'oriTuned' 
+    % change the sequence
+    F1 = F;
+    F1(:, :, 1:4, 1:4) = F(:, :, 5:8, 5:8);
+    F1(:, :, 5:8, 5:8) = F(:, :, 1:4, 1:4);
+    F1 = F1 ./ sum(F1, [1,2,3]);
+    % F1: sz x sz x 8 x8 
+    
+    case 'notTuned'
+    % change the sequence
+    F1 = nan(size(F,1), size(F,2), numthetas);
+    for i=1:numthetas
+        % get the diag filters and normed to 1 
+        f = F(:, :, i, i);
+        f = f ./sum(f(:));
+        F1(:, :, i) = f;         
+    end
+    % F1: sz x sz x 8
+end
+
 end
