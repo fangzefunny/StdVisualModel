@@ -2,7 +2,6 @@ classdef normModel < oriSurroundModel
     
     % The basic properties of the class
     properties 
-        receptive_weight = false
     end
     
     methods

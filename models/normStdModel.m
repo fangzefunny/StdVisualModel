@@ -8,7 +8,7 @@ classdef normStdModel < contrastModel
     methods
         
         % init the model
-        function model = normStdModel( optimizer, fittime, param_bound, param_pbound)
+        function model = normStdModel(optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
          

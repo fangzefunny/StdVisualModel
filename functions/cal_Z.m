@@ -1,4 +1,4 @@
-function Z = cal_Z(E_xy, labelVec, mode, sig_long, sig_short, sig_dot)
+function Z = cal_Z(E_xy, mode, sig_long, sig_short, sig_dot)
 %{
     Calculate the normalization of the OTS
     
@@ -21,6 +21,7 @@ if (nargin < 4), sig_long  = .8; end
 if (nargin < 3), mode      = 'oriTuned'; end
 
 sz = round(size(E_xy, 1) / 20)*2;
+labelVec = size(E_xy, 5);
 
 % get the filter
 F = kernel_weight(sig_long, sig_short, sig_dot, sz, mode);
