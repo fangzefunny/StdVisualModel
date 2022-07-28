@@ -5,10 +5,11 @@ classdef contrastModel
         optimizer               
         fittime        
         num_param    = 2
-        param_name   = ['g'; 'n']
+        param_name   = ['g'; 'alpha']
         param_bound  = []
         param_pbound = []
         param        = []
+        model_idx    = 1;
         model_type   = 'orientation'
         legend       = 'CE'
         loss_log     = []
@@ -45,16 +46,16 @@ classdef contrastModel
             
             % get the parameters
             g = param(1);
-            n = Sigmoid(param(2));
+            alpha = Sigmoid(param(2));
             
             % d: ori x exp x stim
             d = x;
             
-            % sum over orientation, s: exp x stim 
+            % mean over orientation, s: exp x stim 
             s = mean(d, 1);
 
-            % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = g .* s .^ n;
+            % add gain and exponential, yi_hat: exp x stim
+            yi_hat = g .* s .^ alpha;
       
             % mean over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';
@@ -89,7 +90,7 @@ classdef contrastModel
         end
         
         
-        % Loss function for optimization: mean squared erro 
+        % Loss function for optimization: mean squared error 
         function mse = loss_fn(param, model, E, y_tar)
             
             % predict y_hat: 1 x stim 

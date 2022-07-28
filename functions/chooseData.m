@@ -13,11 +13,10 @@ ROIs     = {'V1', 'V2', 'V3'};
 
 models = cell(4, 1);
 models{1} = contrastModel(optimizer, fittime);
-models{2} = normCEModel(optimizer, fittime);
-models{3} = normVarModel(optimizer, fittime);
-models{4} = SOCModel(optimizer, fittime);
-models{5} = oriSurroundModel(optimizer, fittime);
-models{6} = normModel(optimizer, fittime);
+models{2} = SOCModel(optimizer, fittime);
+models{3} = oriSurroundModel(optimizer, fittime);
+models{4} = normModel(optimizer, fittime);
+models{5} = normVarModel(optimizer, fittime);
 
 switch quick_choice
     % for figures
@@ -108,71 +107,10 @@ switch quick_choice
     case {'figureS7d'}
         model_idx = [1, 3, 4, 5];
         datasets  = 4;
-        % for others
-    case {'con'}
-        model_idx = 1;
     case {'all', 'All'}
-        model_idx = [1, 3, 4, 5];
+        model_idx = [1, 2, 3, 5];
     case {'more'}
-        model_idx = [1, 2, 3, 4, 5, 6];
-    case 'orientation'
-        model_idx = [1, 3];
-    case 'noOri'
-        model_idx = [1, 3, 4];
-    case {'SOC', 'soc'}
-        model_idx = 4;
-    case {'OTS'}; model_idx = 5;
-    case 'noNOA'; model_idx = [1, 4, 5];
-    case 'NOA';  model_idx = 3;
-    case 'STD';  model_idx = 2;
-    case 'no_model'; model_idx = NaN;
-    case 'SOC_test'; model_idx = 4; datasets = 1;
-    case 'OTS_test'; model_idx = 5; datasets = 1;
-    case 'NCE_model'; model_idx = 2;
-    case {'figureS8a'}; model_idx = [2, 3, 5]; datasets  = 1;
-    case {'figureS8b'}; model_idx = [2, 3, 5]; datasets  = 2;
-    case {'figureS8c'}; model_idx = [2, 3, 5]; datasets  = 3;
-    case {'figureS8d'}; model_idx = [2, 3, 5]; datasets  = 4;
-    case {'Ori_Model'}; model_idx = [2, 3, 5];
-    case 'NCE_model2'; model_idx = 6;
-    case 'tar-noCross'; model_idx = [1, 2, 3, 4, 5];
-    case 'tar-noCross-m3-m5-m6'; model_idx = [3, 5, 6];
-    case 'all-noCross-m1-ds1'; model_idx = 1; datasets  = 1;
-    case 'all-noCross-m1-ds2'; model_idx = 1; datasets  = 2;
-    case 'all-noCross-m1-ds3'; model_idx = 1; datasets  = 3;
-    case 'all-noCross-m1-ds4'; model_idx = 1; datasets  = 4;
-    case 'all-noCross-m2-ds1'; model_idx = 2; datasets  = 1;
-    case 'all-noCross-m2-ds2'; model_idx = 2; datasets  = 2;
-    case 'all-noCross-m2-ds3'; model_idx = 2; datasets  = 3;
-    case 'all-noCross-m2-ds4'; model_idx = 2; datasets  = 4;
-    case 'all-noCross-m3-ds1'; model_idx = 3; datasets  = 1;
-    case 'all-noCross-m3-ds2'; model_idx = 3; datasets  = 2;
-    case 'all-noCross-m3-ds3'; model_idx = 3; datasets  = 3;
-    case 'all-noCross-m3-ds4'; model_idx = 3; datasets  = 4;
-    case 'all-noCross-m4-ds1'; model_idx = 4; datasets  = 1;
-    case 'all-noCross-m4-ds2'; model_idx = 4; datasets  = 2;
-    case 'all-noCross-m4-ds3'; model_idx = 4; datasets  = 3;
-    case 'all-noCross-m4-ds4'; model_idx = 4; datasets  = 4;
-    case 'all-noCross-m5-ds1'; model_idx = 5; datasets  = 1;
-    case 'all-noCross-m5-ds2'; model_idx = 5; datasets  = 2;
-    case 'all-noCross-m5-ds3'; model_idx = 5; datasets  = 3;
-    case 'all-noCross-m5-ds4'; model_idx = 5; datasets  = 4;
-    case 'all-noCross-m6-ds1'; model_idx = 6; datasets  = 1;
-    case 'all-noCross-m6-ds2'; model_idx = 6; datasets  = 2;
-    case 'all-noCross-m6-ds3'; model_idx = 6; datasets  = 3;
-    case 'all-noCross-m6-ds4'; model_idx = 6; datasets  = 4;
-    case 'all-noCross-m3m5m6-ds1'; model_idx = [3, 5, 6]; datasets  = 1;
-    case 'all-noCross-m3m5m6-ds2'; model_idx = [3, 5, 6]; datasets  = 2;
-    case 'all-noCross-m3m5m6-ds3'; model_idx = [3, 5, 6]; datasets  = 3;
-    case 'all-noCross-m3m5m6-ds4'; model_idx = [3, 5, 6]; datasets  = 4;
-    case 'all-noCross-m2m3m6-ds1'; model_idx = [2, 3, 6]; datasets  = 1;
-    case 'all-noCross-m2m3m6-ds2'; model_idx = [2, 3, 6]; datasets  = 2;
-    case 'all-noCross-m2m3m6-ds3'; model_idx = [2, 3, 6]; datasets  = 3;
-    case 'all-noCross-m2m3m6-ds4'; model_idx = [2, 3, 6]; datasets  = 4;    
-    case 'all-noCross-m2m3m5m6-ds1'; model_idx = [2, 3, 5, 6]; datasets  = 1;
-    case 'all-noCross-m2m3m5m6-ds2'; model_idx = [2, 3, 5, 6]; datasets  = 2;
-    case 'all-noCross-m2m3m5m6-ds3'; model_idx = [2, 3, 5, 6]; datasets  = 3;   
-    case 'all-noCross-m2m3m5m6-ds4'; model_idx = [2, 3, 5, 6]; datasets  = 4;
+        model_idx = [1, 2, 3, 4, 5];
 end
 
 

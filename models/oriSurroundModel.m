@@ -2,7 +2,6 @@ classdef oriSurroundModel < contrastModel
     
     % The basic properties of the class
     properties 
-        receptive_weight = false
     end
     
     methods
@@ -11,8 +10,8 @@ classdef oriSurroundModel < contrastModel
         function model = oriSurroundModel(optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
-           
-            if (nargin < 4), param_pbound = [  .1,   4;    1,   5;  -20,  20]; end
+            % check the range after fitting non-cross fit 
+            if (nargin < 4), param_pbound = [1e-6,  .1;    1,  10;  -20,  20]; end
             if (nargin < 3), param_bound  = [-inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
@@ -29,68 +28,59 @@ classdef oriSurroundModel < contrastModel
             model.param_pbound = param_pbound; 
             model.fittime      = fittime;
             model.optimizer    = optimizer; 
-            model.num_param    = param_num ;
-            model.param_name   = ['w'; 'g'; 'n'];
-            model.legend       = 'oriSurround'; 
+            model.num_param    = param_num;
+            model.fparam_name  = ['w'; 'b'; 'alpha'];
+            model.param_name   = ['sigma'; 'g'; 'alpha'];
+            model.legend       = 'OTS'; 
             model.model_type   = 'space';
             model.param        = [];
-            model.receptive_weight = false; 
+            model.model_idx    = 3;
         end
                        
     end
            
     methods (Static = true)
-                
-       % function: choose weight 
-       function model = disk_weight(model, height)
-           
-           % create a meshgrid
-           [X , Y] = meshgrid(linspace(-1 , 1, height));
-           
-           % Create a disk with certain size
-            w = zeros(height,  height);
-            panel = X.^2 + Y.^2;
-
-            % Choose the radius of the disk ,  3 std of the edge size 
-            theresold = .75;
-            
-            % pixels < theresold
-            [index] = find(panel < theresold);
-            w(index) = 1;
-            
-            % assgin weight 
-           model.receptive_weight = w;
-       end
-        
+                    
        % function: f()
         function y_hat = forward(model, E, Z, param)
              
             % get the parameters
             w = param(1);
             b = param(2);
-            n = Sigmoid(param(3));
+            alpha = Sigmoid(param(3));
             
             % x x y x ori x exp x stim --> x x y x exp x stim
             d = E ./ (b + w * Z); 
             d = squeeze(mean(d, 3));
                         
-            % Sum over spatial position
-            s = squeeze(mean(mean(d , 1) , 2)); % ep x stimuli
+            % mean over spatial position
+            s = squeeze(mean(mean(d , 1), 2)); % ep x stimuli
             
-            % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = s .^ n; 
+            % add gain and exponential, yi_hat: exp x stim
+            yi_hat = s .^ alpha; 
 
-            % Sum over different examples, y_hat: stim 
+            % mean over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));
            
         end
         
-        % print the parameters
-        function param= print_param(model, param)
+        % print the fit parameters
+        function param = print_fparam(model, param)
             % reshape 
             param = reshape(param, model.num_param, []);
-            % set param
+            % reparameterize
             param(3, :) = Sigmoid(param(3, :));
+        end
+        
+        % print the reparameterized parameters
+        function newparam = print_param(model, param)
+            % reshape 
+            param = reshape(param, model.num_param, []);
+            newparam = nan(size(param,1), size(param,2));
+            % reparameterize
+            newparam(3, :) = Sigmoid(param(3, :));    % alpha 
+            newparam(1, :) = param(2,:) / param(1,:); % sigma
+            newparam(1, :) = (1 / param(1,:)) .^ newparam(3, :);  % g
         end
         
         % measure the goodness of 

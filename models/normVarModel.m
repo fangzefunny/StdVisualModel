@@ -11,7 +11,7 @@ classdef normVarModel < contrastModel
             
             model = model@contrastModel();
       
-            if (nargin < 4), param_pbound = [  .1,  10;    1,  10; - 20,  20]; end
+            if (nargin < 4), param_pbound = [1e-6,  .1;    1,  10;  -20,  20]; end
             if (nargin < 3), param_bound  = [-inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
@@ -29,9 +29,11 @@ classdef normVarModel < contrastModel
             model.fittime      = fittime;
             model.optimizer    = optimizer; 
             model.num_param    = param_num ;
-            model.param_name   = [ 'w'; 'g'; 'n' ];
-            model.legend       = 'normVar'; 
+            model.fparam_name  = ['w'; 'b'; 'alpha'];
+            model.param_name   = ['sigma'; 'g'; 'alpha'];
+            model.legend       = 'NOA'; 
             model.param        = [];
+            model.model_idx    = 5; 
         end
            
     end
@@ -44,18 +46,18 @@ classdef normVarModel < contrastModel
             % get the parameters
             w = param(1);
             b = param(2);
-            n = Sigmoid(param(3));
+            alpha = Sigmoid(param(3));
             
             % d: ori x exp x stim
-            d = x ./ (b + w*std(x, 1)); 
+            d = x ./ (b + w.*std(x, 1)); 
             
-            % sum over orientation, s: exp x stim 
+            % mean over orientation, s: exp x stim 
             s = mean(d, 1);
             
-            % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = s .^ n; 
+            % add gain and exponential, yi_hat: exp x stim
+            yi_hat = s .^ alpha; 
 
-            % Sum over different examples, y_hat: stim 
+            % mean over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 2))';
            
         end
@@ -68,7 +70,7 @@ classdef normVarModel < contrastModel
             
         end
         
-        % print the parameters
+        % print the parameters: do it later 
         function param= print_param(model, param)
             % reshape param
             param = reshape(param, model.num_param, []);
@@ -76,19 +78,19 @@ classdef normVarModel < contrastModel
             param(3, :) = Sigmoid(param(3, :));
         end
         
-        % measure the goodness of 
+        % measure the goodness of the model 
         function Rsquare = metric(pred, tar)
             Rsquare = metric@contrastModel(pred, tar);
         end
         
-        % measure the goodness of 
+        % measure the goodness of the model 
         function loss= rmse(pred, tar)
             loss = rmse@contrastModel(pred, tar);
         end
         
-        % loss function with sum sqaure error: sum( y - y_hat ).^2
-        function sse = loss_fn(param, model, E, y_tar)
-            sse = loss_fn@contrastModel(param, model, E, y_tar);
+        % loss function with mean sqaure error: mean(y - y_hat)^2
+        function mse = loss_fn(param, model, E, y_tar)
+            mse = loss_fn@contrastModel(param, model, E, y_tar);
         end
         
         % fit the data 
@@ -97,7 +99,7 @@ classdef normVarModel < contrastModel
                 optim@contrastModel(model, E, BOLD_tar, verbose);
         end
         
-        % fcross valid
+        % fit cross-valid
         function [BOLD_pred, params, Rsquare, model] = fit(model, E, BOLD_tar, verbose, cross_valid, save_info)     
             if (nargin < 5), cross_valid = 'one'; end
             [BOLD_pred, params, Rsquare, model] = ...

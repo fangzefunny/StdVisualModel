@@ -63,31 +63,31 @@ switch model.model_type
     case 'space'      ; which_obj = 'E_xy'; % SOC, OTS
 end
 
-E = dataloader(stdnormRootPath, which_obj, target, dataset, roi, 'old');
+% load contrast energy 
+E = dataloader(stdnormRootPath, which_obj, target, dataset, roi);
 
-if strcmp(model.legend, 'oriSurround')
-    disp('OTS')
+disp(model.legend)
+switch model.legend
 
-    % gain weight E
-    Z = dataloader(stdnormRootPath, 'Z1', target, dataset, roi);
-    
-    % fit the data without cross validation: knock-1-out
-    [BOLD_pred, params, Rsquare, model] = ...
-        model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
-    
-elseif strcmp(model.legend, 'normModel') 
-    disp('normModel')
+    case 'oriSurround'
+        % gain weight E
+        Z = dataloader(stdnormRootPath, 'Z1', target, dataset, roi);
 
-    % gain weight E
-    Z = dataloader(stdnormRootPath, 'Z2', target, dataset, roi);
-    
-    % fit the data without cross validation: knock-1-out
-    [BOLD_pred, params, Rsquare, model] = ...
-        model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
-    
-else 
-    % fit the data without cross validation: knock-1-out
-    [BOLD_pred, params, Rsquare, model] = ...
+        % fit the data without cross validation: knock-1-out
+        [BOLD_pred, params, Rsquare, model] = ...
+            model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
+        
+    case 'normModel'
+        % gain weight E
+        Z = dataloader(stdnormRootPath, 'Z2', target, dataset, roi);
+
+        % fit the data without cross validation: knock-1-out
+        [BOLD_pred, params, Rsquare, model] = ...
+            model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
+        
+    otherwise
+        % fit the data without cross validation: knock-1-out
+        [BOLD_pred, params, Rsquare, model] = ...
         model.fit(model, E, BOLD_target, verbose, cross_valid, save_info);
 end
 

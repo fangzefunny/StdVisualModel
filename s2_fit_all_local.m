@@ -1,8 +1,8 @@
 %% Parse the hyperparameters
 if ~exist('doCross', 'var'), doCross = true; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
-if ~exist('start_idx', 'var'), start_idx = 1; end    % what fold in the cross 
-                                                        % validation to start
+if ~exist('start_idx', 'var'), start_idx = 1; end    % what fold in the cross
+% validation to start
 if ~exist('choose_model', 'var'), choose_model = 'all'; end
 switch doCross
     case false
@@ -15,19 +15,19 @@ end
 
 optimizer            = 'fmincon'; % what kind of optimizer,  value space: 'bads', 'fmincon'
 fittime              = 40;        % how many initialization. value space: Integer
-verbose              = 'off';     % show the fit details? 
+verbose              = 'off';     % show the fit details?
 
 %% save address and create a table for all jobs
 
-% save address 
+% save address
 save_address = fullfile( stdnormRootPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
-% create jobs 
+% create jobs
 T = chooseData(choose_model, optimizer, fittime);
 
 %% start Fit
-% get the job using loop 
+% get the job using loop
 for hpc_job_number = 1:size(T, 1)
     
     dataset   = T.dataset(hpc_job_number);
@@ -36,7 +36,7 @@ for hpc_job_number = 1:size(T, 1)
     model     = T.modelLoader{hpc_job_number};
     
     % set the save info, this helps in
-    % continuing job in the broken pipe 
+    % continuing job in the broken pipe
     save_temp = fullfile( save_address, 'temp');
     if ~exist(save_temp, 'dir'), mkdir(save_temp); end
     save_info.dir       = save_temp;
@@ -45,36 +45,44 @@ for hpc_job_number = 1:size(T, 1)
     save_info.dataset   = dataset;
     save_info.start_idx = start_idx;
     
-    % display information to keep track of fitting 
+    % display information to keep track of fitting
     display = ['dataset: ' num2str(dataset), ' roi: ',num2str( roi), ' model: ', num2str(model_idx) ];
     disp(display)
     
     % load training label
     BOLD_target = dataloader(stdnormRootPath, 'BOLD_target', target, dataset, roi);
     
-    % load the input E 
+    % load the input E
     switch model.model_type
-        case 'orientation'; which_obj = 'E_ori'; % CE, NOA 
+        case 'orientation'; which_obj = 'E_ori'; % CE, NOA
         case 'space';       which_obj = 'E_xy';  % SOC, OTS
     end
-    E = dataloader(stdnormRootPath, which_obj, target, dataset, roi, 'old');
+    % load contrast energy
+    E = dataloader(stdnormRootPath, which_obj, target, dataset, roi);
     
-    if strcmp( model.legend, 'oriSurround')
-        disp( 'OTS')
-    
-        % gain weight E
-        Z = dataloader(stdnormRootPath, 'Z', target, dataset, roi);
+    disp(model.legend)
+    switch model.legend
         
-        % fit the data without cross validation: knock-1-out
-        [BOLD_pred, params, Rsquare, model] = ...
-            model.fit(model, E, Z, BOLD_target, verbose, cross_valid, save_info);
-        
-    else 
-        disp(model.legend)
-        
-        % fit the data without cross validation: knock-1-out
-        [BOLD_pred, params, Rsquare, model] = ...
-            model.fit( model, E, BOLD_target, verbose, cross_valid, save_info);
+        case 'oriSurround'
+            % gain weight E
+            Z = dataloader(stdnormRootPath, 'Z1', target, dataset, roi);
+            
+            % fit the data without cross validation: knock-1-out
+            [BOLD_pred, params, Rsquare, model] = ...
+                model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
+            
+        case 'normModel'
+            % gain weight E
+            Z = dataloader(stdnormRootPath, 'Z2', target, dataset, roi);
+            
+            % fit the data without cross validation: knock-1-out
+            [BOLD_pred, params, Rsquare, model] = ...
+                model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
+            
+        otherwise
+            % fit the data without cross validation: knock-1-out
+            [BOLD_pred, params, Rsquare, model] = ...
+                model.fit(model, E, BOLD_target, verbose, cross_valid, save_info);
     end
     
     if strcmp( cross_valid, 'one')

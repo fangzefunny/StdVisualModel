@@ -26,7 +26,8 @@ for i = 1:nF
 end
 
 % combine the spatial frequencies
-conEnergy = sum(conEnergy, 4);
+% E(x,y,θ) = 1/nF * ∑_f E(x,y,θ,f)
+conEnergy = mean(conEnergy, 4);
 
 end
 

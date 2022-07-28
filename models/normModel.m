@@ -11,7 +11,7 @@ classdef normModel < oriSurroundModel
             
             model = model@oriSurroundModel();
            
-            if (nargin < 4), param_pbound = [  .1,   4;    1,   5;  -20,  20]; end
+            if (nargin < 4), param_pbound = [1e-6,  .1;    1,  10;  -20,  20]; end
             if (nargin < 3), param_bound  = [-inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
             if (nargin < 1), optimizer = 'fmincon';end
@@ -29,11 +29,12 @@ classdef normModel < oriSurroundModel
             model.fittime      = fittime;
             model.optimizer    = optimizer; 
             model.num_param    = param_num ;
-            model.param_name   = ['w'; 'g'; 'n'];
-            model.legend       = 'norm'; 
+            model.fparam_name  = ['w'; 'b'; 'alpha'];
+            model.param_name   = ['sigma'; 'g'; 'alpha'];
+            model.legend       = 'DN'; 
             model.model_type   = 'space';
             model.param        = [];
-            model.receptive_weight = false; 
+            model.model_idx    = 4;
         end
                        
     end

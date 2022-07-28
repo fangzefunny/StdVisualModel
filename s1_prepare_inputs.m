@@ -5,7 +5,7 @@ if ~exist('ds', 'var'), ds = 1; end
 % the spatial frequency
 if ~exist('filter_cpd', 'var'), filter_cpd = [.75, 1.5, 3, 6]; end
 
-%% download the fmri data
+%% download the fmri data % update the origin image
 
 % url= 'https://osf.io/xv8m2/download';
 % pth = fullfile(stdnormRootPath, 'Data', 'Data.zip');
@@ -40,7 +40,7 @@ Z1 = cal_Z(E_xy);
 fname = sprintf('Z1_%02d.mat', ds);
 save(fullfile(save_address, fname), 'Z1','-v7.3')
 % cal Z2 and save: Z2 not tuned
-Z2 = cal_Z(E_xy, 'notTuned');
+Z2 = cal_Z(E_xy, 'unTuned');
 fname = sprintf('Z2_%02d.mat', ds);
 save(fullfile(save_address, fname), 'Z2','-v7.3')
 

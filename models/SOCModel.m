@@ -2,7 +2,6 @@ classdef SOCModel < contrastModel
     
     % The basic properties of the class
     properties 
-        receptive_weight = false
     end
     
     methods
@@ -31,45 +30,25 @@ classdef SOCModel < contrastModel
             model.fittime      = fittime;
             model.optimizer    = optimizer; 
             model.num_param    = param_num ;
-            model.param_name   = ['c'; 'g'; 'n'];
+            model.param_name   = ['c'; 'g'; 'alpha'];
             model.legend       = 'SOC'; 
             model.model_type   = 'space';
             model.param        = [];
             model.receptive_weight = false; 
+            model.model_idx    = 2;
         end
                        
     end
            
     methods (Static = true)
-       
-       % function: choose weight 
-       function model = disk_weight(model, height)
-           
-           % create a meshgrid
-           [X , Y] = meshgrid(linspace(-1 , 1, height));
-           
-           % Create a disk with certain size
-            w = zeros(height,  height);
-            panel = X.^2 + Y.^2;
-
-            % Choose the radius of the disk ,  3 std of the edge size 
-            theresold = .75;
-            
-            % pixels < theresold
-            [index] = find(panel < theresold);
-            w(index) = 1;
-            
-            % assgin weight 
-           model.receptive_weight = w;
-       end
         
        % function: f()
         function y_hat = forward(model, E, param)
              
             % get the parameters
-            c = Sigmoid(param(1));
-            g = param(2);
-            n = Sigmoid(param(3));
+            c     = Sigmoid(param(1));
+            g     = param(2);
+            alpha = Sigmoid(param(3));
             
             %fprintf('c:%5.4f\tg:%5.4f\tn:%5.4f\n',c,g,n);
             
@@ -80,13 +59,13 @@ classdef SOCModel < contrastModel
             E_mean = mean(mean(E, 1), 2);
             d = (E - c * E_mean).^2; 
          
-            % Sum over spatial position
+            % mean over spatial position
             s = squeeze(mean(mean(d , 1) , 2)); % ep x stimuli
         
             % add gain and exp, yi_hat: exp x stim
-            yi_hat = g .* s .^ n; 
+            yi_hat = g .* s.^ alpha; 
             
-            % Sum over different examples, y_hat: stim 
+            % mean over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));
            
         end
@@ -115,9 +94,9 @@ classdef SOCModel < contrastModel
             loss = rmse@contrastModel(pred, tar);
         end
         
-        % loss function with sum sqaure error: sum(y - y_hat).^2
-        function sse = loss_fn(param, model, E, y_tar)
-            sse = loss_fn@contrastModel(param, model, E, y_tar);
+        % loss function with mean square error: mean(y - y_hat).^2
+        function mse = loss_fn(param, model, E, y_tar)
+            mse = loss_fn@contrastModel(param, model, E, y_tar);
         end
         
         % fit the data 
