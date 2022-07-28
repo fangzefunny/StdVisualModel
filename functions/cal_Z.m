@@ -15,13 +15,21 @@ function Z = cal_Z(E_xy, mode, sig_long, sig_short, sig_dot)
 %}
 
 % set the default parameter
-if (nargin < 6), sig_dot   = .01; end
-if (nargin < 5), sig_short = .8; end
-if (nargin < 4), sig_long  = .8; end
-if (nargin < 3), mode      = 'oriTuned'; end
+
+if (nargin < 2), mode      = 'oriTuned'; end
+if (nargin < 3), sig_long  = .8; end
+if (nargin < 4), sig_short = .8; end
+if (nargin < 5)
+    switch mode
+        case 'oriTuned'
+            sig_dot = .01; 
+        otherwise 
+            sig_dot = sig_long; 
+    end 
+end
 
 sz = round(size(E_xy, 1) / 20)*2;
-labelVec = size(E_xy, 5);
+labelVec = 1:size(E_xy, 5);
 
 % get the filter
 F = kernel_weight(sig_long, sig_short, sig_dot, sz, mode);
@@ -32,77 +40,48 @@ Z = nan( size(E_xy));
 idx = round((1:10)/10*length(labelVec));
 fprintf('\n');
 
-switch mode
-    case 'oriTuned'
-        
-        % for all orientaitons
-        for ii= 1:length(labelVec)
-            % track progress
-            if ismember(ii, idx), fprintf('.'); end
-            label = labelVec(ii);
-            
-            % for all examples
-            for ep = 1: size(E_xy,4)
-                
-                % select E
-                E_im = E_xy(:, :, :, ep, label); % Reduce from 5D to 3D
-                
-                % choose the θ for E(x,y,θ)
-                for theta1 = 1:nO
-                    
-                    % init a sum Z(x,y;θ=i)
-                    Z_theta1 = 0;
-                    for theta2 = 1:nO
-                        
-                        % choose the appropriate kernerl_weight and e_1 contrast energy image
-                        kernel_w_2D = squeeze(F(:, :, theta1, theta2)); % xy
-                        image_theta = squeeze(E_im(:, :, theta1)); % xy
-                        
-                        % do the convolution to combine weight and e_1 contrast energy image
-                        z_theta2 = conv2(image_theta, kernel_w_2D, 'same'); % xy . xy = xy
-                        
-                        % Z(x,y;θ=i）= ∑_θ2 E(x-x',y-y';θ=i) F(x',y';θ=i,θ2)
-                        Z_theta1 = Z_theta1 + z_theta2;
-                    end
-                    
-                    % Assign the result into Z
-                    Z(:, :, theta1, ep, label) = Z_theta1; %Z: xyθ
-                end
-            end
-        end
-        
-    case 'notTuned'
-        
-        % for all orientaitons
-        for ii= 1:length(labelVec)
-            % track progress
-            if ismember(ii, idx), fprintf('.'); end
-            label = labelVec(ii);
-            
-            % for all examples
-            for ep = 1: size(E_xy,4)
-                
-                % select E
-                E_im = E_xy(:, :, :, ep, label); % Reduce from 5D to 3D
-                
-                % choose the θ for E(x,y,θ)
-                for theta1 = 1:nO
-                    
-                    % choose the appropriate kernerl_weight and e_1 contrast energy image
-                    kernel_w_2D = squeeze(F(:, :, theta1)); % xy
-                    image_theta = squeeze(E_im(:, :, theta1)); % xy
-                    
-                    % do the convolution to combine weight and e_1 contrast energy image
-                    z_theta = conv2(image_theta, kernel_w_2D, 'same'); % xy . xy = xy
-                    
-                    % Assign the result into Z
-                    Z(:, :, theta1, ep, label) = z_theta; %Z: xyθ
-                end
-            end
-        end
-        
-end
+% for all images
+for ii= 1:length(labelVec)
+    
+    % track progress
+    if ismember(ii, idx), fprintf('.'); end
+    label = labelVec(ii);
 
+    % for all examples
+    for ep = 1: size(E_xy,4)
+
+        % select E
+        E_im = E_xy(:, :, :, ep, label); % Reduce from 5D to 3D
+
+        % init 
+        Z_thetas = NaN(size(E_im,1), size(E_im,2), nO);
+        
+        % choose the θ for E(x,y,θ)
+        for theta1 = 1:nO
+            
+            Z_theta1 = 0;
+            for theta2 = 1:nO
+
+                % choose the appropriate kernerl_weight and e_1 contrast energy image
+                kernel_w_2D = squeeze(F(:, :, theta1, theta2)); % xy
+                image_theta = squeeze(E_im(:, :, theta2)); % xy
+
+                % do the convolution to combine weight and e_1 contrast energy image
+                z_theta = conv2(image_theta, kernel_w_2D, 'same'); % xy . xy = xy
+                
+                % Z(x,y;θ=i）= ∑_θ2 E(x-x',y-y';θ=i) F(x',y';θ=i,θ2)
+                Z_theta1 = Z_theta1 + z_theta;
+            end
+            
+            Z_thetas(:, :, theta1) = Z_theta1;
+
+        end
+                    
+        Z(:, :, :, ep, label) = Z_thetas; %Z: xyθ
+                    
+    end
+end
+ 
 fprintf('\n');
 end
 
