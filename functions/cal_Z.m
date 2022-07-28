@@ -57,22 +57,24 @@ for ii= 1:length(labelVec)
         Z_thetas = NaN(size(E_im,1), size(E_im,2), nO);
         
         % choose the θ for E(x,y,θ)
-        for theta1 = 1:nO
+        for theta1 = 1:nO % θ
             
             Z_theta1 = 0;
-            for theta2 = 1:nO
+            for theta2 = 1:nO % θ'
 
                 % choose the appropriate kernerl_weight and e_1 contrast energy image
                 kernel_w_2D = squeeze(F(:, :, theta1, theta2)); % xy
                 image_theta = squeeze(E_im(:, :, theta2)); % xy
 
                 % do the convolution to combine weight and e_1 contrast energy image
+                % z(x,y,θ') = E(x-x',y-y';θ=i) F(x',y';θ=i,θ2)
                 z_theta = conv2(image_theta, kernel_w_2D, 'same'); % xy . xy = xy
                 
-                % Z(x,y;θ=i）= ∑_θ2 E(x-x',y-y';θ=i) F(x',y';θ=i,θ2)
+                % Z(x,y;θ=i）= ∑_θ' z(x,y,θ') 
                 Z_theta1 = Z_theta1 + z_theta;
             end
             
+            % Z(x,y,θ)
             Z_thetas(:, :, theta1) = Z_theta1;
 
         end
