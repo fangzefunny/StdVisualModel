@@ -29,8 +29,8 @@ classdef normVarModel < contrastModel
             model.fittime      = fittime;
             model.optimizer    = optimizer; 
             model.num_param    = param_num ;
-            model.fparam_name  = ['w'; 'b'; 'alpha'];
-            model.param_name   = ['sigma'; 'g'; 'alpha'];
+            model.fparam_name  = {'w', 'b', 'alpha'};
+            model.param_name   = {'sigma', 'g', 'alpha'};
             model.legend       = 'NOA'; 
             model.param        = [];
             model.model_idx    = 5; 

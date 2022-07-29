@@ -5,7 +5,8 @@ classdef contrastModel
         optimizer               
         fittime        
         num_param    = 2
-        param_name   = ['g'; 'alpha']
+        fparam_name  = {'g', 'alpha'}
+        param_name   = {'g', 'alpha'}
         param_bound  = []
         param_pbound = []
         param        = []

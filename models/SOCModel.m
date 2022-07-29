@@ -30,11 +30,10 @@ classdef SOCModel < contrastModel
             model.fittime      = fittime;
             model.optimizer    = optimizer; 
             model.num_param    = param_num ;
-            model.param_name   = ['c'; 'g'; 'alpha'];
+            model.param_name   = {'c', 'g', 'alpha'};
             model.legend       = 'SOC'; 
             model.model_type   = 'space';
             model.param        = [];
-            model.receptive_weight = false; 
             model.model_idx    = 2;
         end
                        

@@ -34,7 +34,7 @@ T = chooseData(choose_model, optimizer, fittime);
 
 % assign job 
 hpc_job_number = str2double(getenv('SLURM_ARRAY_TASK_ID'));
-if isnan(hpc_job_number), hpc_job_number = 4; end
+if isnan(hpc_job_number), hpc_job_number = 5; end
 dataset   = T.dataset(hpc_job_number);
 roi       = T.roiNum(hpc_job_number);
 model_idx = T.modelNum(hpc_job_number);
@@ -69,7 +69,7 @@ E = dataloader(stdnormRootPath, which_obj, target, dataset, roi);
 disp(model.legend)
 switch model.legend
 
-    case 'oriSurround'
+    case 'OTS'
         % gain weight E
         Z = dataloader(stdnormRootPath, 'Z1', target, dataset, roi);
 
@@ -77,7 +77,7 @@ switch model.legend
         [BOLD_pred, params, Rsquare, model] = ...
             model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
         
-    case 'normModel'
+    case 'DN'
         % gain weight E
         Z = dataloader(stdnormRootPath, 'Z2', target, dataset, roi);
 
