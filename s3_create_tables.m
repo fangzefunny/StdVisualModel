@@ -2,9 +2,10 @@
 if ~exist('doCross', 'var'), doCross = false; end
 if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'all';
 
-fittime          = [];         % how manoy initialization. value space: Integer
-choose_model     = 'all';      % choose some preset data  ('all' or 'noOri');
-error_bar        = false;
+fittime      = [];         % how manoy initialization. value space: Integer
+choose_model = 'test';      % choose some preset data  ('all' or 'noOri');
+error_bar    = false;
+round2n      = 3;
 
 switch doCross
     case false
@@ -18,14 +19,14 @@ switch doCross
         print_loss   = false;           % we don't save all the loss plots when we cross validate
 end
 
-%% define model name 
-model_name = { 'CE', 'SOC', 'OTS', 'NOA'};
+%% load the model info
 
-% define param name
-param_name =  { 'CE: g', 'CE: n',  ...
-                'SOC: c', 'SOC: g', 'SOC: n', ...
-                'OTS: w', 'OTS: g', 'OTS: n',...
-                'NOA: w', 'NOA: g', 'NOA: n'};
+% all models
+modelLoader  = {contrastModel(),...    % published model
+                SOCModel(),...    
+                oriSurroundModel(),... % norm over space & orientation 
+                normModel(),... 
+                normVarModel()};       % norm over orientation
 
 % save address
 save_address = fullfile(stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
@@ -34,38 +35,52 @@ if ~exist(save_address, 'dir'), mkdir(save_address); end
 % choose data as if we are doing parallel computing
 T  = chooseData(choose_model, 'fmincon', fittime);
 
-%% init storages
-
 % obtain some features of the storages
-nummodels    = length(unique(T.modelNum));
-model_vector = [1, 4, 5, 3];
-modelLoader  = {contrastModel('fmincon', 40),... 
-                SOCModel('fmincon', 40),...
-                oriSurroundModel('fmincon', 40),...
-                normVarModel('fmincon', 40),...
-                normCEModel('fmincon', 40),...
-                normCEModel2('fmincon', 40)};
-numrois      = length(unique(T.roiNum));
-numdatasets  = length(unique(T.dataset));
-numstimuli   = 50;
+model_ind   = sort(unique(T.modelNum));
+nummodels   = length(model_ind);
+numrois     = length(unique(T.roiNum));
+numdatasets = length(unique(T.dataset));
+numstimuli  = 50;
+
+% obtain the selected model's names, param_name
+model_names  = {};
+param_names  = {};
+fparam_names = {};
+for idx = 1:nummodels
+    model = modelLoader{model_ind(idx)};
+    model_names{end+1} = model.legend;
+    for j = 1:model.num_param
+        param_names{end+1}  = sprintf('%s: %s', model.legend, model.param_name{j});
+        fparam_names{end+1} = sprintf('%s: %s', model.legend, model.fparam_name{j});
+    end
+end
+numparams = length(param_names);
+
+% obtain the table columns 
+Rtable_cols      = {'model'}; 
+paramtable_cols  = {'model'};
+for i = 1:numdatasets
+    Rtable_cols{end+1}     = sprintf('DS%s',i);
+    paramtable_cols{end+1} = sprintf('DS%d_mean', i);
+    paramtable_cols{end+1} = sprintf('DS%d_sem', i);
+end
 
 %% create Rsquare tables: 3 (roi) x (model x dataset)
-
 for roi = 1: numrois
     % storages
     R_summay= NaN(nummodels,numdatasets);
     for idx = 1:nummodels
         % obain model index
-        model_idx = model_vector(idx);
+        model_idx = model_ind(idx);
         for dataset = 1:numdatasets
-            % load value
+            % load value and round to 3 decimal 
             R_summay(idx, dataset) = ...
-                dataloader(stdnormRootPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, 'fmincon');
+                round(dataloader(stdnormRootPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, 'fmincon'), round2n);
         end
     end
     
-    r2_table = table(model_name', R_summay(:, 1) ,R_summay(:, 2), R_summay(:, 3), R_summay(:, 4));
-    r2_table.Properties.VariableNames = {'model', 'DS1', 'DS2', 'DS3', 'DS4' };
+    r2_table = table(model_names', R_summay(:, 1) ,R_summay(:, 2), R_summay(:, 3), R_summay(:, 4));
+    r2_table.Properties.VariableNames = Rtable_cols;
     writetable(r2_table, fullfile(save_address , sprintf('Rsquare_table_roi-%d.csv', roi)));
     
 end
@@ -74,10 +89,10 @@ end
 
 for roi = 1: numrois
     % storages
-    R_summay= NaN(nummodels,numdatasets);
+    rmse= NaN(nummodels,numdatasets);
     for idx = 1:nummodels
         % obain model index
-        model_idx = model_vector(idx);
+        model_idx = model_ind(idx);
         for dataset = 1:numdatasets
             
             % load target 
@@ -87,56 +102,64 @@ for roi = 1: numrois
             BOLD_pred = dataloader(stdnormRootPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, 'fmincon');
             
             % rmse 
-            rmse(idx, dataset) = double(sqrt(mean((BOLD_pred- BOLD_target).^2)));
+            rmse(idx, dataset) = round(double(sqrt(mean((BOLD_pred- BOLD_target).^2))), round2n);
    
         end
     end
     
-    rmse_table = table(model_name', rmse(:, 1), rmse(:, 2), rmse(:, 3), rmse(:, 4));
-    rmse_table.Properties.VariableNames = {'model', 'DS1', 'DS2', 'DS3', 'DS4' };
+    rmse_table = table(model_names', rmse(:, 1), rmse(:, 2), rmse(:, 3), rmse(:, 4));
+    rmse_table.Properties.VariableNames = Rtable_cols;
     writetable(rmse_table, fullfile(save_address, sprintf('rmse_table_roi-%d.csv', roi)));
     
 end
 
 %%  create param tables: 3 (roi) x (modelx param x dataset)
 
-numparams = length(param_name);
-
 % storages
 for roi = 1: numrois
-    parammean= NaN(numparams,numdatasets);
+    parammean  = NaN(numparams,numdatasets*2);
+    fparammean = NaN(numparams,numdatasets*2);
     
     for idx = 1:nummodels
         % obain model index and model 
-        model_idx = model_vector(idx);
+        model_idx = model_ind(idx);
         model = modelLoader{idx};
         
-        for dataset = 1:numdatasets
+        for ds = 1:numdatasets
             % desgin index 
             row_idx_array = (idx - 1) * 3+1: idx * 3;
             row_idx = unique(max(1, row_idx_array-1));
-            col_idx = (dataset-1) * 2 + 1;
+            col_idx = (ds-1) * 2 + 1;
             % load value
-            param = model.print_param(model, dataloader(stdnormRootPath, 'param', target, dataset, roi, data_folder, model_idx, 'fmincon'));
-                    
+            % the reparameterized params (interpertable parameter)
+            param = model.print_param(model, dataloader(stdnormRootPath, 'param',...
+                                target, ds, roi, data_folder, model_idx, 'fmincon'));
+            % the fitted params ( 
+            fparam = model.print_fparam(model, dataloader(stdnormRootPath, 'param',...
+                                target, ds, roi, data_folder, model_idx, 'fmincon'));
+            
             % assign value 
             if strcmp(cross_valid, 'one')
-                parammean(row_idx, col_idx) = param';
-                parammean(row_idx, col_idx+1) = NaN(size(param'));
+                parammean(row_idx, col_idx)    = param';
+                parammean(row_idx, col_idx+1)  = NaN(size(param'));
+                fparammean(row_idx, col_idx)   = fparam';
+                fparammean(row_idx, col_idx+1) = NaN(size(fparam'));
             else
-                parammean(row_idx, col_idx) = nanmean(param, 2);
+                parammean(row_idx, col_idx)    = nanmean(param, 2);
                 parammean(row_idx, col_idx +1) = std(param, [], 2);
+                fparammean(row_idx, col_idx)   = nanmean(fparam, 2);
+                fparammean(row_idx, col_idx+1) = std(size(fparam'));
             end
             
         end
     end
     
-    param_table = table(param_name', parammean(:, 1) ,parammean(:, 2), parammean(:, 3), parammean(:, 4), ...
-                                                                          parammean(:, 5) ,parammean(:, 6), parammean(:, 7), parammean(:, 8));
-    param_table.Properties.VariableNames = {'model', 'dataset1_mean', 'dataset1_sem', ...
-                                                     'dataset2_mean', 'dataset2_sem', ...
-                                                     'dataset3_mean', 'dataset3_sem', ...
-                                                     'dataset4_mean', 'dataset4_sem'};
+    param_table = table(param_names', parammean(:, 1) ,parammean(:, 2), parammean(:, 3), parammean(:, 4), ...
+                                      parammean(:, 5) ,parammean(:, 6), parammean(:, 7), parammean(:, 8));
+    param_table.Properties.VariableNames = paramtable_cols;
+    fparam_table = table(fparam_names', fparammean(:, 1) , fparammean(:, 2), fparammean(:, 3), fparammean(:, 4), ...
+                                       fparammean(:, 5) , fparammean(:, 6), fparammean(:, 7), fparammean(:, 8));
+    fparam_table.Properties.VariableNames = paramtable_cols;
     writetable(param_table, fullfile(save_address , sprintf('param_table-roi-%d.csv', roi)));
 end
 
@@ -186,7 +209,7 @@ for ii = 1:length(agent_sets)
             switch jj 
                 case { 1, 2}
                     s_ind = [1:5, 15:18];
-                    g_ind = [6:14];
+                    g_ind = 6:14;
                 case { 3, 4}
                     s_ind = [5:8, 14:17];
                     g_ind = [1:4, 9:13];

@@ -69,13 +69,17 @@ classdef SOCModel < contrastModel
            
         end
         
-        % print the parameters
-        function param= print_param(model, param)
-            % reshape 
+        % print the raw parameters, used in s3 
+        function param = print_fparam(model, param)          
+            % reshape
             param = reshape(param, model.num_param, []);
             % set param
-            param(1, :) = Sigmoid(param(1, :));
-            param(3, :) = Sigmoid(param(3, :));
+            param(2, :) = Sigmoid(param(2, :));
+        end
+        
+        % print reparameterized parameters, used in s3 
+        function param = print_param(model, param)          
+            param = model.print_fparam(model, param);
         end
                     
         % predict the BOLD response: y_hat = f(x)

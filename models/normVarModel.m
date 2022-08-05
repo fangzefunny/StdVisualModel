@@ -70,12 +70,26 @@ classdef normVarModel < contrastModel
             
         end
         
-        % print the parameters: do it later 
-        function param= print_param(model, param)
-            % reshape param
+        % print the raw parameters, used in s3 
+        function param = print_fparam(model, param)          
+            % reshape
             param = reshape(param, model.num_param, []);
             % set param
             param(3, :) = Sigmoid(param(3, :));
+        end
+        
+        % print reparameterized parameters, used in s3 
+        function param = print_param(model, param)
+            % get the raw fitted param
+            fparam = model.print_fparam(model, param);
+            w = fparam(1, :);
+            b = fparam(2, :);
+            alpha = fparam(3, :);
+            % reparameterize
+            param  = NaN(size(fparam, 1), size(fparam, 2));
+            param(1, :) = b./w;         % sig 
+            param(2, :) = (1/w).^alpha; % gain
+            param(3, :) = alpha;        % alpha 
         end
         
         % measure the goodness of the model 

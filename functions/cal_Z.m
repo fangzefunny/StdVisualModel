@@ -1,18 +1,17 @@
 function Z = cal_Z(E_xy, mode, sig_long, sig_short, sig_dot)
-%{
-    Calculate the normalization of the OTS
-    
-    Args:
-        E_xy: a 5-D matrix, contrast energy
-        labelVec: an array, tell the label of the dataset
-        mode: oriTuned or notTuned
-        sig_long: the sigma of the longer side
-        sig_short: the sigma of the shorter side
-        sig_dot: the sigma of the local suppression
-    
-    Returns:
-        Z: a 5-D matrix, normalization
-%}
+
+%  Calculate the normalization of the OTS
+%
+%    Args:
+%        E_xy: a 5-D matrix, contrast energy
+%        labelVec: an array, tell the label of the dataset
+%        mode: oriTuned or notTuned
+%        sig_long: the sigma of the longer side
+%        sig_short: the sigma of the shorter side
+%        sig_dot: the sigma of the local suppression
+%    
+%    Returns:
+%        Z: a 5-D matrix, normalization
 
 % set the default parameter
 

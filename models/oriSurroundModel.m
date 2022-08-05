@@ -64,23 +64,26 @@ classdef oriSurroundModel < contrastModel
            
         end
         
-        % print the fit parameters
-        function param = print_fparam(model, param)
-            % reshape 
+        % print the raw parameters, used in s3 
+        function param = print_fparam(model, param)          
+            % reshape
             param = reshape(param, model.num_param, []);
-            % reparameterize
+            % set param
             param(3, :) = Sigmoid(param(3, :));
         end
         
-        % print the reparameterized parameters
-        function newparam = print_param(model, param)
-            % reshape 
-            param = reshape(param, model.num_param, []);
-            newparam = nan(size(param,1), size(param,2));
+        % print reparameterized parameters, used in s3 
+        function param = print_param(model, param)
+            % get the raw fitted param
+            fparam = model.print_fparam(model, param);
+            w = fparam(1, :);
+            b = fparam(2, :);
+            alpha = fparam(3, :);
             % reparameterize
-            newparam(3, :) = Sigmoid(param(3, :));    % alpha 
-            newparam(1, :) = param(2,:) / param(1,:); % sigma
-            newparam(1, :) = (1 / param(1,:)) .^ newparam(3, :);  % g
+            param  = NaN(size(fparam, 1), size(fparam, 2));
+            param(1, :) = b./w;         % sig 
+            param(2, :) = (1/w).^alpha; % gain
+            param(3, :) = alpha;        % alpha 
         end
         
         % measure the goodness of 

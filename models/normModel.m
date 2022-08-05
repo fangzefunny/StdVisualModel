@@ -51,6 +51,11 @@ classdef normModel < oriSurroundModel
             param = print_param@oriSurroundModel(model, param);
         end
         
+        % print the parameters
+        function param= fprint_param(model, param)
+            param = fprint_param@oriSurroundModel(model, param);
+        end
+        
         % measure the goodness of 
         function R2 = metric(BOLD_pred, BOLD_tar)
             R2 = metric@oriSurroundModel(BOLD_pred, BOLD_tar);
@@ -82,7 +87,7 @@ classdef normModel < oriSurroundModel
         function [BOLD_pred, params, R2, model] = fit(model, E, Z, BOLD_tar, verbose, cross_valid, save_info)
             if (nargin < 6), cross_valid = 'one'; end
             [BOLD_pred, params, R2, model] = ...
-                fit@contrastModel(model, E, Z, BOLD_tar, verbose, cross_valid, save_info);
+                fit@oriSurroundModel(model, E, Z, BOLD_tar, verbose, cross_valid, save_info);
         end            
     end
 end
