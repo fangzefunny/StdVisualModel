@@ -1,9 +1,9 @@
 %% Parse the hyperparameters
-if ~exist('doCross', 'var'), doCross = true; end
-if ~exist('target', 'var'),  target  = 'all'; end % 'target' or 'All';
+if ~exist('doCross', 'var'), doCross = false; end
+if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
 if ~exist('start_idx', 'var'), start_idx = 1; end    % what fold in the cross
 % validation to start
-if ~exist('choose_model', 'var'), choose_model = 'all'; end
+if ~exist('choose_model', 'var'), choose_model = 'NOA'; end
 switch doCross
     case false
         cross_valid = 'one';            % 'one': not cross validate; 'cross_valid': cross validate
@@ -63,7 +63,7 @@ for hpc_job_number = 1:size(T, 1)
     disp(model.legend)
     switch model.legend
         
-        case 'oriSurround'
+        case 'OTS'
             % gain weight E
             Z = dataloader(stdnormRootPath, 'Z1', target, dataset, roi);
             
@@ -71,7 +71,7 @@ for hpc_job_number = 1:size(T, 1)
             [BOLD_pred, params, Rsquare, model] = ...
                 model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
             
-        case 'normModel'
+        case 'DN'
             % gain weight E
             Z = dataloader(stdnormRootPath, 'Z2', target, dataset, roi);
             

@@ -111,8 +111,6 @@ classdef oriSurroundModel < contrastModel
            % set up the loss function
             func=@(x) model.loss_fn(x, model, E, Z, BOLD_tar);
             
-            opts.Display = verbose;
-            
             % set up the bound
             lb  = model.param_bound(:, 1);
             ub  = model.param_bound(:, 2);
@@ -124,7 +122,7 @@ classdef oriSurroundModel < contrastModel
             
             % storage
             x   = NaN(model.fittime, model.num_param);
-            sse = NaN(model.fittime, 1);
+            mse = NaN(model.fittime, 1);
             
             % fit with n init
             for ii = 1:model.fittime
@@ -132,19 +130,21 @@ classdef oriSurroundModel < contrastModel
                 % optimization
                 switch model.optimizer
                     case 'bads'
-                        [x(ii, :), sse(ii)] = bads(func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
+                        [x(ii, :), mse(ii)] = bads(func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        [x(ii, :), sse(ii)] = fmincon(func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                        opts = optimoptions('fmincon', 'Display', verbose, 'Algorithm', 'sqp');
+                        [x(ii, :), mse(ii)] = fmincon(func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
-                fprintf('   fit: %d, loss: %.4f \n', ii, sse(ii)) 
+                fprintf('   fit: %d, loss: %.4f \n', ii, mse(ii)) 
             end
             
             % find the lowest sse
-            loss  = min(sse);
-            trial = find(sse == loss);
+            mse(imag(mse) ~= 0) = inf; % find the imag number and set to inf
+            loss  = min(mse);
+            trial = find(mse == loss);
             param = x(trial(1), :); 
-            loss_history = sse;
+            loss_history = mse;
             
         end
         

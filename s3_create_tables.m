@@ -60,7 +60,7 @@ numparams = length(param_names);
 Rtable_cols      = {'model'}; 
 paramtable_cols  = {'model'};
 for i = 1:numdatasets
-    Rtable_cols{end+1}     = sprintf('DS%s',i);
+    Rtable_cols{end+1}     = sprintf('DS%d',i);
     paramtable_cols{end+1} = sprintf('DS%d_mean', i);
     paramtable_cols{end+1} = sprintf('DS%d_sem', i);
 end
@@ -123,7 +123,7 @@ for roi = 1: numrois
     for idx = 1:nummodels
         % obain model index and model 
         model_idx = model_ind(idx);
-        model = modelLoader{idx};
+        model = modelLoader{model_idx};
         
         for ds = 1:numdatasets
             % desgin index 
@@ -161,67 +161,68 @@ for roi = 1: numrois
                                        fparammean(:, 5) , fparammean(:, 6), fparammean(:, 7), fparammean(:, 8));
     fparam_table.Properties.VariableNames = paramtable_cols;
     writetable(param_table, fullfile(save_address , sprintf('param_table-roi-%d.csv', roi)));
+    writetable(fparam_table, fullfile(save_address , sprintf('fparam_table-roi-%d.csv', roi)));
 end
 
 %% Create table heterogeneity
 
-
-roi_sets   = {'v1', 'v2', 'v3'};
-pat_sets   = {'snakes', 'gratings'};
-data_sets  = {'DS1', 'DS2', 'DS3', 'DS4'};
-agent_sets = {'CE', 'SOC', 'OTS', 'NOA', 'Data'}; 
-agent_ind  = [1, 4, 5, 3, 99]; 
-row_names  = {};
-
-table_mat = NaN(length(data_sets) * length(agent_sets), ... 
-                 length(roi_sets)  * length(pat_sets));
-
-for ii = 1:length(agent_sets)
-    for jj = 1:length(data_sets)
-        % append the row name 
-        row_names{ end+1} = sprintf('%s_%s', ...
-                          agent_sets{ii}, data_sets{jj});
-        % generate the row index
-        r_idx = (ii-1) * length(data_sets) + jj;
-
-        col_names  = {};
-        for pp = 1:length(roi_sets)
-
-            % append the col name 
-            col_names{ end+1} = sprintf('%s_%s', ...
-                                roi_sets{pp}, 'snakes');
-            col_names{ end+1} = sprintf('%s_%s', ...
-                                roi_sets{pp}, 'gratings');
-            % col_idx
-            c_idx = (pp-1) * length(pat_sets);
-
-            %% Assign the data to the matrix 
-            switch ii
-                case {1, 2, 3, 4, 5}
-                    which_obj = 'BOLD_pred';
-                    model_idx = agent_ind(ii);
-                    BOLD = dataloader(stdnormRootPath, which_obj, 'target',...
-                                        jj, pp, data_folder, model_idx, 'fmincon');
-                case 6
-                    which_obj = 'BOLD_target';
-                    BOLD = dataloader(stdnormRootPath, which_obj, 'target', jj, pp);
-            end 
-            switch jj 
-                case { 1, 2}
-                    s_ind = [1:5, 15:18];
-                    g_ind = 6:14;
-                case { 3, 4}
-                    s_ind = [5:8, 14:17];
-                    g_ind = [1:4, 9:13];
-            end 
-
-            table_mat(r_idx, c_idx+1) = mean(BOLD(s_ind));
-            table_mat(r_idx, c_idx+2) = mean(BOLD(g_ind));
-        end 
-    end 
-end
-
-T = array2table(table_mat);
-T.Properties.VariableNames = col_names;
-T.Properties.RowNames = row_names;
-writetable(T, fullfile(stdnormRootPath, 'Tables', 'hetero_tables.csv'),'WriteRowNames',true);
+% 
+% roi_sets   = {'v1', 'v2', 'v3'};
+% pat_sets   = {'snakes', 'gratings'};
+% data_sets  = {'DS1', 'DS2', 'DS3', 'DS4'};
+% agent_sets = {'CE', 'SOC', 'OTS', 'NOA', 'Data'}; 
+% agent_ind  = [1, 4, 5, 3, 99]; 
+% row_names  = {};
+% 
+% table_mat = NaN(length(data_sets) * length(agent_sets), ... 
+%                  length(roi_sets)  * length(pat_sets));
+% 
+% for ii = 1:length(agent_sets)
+%     for jj = 1:length(data_sets)
+%         % append the row name 
+%         row_names{ end+1} = sprintf('%s_%s', ...
+%                           agent_sets{ii}, data_sets{jj});
+%         % generate the row index
+%         r_idx = (ii-1) * length(data_sets) + jj;
+% 
+%         col_names  = {};
+%         for pp = 1:length(roi_sets)
+% 
+%             % append the col name 
+%             col_names{ end+1} = sprintf('%s_%s', ...
+%                                 roi_sets{pp}, 'snakes');
+%             col_names{ end+1} = sprintf('%s_%s', ...
+%                                 roi_sets{pp}, 'gratings');
+%             % col_idx
+%             c_idx = (pp-1) * length(pat_sets);
+% 
+%             %% Assign the data to the matrix 
+%             switch ii
+%                 case {1, 2, 3, 4, 5}
+%                     which_obj = 'BOLD_pred';
+%                     model_idx = agent_ind(ii);
+%                     BOLD = dataloader(stdnormRootPath, which_obj, 'target',...
+%                                         jj, pp, data_folder, model_idx, 'fmincon');
+%                 case 6
+%                     which_obj = 'BOLD_target';
+%                     BOLD = dataloader(stdnormRootPath, which_obj, 'target', jj, pp);
+%             end 
+%             switch jj 
+%                 case { 1, 2}
+%                     s_ind = [1:5, 15:18];
+%                     g_ind = 6:14;
+%                 case { 3, 4}
+%                     s_ind = [5:8, 14:17];
+%                     g_ind = [1:4, 9:13];
+%             end 
+% 
+%             table_mat(r_idx, c_idx+1) = mean(BOLD(s_ind));
+%             table_mat(r_idx, c_idx+2) = mean(BOLD(g_ind));
+%         end 
+%     end 
+% end
+% 
+% T = array2table(table_mat);
+% T.Properties.VariableNames = col_names;
+% T.Properties.RowNames = row_names;
+% writetable(T, fullfile(stdnormRootPath, 'Tables', 'hetero_tables.csv'),'WriteRowNames',true);

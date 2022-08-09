@@ -74,7 +74,7 @@ classdef SOCModel < contrastModel
             % reshape
             param = reshape(param, model.num_param, []);
             % set param
-            param(2, :) = Sigmoid(param(2, :));
+            param(3, :) = Sigmoid(param(3, :));
         end
         
         % print reparameterized parameters, used in s3 
