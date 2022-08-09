@@ -139,7 +139,7 @@ classdef oriSurroundModel < contrastModel
                 fprintf('   fit: %d, loss: %.4f \n', ii, mse(ii)) 
             end
             
-            % find the lowest sse
+            % find the lowest mse
             mse(imag(mse) ~= 0) = inf; % find the imag number and set to inf
             loss  = min(mse);
             trial = find(mse == loss);
