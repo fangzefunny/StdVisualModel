@@ -10,11 +10,12 @@ classdef oriSurroundModel < SOCModel
         function model = oriSurroundModel(optimizer, fittime, param_bound, param_pbound)
             
             model = model@SOCModel();
+            
             % check the range after fitting non-cross fit 
-            if (nargin < 4), param_pbound = [1e-6,  .1;    1,  10;  -20,  20]; end
+            if (nargin < 4), param_pbound = [1e-6,  .1; 1e-2,  10;   -5,   5]; end
             if (nargin < 3), param_bound  = [-inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
-            if (nargin < 1), optimizer = 'fmincon';end
+            if (nargin < 1), optimizer = 'classic';end
             
             param_num = 3;
             
@@ -46,21 +47,41 @@ classdef oriSurroundModel < SOCModel
             
             % upack the input 
             e = x{1}; z = x{2};
-             
-            % get the parameters
-            sig = param(1);
-            g = param(2);
-            alpha = Sigmoid(param(3));
             
-            % x x y x ori x exp x stim --> x x y x exp x stim
-            d = e ./ (sig + z); 
-            d = squeeze(mean(d, 3));
+            switch model.optimizer
+                
+                case 'fmincon'
+                    % get the parameters
+                    sig = param(1);
+                    g   = param(2);
+                    alpha = Sigmoid(param(3));
+                    
+                    % x x y x ori x exp x stim --> x x y x exp x stim
+                    d = e ./ (sig + z); 
+                    d = squeeze(mean(d, 3));
                         
-            % mean over spatial position
-            s = squeeze(mean(mean(d , 1), 2)); % ep x stimuli
-            
-            % add gain and exponential, yi_hat: exp x stim
-            yi_hat = g .* s .^ alpha; 
+                    % mean over spatial position
+                    s = squeeze(mean(mean(d , 1), 2)); % ep x stimuli
+
+                    % add gain and exponential, yi_hat: exp x stim
+                    yi_hat = g .* s .^ alpha;
+                    
+                case 'reparam'
+                    % get the parameters
+                    w = param(1);
+                    b = param(2);
+                    alpha = Sigmoid(param(3));
+                    
+                    % x x y x ori x exp x stim --> x x y x exp x stim
+                    d = e ./ (b + w.*z); 
+                    d = squeeze(mean(d, 3));
+                        
+                    % mean over spatial position
+                    s = squeeze(mean(mean(d , 1), 2)); % ep x stimuli
+
+                    % add gain and exponential, yi_hat: exp x stim
+                    yi_hat = s .^ alpha;
+            end
 
             % mean over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));

@@ -12,10 +12,10 @@ classdef SOCModel < contrastModel
             model = model@contrastModel();
             
             % the parameters here are log params
-            if (nargin < 4), param_pbound  = [ .5,   1; 1e-2,   2;  -20,  20]; end
-            if (nargin < 3), param_bound   = [-inf, inf; -inf, inf; -inf, inf]; end
+            if (nargin < 4), param_pbound = [1e-6,  .1; 1e-2,  10;   -5,   5]; end
+            if (nargin < 3), param_bound  = [-inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
-            if (nargin < 1), optimizer = 'fmincon';end
+            if (nargin < 1), optimizer = 'classic';end
             
             param_num = 3;
             

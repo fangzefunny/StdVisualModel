@@ -11,10 +11,10 @@ classdef normVarModel < contrastModel
             
             model = model@contrastModel();
       
-            if (nargin < 4), param_pbound = [1e-6,  .1;    1,  10;  -20,  20]; end
+            if (nargin < 4), param_pbound = [1e-6,  .1; 1e-2,  10;   -5,   5]; end
             if (nargin < 3), param_bound  = [-inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
-            if (nargin < 1), optimizer = 'fmincon';end
+            if (nargin < 1), optimizer = 'classic';end
 
             param_num = 3;
             
@@ -45,34 +45,44 @@ classdef normVarModel < contrastModel
             
             % upack the input 
             e = x{1};
-             
-            % get the parameters
-            w = param(1);
-            b = param(2);
-            alpha = Sigmoid(param(3));
             
-            % d: ori x exp x stim
-            d = e ./ (b + w.*std(e, 1)); 
-            
-            % mean over orientation, s: exp x stim 
-            s = mean(d, 1);
-            
-            % add gain and exponential, yi_hat: exp x stim
-            yi_hat = s .^ alpha; 
+            switch model.optimizer
+                case 'classic'
+                    % get the parameters
+                    sig = param(1);
+                    g   = param(2);
+                    alpha = Sigmoid(param(3));
 
-            % mean over different examples, y_hat: stim 
-            y_hat = squeeze(mean(yi_hat, 2))';
+                    % d: ori x exp x stim
+                    d = e ./ (sig + std(e, 1)); 
+
+                    % mean over orientation, s: exp x stim 
+                    s = mean(d, 1);
+
+                    % add gain and exponential, yi_hat: exp x stim
+                    yi_hat = g .* s .^ alpha; 
+                    
+                case 'reparam'
+                    % get the parameters
+                    w = param(1);
+                    b = param(2);
+                    alpha = Sigmoid(param(3));
+
+                    % d: ori x exp x stim
+                    d = e ./ (b + w.*std(e, 1)); 
+
+                    % mean over orientation, s: exp x stim 
+                    s = mean(d, 1);
+
+                    % add gain and exponential, yi_hat: exp x stim
+                    yi_hat = s .^ alpha; 
+            end
+            
+             % mean over different examples, y_hat: stim 
+             y_hat = squeeze(mean(yi_hat, 2))';
            
         end
-            
-        % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_ori , params, if_cross)
-            if (nargin < 4), if_cross='cross_valid'; end
-            % call subclass
-            BOLD_pred = predict@contrastModel( model, E_ori, params, if_cross);
-            
-        end
-        
+                    
         % print the raw parameters, used in s3 
         function param = print_fparam(model, param)          
             % reshape
@@ -120,7 +130,6 @@ classdef normVarModel < contrastModel
         function [BOLD_pred, params, Rsquare, model] = fit(model, x, BOLD_tar, verbose, cross_valid, save_info)     
             [BOLD_pred, params, Rsquare, model] = ...
                 fit@contrastModel(model, x, BOLD_tar, verbose, cross_valid, save_info);
-            
         end
             
     end

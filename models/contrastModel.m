@@ -23,10 +23,10 @@ classdef contrastModel
             
             % pbound is possible bound, used to init the parameters
             % bound is the real bound of the parameters
-            if (nargin < 4), param_pbound = [   1,  10;  -20,  20]; end
+            if (nargin < 4), param_pbound = [   1,  10;   -5,   5]; end
             if (nargin < 3), param_bound  = [-inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
-            if (nargin < 1), optimizer = 'fmincon';end
+            if (nargin < 1), optimizer = 'classic';end
             if size(param_bound,1) ~= model.num_param
                 disp('Wrong Bound')
             elseif size(param_pbound, 1) ~= model.num_param
@@ -136,8 +136,11 @@ classdef contrastModel
                 switch model.optimizer
                     case 'bads'
                         [x_opt(ii, :), mse(ii)] = bads(func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
-                    case 'fmincon'
-                        opts = optimoptions('fmincon', 'Display', verbose); %, 'Algorithm', 'sqp'
+                    case 'classic'
+                        opts = optimoptions('fmincon', 'Display', verbose); 
+                        [x_opt(ii, :), mse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                    case 'reparam'
+                        opts = optimoptions('fmincon', 'Display', verbose, 'Algorithm', 'sqp');
                         [x_opt(ii, :), mse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 

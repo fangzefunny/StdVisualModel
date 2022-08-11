@@ -1,19 +1,19 @@
 %% Parse the hyperparameters
-if ~exist('doCross', 'var'), doCross = false; end
-if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'All';
-if ~exist('start_idx', 'var'), start_idx = 1; end    % what fold in the cross
-% validation to start
-if ~exist('choose_model', 'var'), choose_model = 'NOA'; end
+if ~exist('doCross',      'var'), doCross = false;       end
+if ~exist('target',       'var'), target  = 'target';    end % 'target' or 'All';
+if ~exist('optimizer',    'var'), target  = 'classic';   end % 'classic' or 'reparam';
+if ~exist('start_idx',    'var'), start_idx = 1;         end % cache 
+if ~exist('choose_model', 'var'), choose_model = 'more'; end  
+
 switch doCross
     case false
-        cross_valid = 'one';            % 'one': not cross validate; 'cross_valid': cross validate
+        cross_valid = 'one';           % 'one': not cross validate; 'cross_valid': cross validate
         data_folder = 'noCross';       % save in which folder. value space: 'noCross', 'Cross'
     case true
         cross_valid = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder = 'Cross';         % save in which folder. value space: 'noCross', .....
 end
 
-optimizer           = 'fmincon'; % what kind of optimizer,  value space: 'bads', 'fmincon'
 fittime             = 40;        % how many initialization. value space: Integer
 verbose             = 'off';     % show the fit details?
 
