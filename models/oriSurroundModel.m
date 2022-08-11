@@ -45,19 +45,19 @@ classdef oriSurroundModel < contrastModel
         function y_hat = forward(model, E, Z, param)
              
             % get the parameters
-            w = param(1);
-            b = param(2);
+            sig = param(1);
+            g = param(2);
             alpha = Sigmoid(param(3));
             
             % x x y x ori x exp x stim --> x x y x exp x stim
-            d = E ./ (b + w * Z); 
+            d = E ./ (sig + Z); 
             d = squeeze(mean(d, 3));
                         
             % mean over spatial position
             s = squeeze(mean(mean(d , 1), 2)); % ep x stimuli
             
             % add gain and exponential, yi_hat: exp x stim
-            yi_hat = s .^ alpha; 
+            yi_hat = g .* s .^ alpha; 
 
             % mean over different examples, y_hat: stim 
             y_hat = squeeze(mean(yi_hat, 1));

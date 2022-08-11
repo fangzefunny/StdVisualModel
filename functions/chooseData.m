@@ -27,7 +27,7 @@ models{5} = normVarModel(optimizer, fittime);
 switch quick_choice
     % for model fitting
     case {'all', 'All'}; model_idx = [1, 2, 3, 5];
-    case {'test'}; model_idx = [1, 3, 5];
+    case {'test'}; model_idx = [1, 3, 4, 5]; datasets = 2;
     case {'more'}; model_idx = [1, 2, 3, 4, 5];
     case {'CE'}; model_idx = 1;
     case {'SOC'}; model_idx = 2;
