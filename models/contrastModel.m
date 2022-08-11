@@ -152,7 +152,7 @@ classdef contrastModel
             loss_history = mse;
             
             tEnd = toc(tStart);
-            fprintf('opt loss %.4f, elasped timed %.2f', loss, tEnd)
+            fprintf('opt loss %.4f, elasped timed %.2f\n', loss, tEnd)
             
         end
         
