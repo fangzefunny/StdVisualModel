@@ -50,7 +50,7 @@ classdef oriSurroundModel < SOCModel
             
             switch model.optimizer
                 
-                case 'fmincon'
+                case 'classic'
                     % get the parameters
                     sig = param(1);
                     g   = param(2);
