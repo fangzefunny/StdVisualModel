@@ -133,13 +133,13 @@ classdef oriSurroundModel < contrastModel
                     case 'bads'
                         [x(ii, :), mse(ii)] = bads(func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'fmincon'
-                        opts = optimoptions('fmincon', 'Display', verbose); %, 'Algorithm', 'sqp'
+                        opts = optimoptions('fmincon', 'Display', verbose, 'Algorithm', 'sqp');
                         [x(ii, :), mse(ii)] = fmincon(func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
-                fprintf('   fit: %d, progress: %.2f, loss: %.4f \n', ii, ii/model.fittime, mse(ii)) 
+                fprintf('   fit: %d, progress:, loss: %.4f \n', ii, mse(ii)) 
             end
-            
+            tEnd = toc(tStart);
             
             % find the lowest mse
             mse(imag(mse) ~= 0) = inf; % find the imag number and set to inf
@@ -147,9 +147,6 @@ classdef oriSurroundModel < contrastModel
             trial = find(mse == loss);
             param = x(trial(1), :); 
             loss_history = mse;
-            
-            tEnd = toc(tStart);
-            fprintf('opt loss %.4f, elasped timed %.2f', loss, tEnd)
             
         end
         
