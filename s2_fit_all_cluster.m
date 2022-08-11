@@ -5,7 +5,7 @@
 %% Parse the hyperparameters
 if ~exist('doCross',      'var'), doCross = false;       end
 if ~exist('target',       'var'), target  = 'target';    end % 'target' or 'All';
-if ~exist('optimizer',    'var'), target  = 'classic';   end % 'classic' or 'reparam';
+if ~exist('optimizer',    'var'), optimizer = 'classic'; end % 'classic' or 'reparam';
 if ~exist('start_idx',    'var'), start_idx = 1;         end % cache 
 if ~exist('choose_model', 'var'), choose_model = 'more'; end  
 
