@@ -42,6 +42,9 @@ classdef normVarModel < contrastModel
               
         % function: f()
         function y_hat = forward(model, x, param)
+            
+            % upack the input 
+            e = x{1};
              
             % get the parameters
             w = param(1);
@@ -49,7 +52,7 @@ classdef normVarModel < contrastModel
             alpha = Sigmoid(param(3));
             
             % d: ori x exp x stim
-            d = x ./ (b + w.*std(x, 1)); 
+            d = e ./ (b + w.*std(e, 1)); 
             
             % mean over orientation, s: exp x stim 
             s = mean(d, 1);
@@ -103,21 +106,20 @@ classdef normVarModel < contrastModel
         end
         
         % loss function with mean sqaure error: mean(y - y_hat)^2
-        function mse = loss_fn(param, model, E, y_tar)
-            mse = loss_fn@contrastModel(param, model, E, y_tar);
+        function mse = loss_fn(param, model, x, y_tar)
+            mse = loss_fn@contrastModel(param, model, x, y_tar);
         end
         
         % fit the data 
-        function [loss, param, loss_history] = optim(model, E, BOLD_tar, verbose)
+        function [loss, param, loss_history] = optim(model, x, BOLD_tar, verbose)
             [loss, param, loss_history] = ...
-                optim@contrastModel(model, E, BOLD_tar, verbose);
+                optim@contrastModel(model, x, BOLD_tar, verbose);
         end
         
         % fit cross-valid
-        function [BOLD_pred, params, Rsquare, model] = fit(model, E, BOLD_tar, verbose, cross_valid, save_info)     
-            if (nargin < 5), cross_valid = 'one'; end
+        function [BOLD_pred, params, Rsquare, model] = fit(model, x, BOLD_tar, verbose, cross_valid, save_info)     
             [BOLD_pred, params, Rsquare, model] = ...
-                fit@contrastModel(model, E, BOLD_tar, verbose, cross_valid, save_info);
+                fit@contrastModel(model, x, BOLD_tar, verbose, cross_valid, save_info);
             
         end
             

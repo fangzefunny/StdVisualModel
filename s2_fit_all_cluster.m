@@ -65,31 +65,22 @@ end
 
 % load contrast energy 
 E = dataloader(stdnormRootPath, which_obj, target, dataset, roi);
+x = {E};
 
 disp(model.legend)
+% get pre-calc normalized energy
 switch model.legend
-
     case 'OTS'
-        % gain weight E
         Z = dataloader(stdnormRootPath, 'Z1', target, dataset, roi);
-
-        % fit the data without cross validation: knock-1-out
-        [BOLD_pred, params, Rsquare, model] = ...
-            model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
-        
+        x{end + 1} = Z;
     case 'DN'
-        % gain weight E
-        Z = dataloader(stdnormRootPath, 'Z2', target, dataset, roi);
-
-        % fit the data without cross validation: knock-1-out
-        [BOLD_pred, params, Rsquare, model] = ...
-            model.fit(model, E, Z, BOLD_target, verbose , cross_valid, save_info);
-        
-    otherwise
-        % fit the data without cross validation: knock-1-out
-        [BOLD_pred, params, Rsquare, model] = ...
-        model.fit(model, E, BOLD_target, verbose, cross_valid, save_info);
+        Z = dataloader(stdnormRootPath, 'Z2', target, dataset, roi);  
+        x{end + 1} = Z;
 end
+
+% fit the data without cross validation: knock-1-out
+[BOLD_pred, params, Rsquare, model] = ...
+model.fit(model, x, BOLD_target, verbose, cross_valid, save_info);
 
 if strcmp(cross_valid, 'one')
     loss_log = model.loss_log;

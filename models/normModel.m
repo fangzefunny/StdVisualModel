@@ -42,8 +42,8 @@ classdef normModel < oriSurroundModel
     methods (Static = true)
                 
        % function: f()
-        function y_hat = forward(model, E, Z, param)
-             y_hat = forward@oriSurroundModel(model, E, Z, param);
+        function y_hat = forward(model, x, param)
+             y_hat = forward@oriSurroundModel(model, x, param);
         end
         
         % print the parameters
@@ -67,27 +67,21 @@ classdef normModel < oriSurroundModel
         end
         
         % loss function with sum sqaure error: sum(y - y_hat).^2
-        function mse = loss_fn(param, model, E, Z, y_tar)
-            mse = loss_fn@oriSurroundModel(param, model, E, Z, y_tar);
+        function mse = loss_fn(param, model, x, y_tar)
+            mse = loss_fn@oriSurroundModel(param, model, x, y_tar);
         end
         
         % fit the data 
-        function [loss, param, loss_history]  = optim(model, E, Z,  BOLD_tar, verbose)
+        function [loss, param, loss_history]  = optim(model, x,  BOLD_tar, verbose)
             [loss, param, loss_history] = ...
-                optim@oriSurroundModel(model, E, Z,  BOLD_tar, verbose);
+                optim@oriSurroundModel(model, x,  BOLD_tar, verbose);
         end
         
-        % Predict the BOLD response: y_hat = f(x)
-        function BOLD_hat = predict(model, E, Z, params, if_cross)
-            if (nargin < 5), if_cross='cross_valid'; end
-            BOLD_hat = predict@oriSurroundModel(model, E, Z, params, if_cross);
-        end
-        
+
         % fcross valid
-        function [BOLD_pred, params, R2, model] = fit(model, E, Z, BOLD_tar, verbose, cross_valid, save_info)
-            if (nargin < 6), cross_valid = 'one'; end
-            [BOLD_pred, params, R2, model] = ...
-                fit@oriSurroundModel(model, E, Z, BOLD_tar, verbose, cross_valid, save_info);
+        function [BOLD_hat, params, R2, model] = fit(model, x, BOLD_tar, verbose, cross_valid, save_info)
+            [BOLD_hat, params, R2, model] = ...
+                fit@oriSurroundModel(model, x, BOLD_tar, verbose, cross_valid, save_info);
         end            
     end
 end

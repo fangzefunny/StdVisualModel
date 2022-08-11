@@ -15,12 +15,12 @@ end
 
 optimizer           = 'fmincon'; % what kind of optimizer,  value space: 'bads', 'fmincon'
 fittime             = 40;        % how many initialization. value space: Integer
-verbose             = 'off';     % show the fit details?
+verbose              = 'off';     % show the fit details?
 
 %% save address and create a table for all jobs
 
 % save address
-save_address = fullfile(stdnormRootPath, 'Data', data_folder, target,  optimizer);
+save_address = fullfile( stdnormRootPath, 'Data', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % create jobs
