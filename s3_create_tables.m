@@ -1,9 +1,10 @@
-%% hyperparameter: each time, we only need to edit this section !!
-if ~exist('doCross', 'var'), doCross = false; end
-if ~exist('target', 'var'),  target  = 'target'; end % 'target' or 'all';
+%% Parse the hyperparameters
+if ~exist('doCross',      'var'), doCross = false;       end
+if ~exist('target',       'var'), target  = 'target';    end % 'target' or 'All';
+if ~exist('optimizer',    'var'), optimizer = 'classic'; end % 'classic' or 'reparam';
 
 fittime      = [];         % how manoy initialization. value space: Integer
-choose_model = 'test';      % choose some preset data  ('all' or 'noOri');
+choose_model = 'NOA';      % choose some preset data  ('all' or 'noOri');
 error_bar    = false;
 round2n      = 3;
 
@@ -29,11 +30,11 @@ modelLoader  = {contrastModel(),...    % published model
                 normVarModel()};       % norm over orientation
 
 % save address
-save_address = fullfile(stdnormRootPath, 'Tables', data_folder, target,  'fmincon');
+save_address = fullfile(stdnormRootPath, 'Tables', data_folder, target,  optimizer);
 if ~exist(save_address, 'dir'), mkdir(save_address); end
 
 % choose data as if we are doing parallel computing
-T  = chooseData(choose_model, 'fmincon', fittime);
+T  = chooseData(choose_model, optimizer, fittime);
 
 % obtain some features of the storages
 model_ind   = sort(unique(T.modelNum));
@@ -75,7 +76,7 @@ for roi = 1: numrois
         for dataset = 1:numdatasets
             % load value and round to 3 decimal 
             R_summay(idx, dataset) = ...
-                round(dataloader(stdnormRootPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, 'fmincon'), round2n);
+                round(dataloader(stdnormRootPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, optimizer), round2n);
         end
     end
     
@@ -99,7 +100,7 @@ for roi = 1: numrois
             BOLD_target = dataloader(stdnormRootPath, 'BOLD_target', target, dataset, roi);
             
             % load predction 
-            BOLD_pred = dataloader(stdnormRootPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, 'fmincon');
+            BOLD_pred = dataloader(stdnormRootPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
             
             % rmse 
             rmse(idx, dataset) = round(double(sqrt(mean((BOLD_pred- BOLD_target).^2))), round2n);
@@ -133,10 +134,10 @@ for roi = 1: numrois
             % load value
             % the reparameterized params (interpertable parameter)
             param = model.print_param(model, dataloader(stdnormRootPath, 'param',...
-                                target, ds, roi, data_folder, model_idx, 'fmincon'));
+                                target, ds, roi, data_folder, model_idx, optimizer));
             % the fitted params ( 
             fparam = model.print_fparam(model, dataloader(stdnormRootPath, 'param',...
-                                target, ds, roi, data_folder, model_idx, 'fmincon'));
+                                target, ds, roi, data_folder, model_idx, optimizer));
             
             % assign value 
             if strcmp(cross_valid, 'one')
@@ -202,7 +203,7 @@ end
 %                     which_obj = 'BOLD_pred';
 %                     model_idx = agent_ind(ii);
 %                     BOLD = dataloader(stdnormRootPath, which_obj, 'target',...
-%                                         jj, pp, data_folder, model_idx, 'fmincon');
+%                                         jj, pp, data_folder, model_idx, optimizer);
 %                 case 6
 %                     which_obj = 'BOLD_target';
 %                     BOLD = dataloader(stdnormRootPath, which_obj, 'target', jj, pp);

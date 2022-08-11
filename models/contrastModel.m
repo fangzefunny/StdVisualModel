@@ -140,7 +140,7 @@ classdef contrastModel
                         opts = optimoptions('fmincon', 'Display', verbose); 
                         [x_opt(ii, :), mse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                     case 'reparam'
-                        opts = optimoptions('fmincon', 'Display', verbose, 'Algorithm', 'sqp');
+                        opts = optimoptions('fmincon', 'Display', verbose);
                         [x_opt(ii, :), mse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
