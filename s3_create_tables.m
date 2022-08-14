@@ -4,7 +4,7 @@ if ~exist('target',       'var'), target  = 'target';    end % 'target' or 'All'
 if ~exist('optimizer',    'var'), optimizer = 'classic'; end % 'classic' or 'reparam';
 
 fittime      = [];         % how manoy initialization. value space: Integer
-choose_model = 'NOA';      % choose some preset data  ('all' or 'noOri');
+choose_model = 'more';      % choose some preset data;
 error_bar    = false;
 round2n      = 3;
 
@@ -13,7 +13,7 @@ switch doCross
         cross_valid  = 'one';           % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'noCross';       % save in which folder. value space: 'noCross', .....
         print_loss   = true;
-
+        
     case true
         cross_valid  = 'cross_valid';   % choose what kind of cross , value space: 'one', 'cross_valid'. 'one' is no cross validation.
         data_folder  = 'Cross';         % save in which folder. value space: 'noCross', .....
@@ -24,10 +24,10 @@ end
 
 % all models
 modelLoader  = {contrastModel(),...    % published model
-                SOCModel(),...    
-                oriSurroundModel(),... % norm over space & orientation 
-                normModel(),... 
-                normVarModel()};       % norm over orientation
+    SOCModel(),...
+    oriSurroundModel(),... % norm over space & orientation
+    normModel(),...
+    normVarModel()};       % norm over orientation
 
 % save address
 save_address = fullfile(stdnormRootPath, 'Tables', data_folder, target,  optimizer);
@@ -57,8 +57,8 @@ for idx = 1:nummodels
 end
 numparams = length(param_names);
 
-% obtain the table columns 
-Rtable_cols      = {'model'}; 
+% obtain the table columns
+Rtable_cols      = {'model'};
 paramtable_cols  = {'model'};
 for i = 1:numdatasets
     Rtable_cols{end+1}     = sprintf('DS%d',i);
@@ -74,7 +74,7 @@ for roi = 1: numrois
         % obain model index
         model_idx = model_ind(idx);
         for dataset = 1:numdatasets
-            % load value and round to 3 decimal 
+            % load value and round to 3 decimal
             R_summay(idx, dataset) = ...
                 round(dataloader(stdnormRootPath, 'Rsquare', target, dataset, roi, data_folder, model_idx, optimizer), round2n);
         end
@@ -96,15 +96,15 @@ for roi = 1: numrois
         model_idx = model_ind(idx);
         for dataset = 1:numdatasets
             
-            % load target 
+            % load target
             BOLD_target = dataloader(stdnormRootPath, 'BOLD_target', target, dataset, roi);
             
-            % load predction 
+            % load predction
             BOLD_pred = dataloader(stdnormRootPath, 'BOLD_pred', target, dataset, roi, data_folder, model_idx, optimizer);
             
-            % rmse 
+            % rmse
             rmse(idx, dataset) = round(double(sqrt(mean((BOLD_pred- BOLD_target).^2))), round2n);
-   
+            
         end
     end
     
@@ -122,32 +122,38 @@ for roi = 1: numrois
     fparammean = NaN(numparams,numdatasets*2);
     
     for idx = 1:nummodels
-        % obain model index and model 
+        % obain model index and model
         model_idx = model_ind(idx);
         model = modelLoader{model_idx};
         
         for ds = 1:numdatasets
-            % desgin index 
+            % desgin index
             row_idx_array = (idx - 1) * 3+1: idx * 3;
             row_idx = unique(max(1, row_idx_array-1));
             col_idx = (ds-1) * 2 + 1;
             % load value
-            % the reparameterized params (interpertable parameter)
-            param = model.print_param(model, dataloader(stdnormRootPath, 'param',...
-                                target, ds, roi, data_folder, model_idx, optimizer));
-            % the fitted params ( 
+            if strcmp(optimizer, 'reparam')
+                % the reparameterized params (interpertable parameter)
+                param = model.print_param(model, dataloader(stdnormRootPath, 'param',...
+                    target, ds, roi, data_folder, model_idx, optimizer));
+            end
+            % the fitted params (
             fparam = model.print_fparam(model, dataloader(stdnormRootPath, 'param',...
-                                target, ds, roi, data_folder, model_idx, optimizer));
+                target, ds, roi, data_folder, model_idx, optimizer));
             
-            % assign value 
+            % assign value
             if strcmp(cross_valid, 'one')
-                parammean(row_idx, col_idx)    = param';
-                parammean(row_idx, col_idx+1)  = NaN(size(param'));
+                if strcmp(optimizer, 'reparam')
+                    parammean(row_idx, col_idx)    = param';
+                    parammean(row_idx, col_idx+1)  = NaN(size(param'));
+                end
                 fparammean(row_idx, col_idx)   = fparam';
                 fparammean(row_idx, col_idx+1) = NaN(size(fparam'));
             else
-                parammean(row_idx, col_idx)    = nanmean(param, 2);
-                parammean(row_idx, col_idx +1) = std(param, [], 2);
+                if strcmp(optimizer, 'reparam')
+                    parammean(row_idx, col_idx)    = nanmean(param, 2);
+                    parammean(row_idx, col_idx +1) = std(param, [], 2);
+                end
                 fparammean(row_idx, col_idx)   = nanmean(fparam, 2);
                 fparammean(row_idx, col_idx+1) = std(size(fparam'));
             end
@@ -156,10 +162,10 @@ for roi = 1: numrois
     end
     
     param_table = table(param_names', parammean(:, 1) ,parammean(:, 2), parammean(:, 3), parammean(:, 4), ...
-                                      parammean(:, 5) ,parammean(:, 6), parammean(:, 7), parammean(:, 8));
+        parammean(:, 5) ,parammean(:, 6), parammean(:, 7), parammean(:, 8));
     param_table.Properties.VariableNames = paramtable_cols;
     fparam_table = table(fparam_names', fparammean(:, 1) , fparammean(:, 2), fparammean(:, 3), fparammean(:, 4), ...
-                                       fparammean(:, 5) , fparammean(:, 6), fparammean(:, 7), fparammean(:, 8));
+        fparammean(:, 5) , fparammean(:, 6), fparammean(:, 7), fparammean(:, 8));
     fparam_table.Properties.VariableNames = paramtable_cols;
     writetable(param_table, fullfile(save_address , sprintf('param_table-roi-%d.csv', roi)));
     writetable(fparam_table, fullfile(save_address , sprintf('fparam_table-roi-%d.csv', roi)));
@@ -167,37 +173,37 @@ end
 
 %% Create table heterogeneity
 
-% 
+%
 % roi_sets   = {'v1', 'v2', 'v3'};
 % pat_sets   = {'snakes', 'gratings'};
 % data_sets  = {'DS1', 'DS2', 'DS3', 'DS4'};
-% agent_sets = {'CE', 'SOC', 'OTS', 'NOA', 'Data'}; 
-% agent_ind  = [1, 4, 5, 3, 99]; 
+% agent_sets = {'CE', 'SOC', 'OTS', 'NOA', 'Data'};
+% agent_ind  = [1, 4, 5, 3, 99];
 % row_names  = {};
-% 
-% table_mat = NaN(length(data_sets) * length(agent_sets), ... 
+%
+% table_mat = NaN(length(data_sets) * length(agent_sets), ...
 %                  length(roi_sets)  * length(pat_sets));
-% 
+%
 % for ii = 1:length(agent_sets)
 %     for jj = 1:length(data_sets)
-%         % append the row name 
+%         % append the row name
 %         row_names{ end+1} = sprintf('%s_%s', ...
 %                           agent_sets{ii}, data_sets{jj});
 %         % generate the row index
 %         r_idx = (ii-1) * length(data_sets) + jj;
-% 
+%
 %         col_names  = {};
 %         for pp = 1:length(roi_sets)
-% 
-%             % append the col name 
+%
+%             % append the col name
 %             col_names{ end+1} = sprintf('%s_%s', ...
 %                                 roi_sets{pp}, 'snakes');
 %             col_names{ end+1} = sprintf('%s_%s', ...
 %                                 roi_sets{pp}, 'gratings');
 %             % col_idx
 %             c_idx = (pp-1) * length(pat_sets);
-% 
-%             %% Assign the data to the matrix 
+%
+%             %% Assign the data to the matrix
 %             switch ii
 %                 case {1, 2, 3, 4, 5}
 %                     which_obj = 'BOLD_pred';
@@ -207,22 +213,22 @@ end
 %                 case 6
 %                     which_obj = 'BOLD_target';
 %                     BOLD = dataloader(stdnormRootPath, which_obj, 'target', jj, pp);
-%             end 
-%             switch jj 
+%             end
+%             switch jj
 %                 case { 1, 2}
 %                     s_ind = [1:5, 15:18];
 %                     g_ind = 6:14;
 %                 case { 3, 4}
 %                     s_ind = [5:8, 14:17];
 %                     g_ind = [1:4, 9:13];
-%             end 
-% 
+%             end
+%
 %             table_mat(r_idx, c_idx+1) = mean(BOLD(s_ind));
 %             table_mat(r_idx, c_idx+2) = mean(BOLD(g_ind));
-%         end 
-%     end 
+%         end
+%     end
 % end
-% 
+%
 % T = array2table(table_mat);
 % T.Properties.VariableNames = col_names;
 % T.Properties.RowNames = row_names;

@@ -30,6 +30,7 @@ classdef SOCModel < contrastModel
             model.fittime      = fittime;
             model.optimizer    = optimizer;
             model.num_param    = param_num ;
+            model.fparam_name  = {'c', 'g', 'alpha'};
             model.param_name   = {'c', 'g', 'alpha'};
             model.legend       = 'SOC';
             model.model_type   = 'space';
@@ -77,6 +78,7 @@ classdef SOCModel < contrastModel
             % reshape
             param = reshape(param, model.num_param, []);
             % set param
+            param(1, :) = Sigmoid(param(1, :));
             param(3, :) = Sigmoid(param(3, :));
         end
         
@@ -128,7 +130,7 @@ classdef SOCModel < contrastModel
                 case 'cross_valid'
                     
                     % achieve stim vector
-                    E = x{1}; Z = x{2};
+                    E = x{1};
                     last_idx = length(size(E));
                     stim_dim = size(E, last_idx);
                     stim_vector = save_info.start_idx:size(E, last_idx);
@@ -154,13 +156,11 @@ classdef SOCModel < contrastModel
                         % train vector and train data
                         keep_idx = setdiff(stim_vector, knock_idx);
                         E_train  = E(:, :, :, :, keep_idx);
-                        Z_train  = Z(:, :, :, :, keep_idx);
                         tar_train = BOLD_tar(keep_idx);
-                        E_test   = E(:, :, :, :, knock_idx);
-                        Z_test   = Z(:, :, :, :, knock_idx);
+                        E_test   = E(:, :, :, :, knock_idx);   
                         
                         % fit the training data
-                        x_train = {E_train, Z_train}; x_test = {E_test, Z_test};
+                        x_train = {E_train}; x_test = {E_test};
                         [loss, param, loss_history] = model.optim(model, x_train, tar_train, verbose);
                         params(:, knock_idx) = param;
                         losses(knock_idx) = loss;
