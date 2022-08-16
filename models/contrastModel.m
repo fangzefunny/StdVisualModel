@@ -138,10 +138,10 @@ classdef contrastModel
                         [x_opt(ii, :), mse(ii)] = bads(func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
                     case 'classic'
                         opts = optimoptions('fmincon', 'Display', verbose); 
-                        [x_opt(ii, :), mse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                        [x_opt(ii, :), mse(ii)] = fmincon(func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                     case 'reparam'
                         opts = optimoptions('fmincon', 'Display', verbose);
-                        [x_opt(ii, :), mse(ii)] = fmincon( func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                        [x_opt(ii, :), mse(ii)] = fmincon(func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
                 fprintf('   fit: %d, progress: %.2f, loss: %.4f \n', ii, ii/model.fittime, mse(ii))

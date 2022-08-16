@@ -46,7 +46,7 @@ classdef oriSurroundModel < SOCModel
         function y_hat = forward(model, x, param)
             
             % upack the input 
-            e = x{1};
+            e = x{1}; z = x{2};
             
             switch model.optimizer
                 
