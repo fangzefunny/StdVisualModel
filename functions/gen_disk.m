@@ -1,6 +1,6 @@
-function [w] = gen_disk(size_e, numpix)
-
-        scaleFactor = 0.85;
+function [w] = gen_disk(size_e, numpix, scaleFactor)
+        
+        if (nargin < 3), scaleFactor = 0.85; end
         
         % Create a meshgrid 
         [X, Y] = meshgrid(linspace(-1, 1, size_e));

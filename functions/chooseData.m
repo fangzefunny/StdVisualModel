@@ -25,6 +25,7 @@ models{4} = normModel(optimizer, fittime);
 models{5} = normVarModel(optimizer, fittime);
 
 switch quick_choice
+    
     % for model fitting
     case {'all', 'All'}; model_idx = [1, 2, 3, 5];
     case {'test'}; model_idx = [3, 4]; datasets = 2;
@@ -36,35 +37,48 @@ switch quick_choice
     case {'NOA'}; model_idx = 5;
     
     % for figures
+    % main figures
     case {'figure3'};   model_idx = 1; datasets = 1;
     case {'figure4'};   model_idx = 1; datasets = 1;
-    case {'figure5'};   model_idx = 4; datasets = 1;
-    case {'figure6'};   model_idx = 5; datasets = 1;
-    case {'figure7'};   model_idx = 3; datasets = 1;
+    case {'figure5'};   model_idx = 2; datasets = 1;
+    case {'figure6'};   model_idx = 3; datasets = 1;
+    case {'figure7'};   model_idx = 5; datasets = 1;
     case {'figure9'};   model_idx = 3; datasets  = 1;
+    % Supp figures: target data
     case {'figureS2a'}; model_idx = 3; datasets  = [1, 2, 3, 4];
     case {'figureS2b'}; model_idx = 1; datasets  = [1, 2, 3, 4];
-    case {'figureS2c'}; model_idx = 4; datasets  = [1, 2, 3, 4];
-    case {'figureS2d'}; model_idx = 5; datasets  = [1, 2, 3, 4];
+    case {'figureS2c'}; model_idx = 2; datasets  = [1, 2, 3, 4];
+    case {'figureS2d'}; model_idx = 4; datasets  = [1, 2, 3, 4];
+    case {'figureS2e'}; model_idx = 5; datasets  = [1, 2, 3, 4];
+    % Supp figures: all data, OTS
     case {'figureS3a'}; model_idx = 3; datasets  = 2;
     case {'figureS3b'}; model_idx = 3; datasets  = 3;
     case {'figureS3c'}; model_idx = 3; datasets  = 4;
+    % Supp figures: all data, CE
     case {'figureS4a'}; model_idx = 1; datasets  = 1;
     case {'figureS4b'}; model_idx = 1; datasets  = 2;
     case {'figureS4c'}; model_idx = 1; datasets  = 3;
     case {'figureS4d'}; model_idx = 1; datasets  = 4;
-    case {'figureS5a'}; model_idx = 4; datasets  = 1;
-    case {'figureS5b'}; model_idx = 4; datasets  = 2;
-    case {'figureS5c'}; model_idx = 4; datasets  = 3;
-    case {'figureS5d'}; model_idx = 4; datasets  = 4;
-    case {'figureS6a'}; model_idx = 5; datasets  = 1;
-    case {'figureS6b'}; model_idx = 5; datasets  = 2;
-    case {'figureS6c'}; model_idx = 5; datasets  = 3;
-    case {'figureS6d'}; model_idx = 5; datasets  = 4;
-    case {'figureS7a'}; model_idx = [1, 3, 4, 5]; datasets  = 1;
-    case {'figureS7b'}; model_idx = [1, 3, 4, 5]; datasets  = 2;
-    case {'figureS7c'}; model_idx = [1, 3, 4, 5]; datasets  = 3;
-    case {'figureS7d'}; model_idx = [1, 3, 4, 5]; datasets  = 4;
+    % Supp figures: all data, SOC
+    case {'figureS5a'}; model_idx = 2; datasets  = 1;
+    case {'figureS5b'}; model_idx = 2; datasets  = 2;
+    case {'figureS5c'}; model_idx = 2; datasets  = 3;
+    case {'figureS5d'}; model_idx = 2; datasets  = 4;
+    % Supp figures: all data, DN
+    case {'figureS6a'}; model_idx = 4; datasets  = 1;
+    case {'figureS6b'}; model_idx = 4; datasets  = 2;
+    case {'figureS6c'}; model_idx = 4; datasets  = 3;
+    case {'figureS6d'}; model_idx = 4; datasets  = 4;
+    % Supp figures: all data, NOA
+    case {'figureS7a'}; model_idx = 5; datasets  = 1;
+    case {'figureS7b'}; model_idx = 5; datasets  = 2;
+    case {'figureS7c'}; model_idx = 5; datasets  = 3;
+    case {'figureS7d'}; model_idx = 5; datasets  = 4;
+    % Supp figures: all data, all models 
+    case {'figureS8a'}; model_idx = [1, 3, 4, 5]; datasets  = 1;
+    case {'figureS8b'}; model_idx = [1, 3, 4, 5]; datasets  = 2;
+    case {'figureS8c'}; model_idx = [1, 3, 4, 5]; datasets  = 3;
+    case {'figureS8d'}; model_idx = [1, 3, 4, 5]; datasets  = 4;
 end
 
 n = length(datasets) * length(ROIs) * length(model_idx);

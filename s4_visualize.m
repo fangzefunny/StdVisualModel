@@ -31,7 +31,7 @@ end
 if strcmp(fig,'figure2')
     
     nTheta  = 8;
-    sigma_p = .1;
+    sigma_p = .85;
     sigma_g = .85;
     sigma_s = .01;
     sz      = 30;
@@ -40,7 +40,7 @@ if strcmp(fig,'figure2')
         for theta2 = 1:nTheta
             subplot(8, 8, (theta1-1)*nTheta + theta2)
             imshow(squeeze(kernel_w(:, :, theta1, theta2)), []);
-            title(sum(kernel_w(:, :, theta1, theta2),[1,2]))
+            %title(sum(kernel_w(:, :, theta1, theta2),[1,2]))
             axis off
         end
     end
@@ -153,7 +153,7 @@ elseif strcmp(fig, 'figureS1')
 elseif strcmp(fig, 'figure8')
     
     % define the models and data sets
-    models = { 'CE', 'SOC', 'OTS', 'NOA', 'Data'};
+    models = { 'CE', 'SOC', 'OTS', 'DN', 'NOA', 'Data'};
     data_sets = [ 1, 2, 3, 4];
     
     % get the plot color
@@ -208,7 +208,7 @@ elseif strcmp(fig, 'figure8')
     legend('V1', 'V2', 'V3', 'Location', 'southwest')
     xticklabels(models)
     
-    ylim([ 1/3, 3])
+    ylim([ 1/2, 3])
     set(gca, 'Yscale', 'log', 'Fontsize', 15, 'YTick', [ 1/3, 1/2, 1, 2, 3],...
          'YTickLabel', { '1/3', '1/2', '1', '2', '3'})
     set(gcf, 'Color', 'w')
@@ -329,7 +329,7 @@ else
     
     % Tune the hyperparameters
     doModel          = true;
-    optimizer        = 'fmincon';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
+    optimizer        = 'classic';  % what kind of optimizer, bads or fmincon . value space: 'bads', 'fmincon'
     error_bar        = true;
     data_folder      = 'Cross';  % save in which folder. value space: 'noCross', .....
     target           = 'target';
@@ -347,26 +347,7 @@ else
                 'figureS8a', 'figureS8b', 'figureS8c', 'figureS8d',...
                 }
             target   = 'all';
-        case {
-                'tar-noCross',...
-                'tar-noCross-m3-m5-m6',...
-             }
-            % note: m1: CE, m2:NCE1, m3:NOA, m4:SOC, m5:OTS, m6:NCE2
-            data_folder = 'noCross';
-            
-        case {
-                'all-noCross-m1-ds1', 'all-noCross-m1-ds2', 'all-noCross-m1-ds3', 'all-noCross-m1-ds4',...
-                'all-noCross-m2-ds1', 'all-noCross-m2-ds2', 'all-noCross-m2-ds3', 'all-noCross-m2-ds4',...
-                'all-noCross-m3-ds1', 'all-noCross-m3-ds2', 'all-noCross-m3-ds3', 'all-noCross-m3-ds4',...
-                'all-noCross-m4-ds1', 'all-noCross-m4-ds2', 'all-noCross-m4-ds3', 'all-noCross-m4-ds4',...
-                'all-noCross-m5-ds1', 'all-noCross-m5-ds2', 'all-noCross-m5-ds3', 'all-noCross-m5-ds4',...
-                'all-noCross-m6-ds1', 'all-noCross-m6-ds2', 'all-noCross-m6-ds3', 'all-noCross-m6-ds4',...
-                'all-noCross-m3m5m6-ds1','all-noCross-m3m5m6-ds2','all-noCross-m3m5m6-ds3','all-noCross-m3m5m6-ds4'...
-                'all-noCross-m2m3m6-ds1','all-noCross-m2m3m6-ds2','all-noCross-m2m3m6-ds3','all-noCross-m2m3m6-ds4'...
-                'all-noCross-m2m3m5m6-ds1','all-noCross-m2m3m5m6-ds2','all-noCross-m2m3m5m6-ds3','all-noCross-m2m3m5m6-ds4'...
-             }
-            data_folder = 'noCross';
-            target   = 'all';
+
     end
     
     % Generate save address and  choose data

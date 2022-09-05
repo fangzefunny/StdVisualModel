@@ -1,17 +1,12 @@
-function plot_legend( all_prediction, model_ind )
+function plot_legend( all_prediction, model_ind)
 
 nummodels = size( all_prediction ,1);
 model_ind = model_ind + 1;
-white = [ 0, 0, 0];
+white = [0, 0, 0];
 viz = ColorPalette();
-dark    = viz.Dark;
-blue    = viz.Blue;
-red     = viz.Red;
-yellow  = viz.Yellow;
-green   = viz.Green;
-purple  = viz.Purple;
-col_vector = {white, dark, green, red, blue, yellow, purple};
-legend_name = { 'BOLD', 'CE', 'NCE', 'NOA', 'SOC', 'OTS', 'NCE2'};
+col_vector = {{white}, viz.getPalette()};
+col_vector = cat(2, col_vector{:});
+legend_name = {'BOLD', 'CE', 'SOC', 'OTS', 'DN', 'NOA'};
 legend_name = legend_name(model_ind);
 fontsize = 15;
 plotwidth = 1.5;
