@@ -1,18 +1,16 @@
-function [ w ] = gen_disk( size_e)
-
-        % Create a meshgrid to
-        [ X , Y ] = meshgrid( linspace( -1 , 1, size_e));
+function [w] = gen_disk(size_e, numpix, scaleFactor)
         
-        % Create a disk with certain size
-        w = zeros( size_e ,  size_e);
-        panel = X.^2 + Y.^2;
+        if (nargin < 3), scaleFactor = 0.85; end
         
-        % Choose the radius of the disk ,  3 std of the edge size 
-        theresold = .75;
+        % Create a meshgrid 
+        [X, Y] = meshgrid(linspace(-1, 1, size_e));
+        panel = sqrt(X.^2 + Y.^2); 
+ 
+        % Create a disk
+        w = zeros(size_e, size_e);
         
-        % Any pixels 
-        [index] = find(panel < theresold);
+        radius = (numpix/size_e) * scaleFactor;
+        index = panel < radius;
         w(index) = 1;
      
 end
-

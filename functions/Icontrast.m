@@ -1,29 +1,34 @@
 
-function [response]=Icontrast(stimulus,G_c,G_s, sfvec, thetavec)
+function conEnergy = Icontrast(stimulus, G_c, G_s)
 
-% Parameter setting
-nf=length(sfvec);
-nO=length(thetavec);
-ni=size(stimulus,1);
+% contrast image size 
+sz = size(stimulus,1);
+[nT, nF] = size(G_c);
 
-response = nan( ni, ni, nO, nf );
+% placeholders 
+conEnergy = nan(sz, sz, nT, nF);
 
-for sfind = 1:nf
-    
-    for thetaind = 1:length(thetavec)
-        % Extract the Gabor filters
-        Gabor_c = G_c{thetaind,sfind};
-        Gabor_s = G_s{thetaind,sfind};
+% for all frequencies, 
+% in this project, there is only 1 frequency
+for i = 1:nF
+    % for all orientaitons 
+    for j = 1:nT
         
-        % First Order Output
-        out_stim1 = sqrt((conv2(stimulus,Gabor_c,'same').^2 ...
-                                        +conv2(stimulus,Gabor_s,'same').^2));
-
-        % Put the output into a 4-d matrix
-        response(:,:,thetaind, sfind) = out_stim1;
-        %response_1x((1+ni*(nF-sfind)):ni*(nF+1-sfind),(1+ni*(thetaind-1)):ni*(thetaind)) = out_stim1;
-       
+        % get the Gabor filters
+        Gabor_c = G_c{j, i};
+        Gabor_s = G_s{j, i};
+        
+        % compute the energy 
+         CE = conv2(stimulus,Gabor_c,'same').^2 ...
+            + conv2(stimulus,Gabor_s,'same').^2;
+         conEnergy(:, :, j, i) = CE; 
     end
+end
+
+% combine the spatial frequencies
+% E(x,y,θ) = 1/nF * ∑_f E(x,y,θ,f)
+conEnergy = mean(conEnergy, 4);
+
 end
 
 

@@ -2,21 +2,20 @@ classdef normVarModel < contrastModel
     
     % The basic properties of the class
     properties 
-
     end
     
     methods
         
         % init the model
-        function model = normVarModel( optimizer, fittime, param_bound, param_pbound )
+        function model = normVarModel( optimizer, fittime, param_bound, param_pbound)
             
             model = model@contrastModel();
-           
-            if (nargin < 4), param_pbound = [ .1, 8; 1,  10;  .1, .5 ]; end
-            if (nargin < 3), param_bound  = [ -6, 6; -6, 6; -6,  2  ]; end
+      
+            if (nargin < 4), param_pbound = [1e-6,  .1; 1e-2,  10;   -5,   5]; end
+            if (nargin < 3), param_bound  = [-inf, inf; -inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
-            if (nargin < 1), optimizer = 'fmincon';end
-            
+            if (nargin < 1), optimizer = 'classic';end
+
             param_num = 3;
             
             if size(param_bound,1) ~= param_num 
@@ -30,119 +29,107 @@ classdef normVarModel < contrastModel
             model.fittime      = fittime;
             model.optimizer    = optimizer; 
             model.num_param    = param_num ;
-            model.param_name   = [ 'w'; 'g'; 'n' ];
-            model.legend       = 'normVar'; 
+            model.fparam_name  = {'w', 'b', 'alpha'};
+            model.param_name   = {'sigma', 'g', 'alpha'};
+            model.legend       = 'NOA'; 
             model.param        = [];
+            model.model_idx    = 5; 
         end
            
     end
-           
-    
-           
-    methods ( Static = true )
-        
-        % fix parameters
-        function model = fixparameters( model, param )
-            model.param = param;
-            model.legend = sprintf('normVar %s=%.2f %s=%.2f %s=%.2f',...
-                            model.param_name(1), param(1),...
-                            model.param_name(2), param(2),...
-                            model.param_name(3), param(3));
-                            
-        end
-        
+          
+    methods (Static = true)
+              
         % function: f()
-        function y_hat = forward( model, x, param )
-             
-            w = exp(param(1));
-            g = exp(param(2));
-            n = exp(param(3));
+        function y_hat = forward(model, x, param)
             
-            % d: ori x exp x stim
-            d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 
+            % upack the input 
+            e = x{1};
             
-            % sum over orientation, s: exp x stim 
-            s = mean(d, 1);
-            
-            % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = g .* s .^ n; 
+            switch model.optimizer
+                case 'classic'
+                    % get the parameters
+                    sig = param(1);
+                    g   = param(2);
+                    alpha = Sigmoid(param(3));
 
-            % Sum over different examples, y_hat: stim 
-            y_hat = squeeze(mean(yi_hat, 2))';
+                    % d: ori x exp x stim
+                    d = e ./ (sig + std(e, 1)); 
+
+                    % mean over orientation, s: exp x stim 
+                    s = mean(d, 1);
+
+                    % add gain and exponential, yi_hat: exp x stim
+                    yi_hat = g .* s .^ alpha; 
+                    
+                case 'reparam'
+                    % get the parameters
+                    w = param(1);
+                    b = param(2);
+                    alpha = Sigmoid(param(3));
+
+                    % d: ori x exp x stim
+                    d = e ./ (b + w.*std(e, 1)); 
+
+                    % mean over orientation, s: exp x stim 
+                    s = mean(d, 1);
+
+                    % add gain and exponential, yi_hat: exp x stim
+                    yi_hat = s .^ alpha; 
+            end
+            
+             % mean over different examples, y_hat: stim 
+             y_hat = squeeze(mean(yi_hat, 2))';
            
         end
-
-        % foward model to generate an image 
-        function x_hat = reconstruct(model, x, param)
-
-            w = exp(param(1));
-            g = exp(param(2));
-            n = exp(param(3));
-            
-            % d: ori x exp x stim
-            d = x.^2 ./ (1 + w^2 .* var(x, 1) ); 
-            d = squeeze(mean(d, 3));
-                
-            % sum over orientation, s: exp x stim 
-            x_hat = g .* d.^n;
-
-        end
-
-        function err = recon_err( model, x, E, params)
-
-            % call subclass
-            err = recon_err@contrastModel( model, x, E, params);
-
-        end
-            
-        % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_ori )
-            
-            % call subclass
-            BOLD_pred = predict@contrastModel( model, E_ori);
-            
+                    
+        % print the raw parameters, used in s3 
+        function param = print_fparam(model, param)          
+            % reshape
+            param = reshape(param, model.num_param, []);
+            % set param
+            param(3, :) = Sigmoid(param(3, :));
         end
         
-        % measure the goodness of 
-        function Rsquare = metric( BOLD_pred, BOLD_target )
-            
-            % call subclass
-            Rsquare = metric@contrastModel( BOLD_pred, BOLD_target );
-            
+        % print reparameterized parameters, used in s3 
+        function param = print_param(model, param)
+            % get the raw fitted param
+            fparam = model.print_fparam(model, param);
+            w = fparam(1, :);
+            b = fparam(2, :);
+            alpha = fparam(3, :);
+            % reparameterize
+            param  = NaN(size(fparam, 1), size(fparam, 2));
+            param(1, :) = b./w;         % sig 
+            param(2, :) = (1/w).^alpha; % gain
+            param(3, :) = alpha;        % alpha 
         end
         
-        % measure the goodness of 
-        function loss= rmse( BOLD_pred, BOLD_target )
-            
-            % call subclass
-            loss = rmse@contrastModel( BOLD_pred, BOLD_target );
-            
+        % measure the goodness of the model 
+        function Rsquare = metric(pred, tar)
+            Rsquare = metric@contrastModel(pred, tar);
         end
         
-        % loss function with sum sqaure error: sum( y - y_hat ).^2
-        function sse = loss_fn( param, model, E_ori, y_target )
-            
-            % call subclass 
-            sse = loss_fn@contrastModel( param, model, E_ori, y_target );
-            
+        % measure the goodness of the model 
+        function loss= rmse(pred, tar)
+            loss = rmse@contrastModel(pred, tar);
+        end
+        
+        % loss function with mean sqaure error: mean(y - y_hat)^2
+        function mse = loss_fn(param, model, x, y_tar)
+            mse = loss_fn@contrastModel(param, model, x, y_tar);
         end
         
         % fit the data 
-        function [loss, param, loss_history] = optim( model, E_ori, BOLD_target, verbose )
-            
-            % call subclass
-            [loss, param, loss_history] = optim@contrastModel( model, E_ori, BOLD_target, verbose );
-        
+        function [loss, param, loss_history] = optim(model, x, BOLD_tar, verbose)
+            [loss, param, loss_history] = ...
+                optim@contrastModel(model, x, BOLD_tar, verbose);
         end
         
-        % fcross valid
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid, save_info )
-            
-            if (nargin < 5), cross_valid = 'one'; end
-           
-            % call subclass
-            [BOLD_pred, params, Rsquare, model] = fit@contrastModel( model, E_ori, BOLD_target, verbose, cross_valid, save_info );
-            
+        % fit cross-valid
+        function [BOLD_pred, params, Rsquare, model] = fit(model, x, BOLD_tar, verbose, cross_valid, save_info)     
+            [BOLD_pred, params, Rsquare, model] = ...
+                fit@contrastModel(model, x, BOLD_tar, verbose, cross_valid, save_info);
         end
             
     end

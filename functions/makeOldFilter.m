@@ -1,7 +1,7 @@
-function [Gabor_cos,Gabor_sin]= makeGaborFilter(ppcvec, thetavec, support)
+function [Gabor_cos,Gabor_sin]= makeOldFilter(ppcvec, thetavec, support)
  
 if ~exist('support', 'var') || isempty(support)
-    support = 3; % 3 cycles per filter --// 
+    support = 3; % 3 cycles per filter
 end
 
 numOrientations = length(thetavec);
@@ -41,8 +41,8 @@ for f = 1:numFrequencies
         Gabor_s = Gauss.*real(h);
         
         %Normalization
-        norm_Gabor_c=Gabor_c.*1/norm(Gabor_c(:));
-        norm_Gabor_s=Gabor_s.*1/norm(Gabor_s(:));
+        norm_Gabor_c=Gabor_c.*1/norm(Gabor_c);
+        norm_Gabor_s=Gabor_s.*1/norm(Gabor_s);
        
         
         % Scale the gobors

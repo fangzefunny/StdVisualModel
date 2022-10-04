@@ -1,14 +1,16 @@
 classdef contrastModel
     
     % The basic properties of the class
-    properties 
-        optimizer               
-        fittime        
+    properties
+        optimizer
+        fittime
         num_param    = 2
-        param_name   = ['g'; 'n']
+        fparam_name  = {'g', 'alpha'}
+        param_name   = {'g', 'alpha'}
+        param_bound  = []
+        param_pbound = []
         param        = []
-        param_bound  = [ 0, 100; 0,   1  ]
-        param_pbound = [ 1,  10;  .1, .5 ]
+        model_idx    = 1;
         model_type   = 'orientation'
         legend       = 'CE'
         loss_log     = []
@@ -17,13 +19,14 @@ classdef contrastModel
     methods
         
         % init the model
-        function model = contrastModel( optimizer, fittime, param_bound, param_pbound )
+        function model = contrastModel(optimizer, fittime, param_bound, param_pbound)
             
-            if (nargin < 4), param_pbound = [ 1,  10;  .1, .5 ]; end
-            if (nargin < 3), param_bound  = [ -6, 5;  -6,   1  ]; end
+            % pbound is possible bound, used to init the parameters
+            % bound is the real bound of the parameters
+            if (nargin < 4), param_pbound = [   1,  10;   -5,   5]; end
+            if (nargin < 3), param_bound  = [-inf, inf; -inf, inf]; end
             if (nargin < 2), fittime = 40; end
-            if (nargin < 1), optimizer = 'fmincon';end
-            
+            if (nargin < 1), optimizer = 'classic';end
             if size(param_bound,1) ~= model.num_param
                 disp('Wrong Bound')
             elseif size(param_pbound, 1) ~= model.num_param
@@ -31,229 +34,194 @@ classdef contrastModel
             end
             
             model.param_bound  = param_bound;
-            model.param_pbound = param_pbound; 
+            model.param_pbound = param_pbound;
             model.fittime      = fittime;
-            model.optimizer    = optimizer; 
+            model.optimizer    = optimizer;
         end
-           
     end
+    
+    methods (Static = true)
         
-    methods ( Static = true )
-        
-        % fix parameters
-        function model = fixparameters( model, param )
-            model.param = param;
-            model.legend = sprintf('contrast %s=%.2f %s=%.2f',...
-                            model.param_name(1), param(1),... 
-                            model.param_name(2), param(2) );
-        end
-        
-        % the core model function 
-        function y_hat = forward(model, x, param )
+        % the core model function
+        function y_hat = forward(model, x, param)
             
-            % set param
-            g = exp(param(1));
-            n = exp(param(2));
+            % upack the input
+            e = x{1};
+            
+            % get the parameters
+            g = param(1);
+            alpha = Sigmoid(param(2));
             
             % d: ori x exp x stim
-            d = x;
+            d = e;
             
-            % sum over orientation, s: exp x stim 
+            % mean over orientation, s: exp x stim
             s = mean(d, 1);
-
-            % add gain and nonlinearity, yi_hat: exp x stim
-            yi_hat = g .* s.^n;
-      
-            % Sum over different examples, y_hat: stim 
+            
+            % add gain and exponential, yi_hat: exp x stim
+            yi_hat = g .* s .^ alpha;
+            
+            % mean over different examples, y_hat: stim
             y_hat = squeeze(mean(yi_hat, 2))';
-   
+            
         end
-
-        % foward model to generate an image 
-        function x_hat = reconstruct(model, E_xy, param)
-
+        
+        % print the raw parameters, used in s3
+        function param = print_fparam(model, param)
+            % reshape
+            param = reshape(param, model.num_param, []);
             % set param
-            g = exp(param(1));
-            n = exp(param(2));
-            
-            % d: ori x exp x stim
-            d = squeeze(mean(E_xy,3));
-            
-            % sum over orientation, s: exp x stim 
-            x_hat = g .* d.^n;
-
+            param(2, :) = Sigmoid(param(2, :));
         end
-
-        function err = recon_err( model, x, E, params)
-
-            x_hat = model.reconstruct( model, E, params);
-            mean(x(:))
-            nX = size(E,1);
-            nS = size(E,5);
-            %pad the stimuli
-            pad_x = zeros(nX, nX, 9, nS);
-            nP = (nX - size(x,1))/2;
-            pad_x( nP+1:nX-nP, nP+1:nX-nP, :, :) = x( :, :, :, :);
-            err2 = (pad_x - x_hat).^2;
-            err  = mean( err2(1:3));
-
+        
+        % print reparameterized parameters, used in s3
+        function param = print_param(model, param)
+            param = model.print_fparam(model, param);
         end
+        
+        % measure the goodness of
+        function R2 = metric(pred, tar)
             
-        % predict the BOLD response: y_hat = f(x)
-        function BOLD_pred = predict( model, E_ori )
-            
-            BOLD_pred = model.forward(model, E_ori, model.param );
+            % sse of the benchmark, mean
+            sse_mean = sum((tar - mean(tar)).^2);
+            % sse of the model
+            sse_model = sum((tar - pred).^2);
+            % R2: the variance reduction performance relative
+            %     to the benchmark
+            R2 = 1 -  sse_model / sse_mean;
             
         end
         
-        % measure the goodness of 
-        function Rsquare = metric( BOLD_pred, BOLD_target )
-            
-            Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
-            
-        end
-        
-        % measure the mse 
-        function loss = rmse( BOLD_pred, BOLD_target )
-            
-            loss = double(sqrt(mean((BOLD_pred- BOLD_target).^2)));
-            
+        % measure the mse
+        function loss = rmse(pred, tar)
+            % rooted mean square error
+            loss = double(sqrt(mean((pred - tar).^2)));
         end
         
         
-        % loss function with sum sqaure error: sum( y - y_hat ).^2
-        function sse = loss_fn(param, model, E_ori, y_target )
+        % Loss function for optimization: mean squared error
+        function mse = loss_fn(param, model, x, y_tar)
             
-            % predict y_hat: 1 x stim 
-            y_hat = model.forward(model, E_ori, param );
+            % predict y_hat: 1 x stim
+            y_hat = model.forward(model, x, param);
             
-            % square error
-            square_error = (y_target - y_hat).^2;
-            
-            % sse
-            sse = double(mean(square_error));
-            
+            % cal mse; squeeze the matrix into a scalar
+            mse = double(mean((y_tar - y_hat).^2));
         end
         
-        % fit the data 
-        function [loss, param, loss_history] = optim( model, E_ori, BOLD_target, verbose )
+        % Fit the data
+        function [loss, param, loss_history] = optim(model, x, BOLD_tar, verbose)
             
             % set up the loss function
-            func=@(x) model.loss_fn( x, model, E_ori, BOLD_target );
-            
-            opts.Display = verbose;
+            func=@(z) model.loss_fn(z, model, x, BOLD_tar);
             
             % set up the bound
-            lb  = model.param_bound( :, 1 );
-            ub  = model.param_bound( :, 2 );
-            plb = model.param_pbound( :, 1 );
-            pub = model.param_pbound( :, 2 );
+            lb  = model.param_bound(:, 1);
+            ub  = model.param_bound(:, 2);
+            plb = model.param_pbound(:, 1);
+            pub = model.param_pbound(:, 2);
             
-            % init param
-            x0_set = ( plb + ( pub - plb ) .* rand( model.num_param, model.fittime ) )';
+            % init param using possible bound
+            x0_set = (plb + (pub - plb) .* rand(model.num_param, model.fittime))';
             
             % storage
-            x   = NaN( model.fittime, model.num_param );
-            sse = NaN( model.fittime, 1 );
+            x_opt = nan(model.fittime, model.num_param);
+            mse = nan(model.fittime, 1);
             
             % fit with n init
+            tStart = tic;
             for ii = 1:model.fittime
                 
                 % optimization
                 switch model.optimizer
                     case 'bads'
-                        [ x(ii, :), sse(ii) ] = bads( func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
-                    case 'fmincon'
-                        [ x(ii, :), sse(ii) ] = fmincon( func, x0_set(ii, :), [], [], [], [], [], [], [], opts);
+                        [x_opt(ii, :), mse(ii)] = bads(func, x0_set(ii, :), lb', ub', plb', pub', [], opts);
+                    case 'classic'
+                        opts = optimoptions('fmincon', 'Display', verbose); 
+                        [x_opt(ii, :), mse(ii)] = fmincon(func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
+                    case 'reparam'
+                        opts = optimoptions('fmincon', 'Display', verbose);
+                        [x_opt(ii, :), mse(ii)] = fmincon(func, x0_set(ii, :), [], [], [], [], lb', ub', [], opts);
                 end
                 
-                fprintf('   fit: %d, loss: %.4f \n   params:', ii, sse(ii)) 
-                disp(exp(x(ii,:)))
+                fprintf('   fit: %d, progress: %.2f, loss: %.4f \n', ii, ii/model.fittime, mse(ii))
             end
             
-            % find the lowest sse
-            loss  = min(sse);
-            trial = find( sse == loss );
-            param = x( trial(1), : ); 
-            loss_history = sse;
+            % find the lowest mse
+            mse(imag(mse) ~= 0) = inf; % find the imag number and set to inf
+            loss  = min(mse);
+            trial = find(mse == loss);
+            param = x_opt(trial(1), :);
+            loss_history = mse;
             
+            tEnd = toc(tStart);
+            fprintf('opt loss %.4f, elasped timed %.2f\n', loss, tEnd)
             
         end
         
         % fit the data
-        function [BOLD_pred, params, Rsquare, model] = fit( model, E_ori, BOLD_target, verbose, cross_valid, save_info)
-            
-            if (nargin < 5), cross_valid = 'one'; end
+        function [BOLD_hat, params, R2, model] = fit(model, x, BOLD_tar, verbose, cross_valid, save_info)
             
             switch cross_valid
                 
                 case 'one'
                     
-                    % optimize to find the best 
-                    [~, param, loss_history] = model.optim( model, E_ori, BOLD_target, verbose );
+                    % optimize to find the best
+                    [~, param, loss_history] = model.optim(model, x, BOLD_tar, verbose );
                     params = param;
                     loss_histories = loss_history;
-                  
-                    % predict test data 
-                    BOLD_pred = model.forward(model, E_ori, param );
-                    Rsquare = 1 - sum((BOLD_target - BOLD_pred).^2) / sum((BOLD_target - mean(BOLD_target)).^2);
-                    model  = model.fixparameters( model, param );
                     
+                    % predict test data
+                    BOLD_hat = model.forward(model, x, param );
+                    R2 = model.metric(BOLD_hat, BOLD_tar);
                     model.loss_log = loss_histories;
                     
                 case 'cross_valid'
-                 
+                    
                     % achieve stim vector
-                    % achieve stim vector
-                    last_idx = length(size( E_ori ));
-                    stim_dim = size( E_ori, last_idx ); 
-                    stim_vector = save_info.start_idx : size( E_ori, last_idx );
-    
+                    E = x{1};
+                    stim_dim = size(E, length(size(E)));
+                    stim_vector = save_info.start_idx : size(E, length(size(E)));
+                    
                     % storage, try to load the saved history, if any
                     if save_info.start_idx == 1
-                        params    = nan( model.num_param, size( E_ori, stim_dim ) );
-                        BOLD_pred = nan( 1, size( E_ori, stim_dim ) );
+                        params   = nan(model.num_param, size(E, stim_dim));
+                        BOLD_hat = nan(1, size(E, stim_dim));
                     else
                         load(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
+                            save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
                         load(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
+                            save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_hat');
                     end
-
-                    % cross_valid  
+                    
+                    % cross_valid
                     for knock_idx = stim_vector
                         fprintf('fold %d \n', knock_idx)
-
-                        % train vector and train data
-                        keep_idx = setdiff( stim_vector, knock_idx );
-                        E_train  = E_ori( :, :, keep_idx );
-                        target_train = BOLD_target( keep_idx );
-                        E_test   = E_ori( :, :, knock_idx );
-                      
-                        % fit the training data 
-                        [~, param] = model.optim( model, E_train, target_train, verbose );
-                        params( :, knock_idx ) = param;
                         
-                        % predict test data 
-                        BOLD_pred( knock_idx ) = model.forward(model, E_test, param);
-
+                        % train vector and train data
+                        keep_idx = setdiff(stim_vector, knock_idx);
+                        E_train  = E(:, :, keep_idx);
+                        target_train = BOLD_tar(keep_idx);
+                        E_test   = E(:, :, knock_idx);
+                        
+                        % fit the training data
+                        x_train = {E_train}; x_test = {E_test};
+                        [~, param] = model.optim(model, x_train, target_train, verbose);
+                        params(:, knock_idx) = param;
+                        
+                        % predict test data
+                        BOLD_hat(knock_idx) = model.forward(model, x_test, param);
+                        
                         % save files for each cross validated fold
                         save(fullfile(save_info.dir, sprintf('parameters_data-%d_roi-%d_model-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
+                            save_info.dataset, save_info.roi, save_info.model_idx)) , 'params');
                         save(fullfile(save_info.dir, sprintf('predictions_data-%d_roi-%d_model-%d.mat',...
-                                        save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_pred');
-                    end 
+                            save_info.dataset, save_info.roi, save_info.model_idx)) , 'BOLD_hat');
+                    end
                     
                     % evaluate performance of the algorithm on test data
-                    Rsquare = model.metric( BOLD_pred, BOLD_target);
-                    
-                    % bootstrap to get the param
-                    params_boot = mean( params, 1 );
-                    model  = model.fixparameters( model, params_boot );
+                    R2 = model.metric(BOLD_hat, BOLD_tar);
             end
-            
-                      
         end
-                
     end
 end
